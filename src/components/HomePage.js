@@ -1,7 +1,38 @@
-import { HelpCircle, UserPlus } from "lucide-react"
-import Banner from "./Banner.js"
+import { useState, useEffect } from "react";
+import { HelpCircle, UserPlus } from "lucide-react";
+import axios from "axios";
+import Banner from "./Banner.js";
 
 function HomePage() {
+  const [majors, setMajors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch majors when the component mounts
+  useEffect(() => {
+    const fetchMajors = async () => {
+      try {
+        const token = localStorage.getItem("token"); // Assuming JWT token is stored in localStorage
+        const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/majors/getall`,
+          {}, // Empty payload; adjust if backend expects specific data
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include token for authentication
+            },
+          }
+        );
+
+        setMajors(response.data); // Assuming the response contains an array of majors
+        setLoading(false);
+      } catch (err) {
+        setError(err.response?.data?.message || err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchMajors();
+  }, []);
+
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Banner Component */}
@@ -31,6 +62,31 @@ function HomePage() {
               </button>
             </div>
           </div>
+
+          {/* Majors List */}
+          <div className="mt-6">
+            <h3 className="text-xl font-semibold text-blue-800 mb-4">Danh sách ngành học</h3>
+            {loading ? (
+              <p className="text-gray-600">Đang tải dữ liệu...</p>
+            ) : error ? (
+              <p className="text-red-600">Lỗi: {error}</p>
+            ) : majors.length === 0 ? (
+              <p className="text-gray-600">Không có ngành học nào.</p>
+            ) : (
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {majors.map((major) => (
+                  <li
+                    key={major._id} // Assuming each major has a unique `_id`
+                    className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                  >
+                    <h4 className="text-lg font-medium text-blue-800">{major.name}</h4>
+                    <p className="text-gray-600">{major.description}</p>
+                    {/* Add more fields as needed, e.g., major.code, major.combination */}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
         {/* International Education Section */}
@@ -52,7 +108,7 @@ function HomePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;

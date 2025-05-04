@@ -6,12 +6,12 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 function Banner() {
   const [currentSlide, setCurrentSlide] = useState(0)
 
-  // Sample banner images - replace with your actual images
   const bannerImages = [
-    "/placeholder.svg?height=300&width=1200",
-    "/placeholder.svg?height=300&width=1200",
-    "/placeholder.svg?height=300&width=1200",
-  ]
+    "/banner-01.jpg?height=512&width=2560",
+    "/banner-02.jpg?height=512&width=2560",
+    "/banner-03.jpg?height=512&width=2560",
+    "/banner-04.jpg?height=512&width=2560",
+  ];
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev === bannerImages.length - 1 ? 0 : prev + 1))
