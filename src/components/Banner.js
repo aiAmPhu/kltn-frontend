@@ -1,15 +1,75 @@
+"use client"
+
+import { useState } from "react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+
 function Banner() {
-    return (
-        <section className="bg-gray-100 py-16 text-center">
-            <div className="container mx-auto px-4">
-                <h1 className="text-4xl font-bold mb-4">Chào mừng đến với Tuyển sinh Đại học 2025</h1>
-                <p className="text-lg mb-6">Đăng ký nguyện vọng và theo dõi thông tin tuyển sinh dễ dàng!</p>
-                <a href="#" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-                    Đăng ký ngay
-                </a>
+  const [currentSlide, setCurrentSlide] = useState(0)
+
+  // Sample banner images - replace with your actual images
+  const bannerImages = [
+    "/placeholder.svg?height=300&width=1200",
+    "/placeholder.svg?height=300&width=1200",
+    "/placeholder.svg?height=300&width=1200",
+  ]
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev === bannerImages.length - 1 ? 0 : prev + 1))
+  }
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev === 0 ? bannerImages.length - 1 : prev - 1))
+  }
+
+  return (
+    <div className="relative max-w-6xl mx-auto my-6">
+      <div className="rounded-lg overflow-hidden shadow-md">
+        {/* Navigation Arrows */}
+        <button
+          onClick={prevSlide}
+          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 z-10 shadow-md hover:bg-white transition-colors"
+        >
+          <ChevronLeft className="w-6 h-6 text-blue-600" />
+        </button>
+
+        {/* Banner Images */}
+        <div className="relative h-[300px] w-full">
+          {bannerImages.map((image, index) => (
+            <div
+              key={index}
+              className={`absolute top-0 left-0 w-full h-full transition-opacity duration-500 ${
+                index === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
+              }`}
+            >
+              <img
+                src={image || "/placeholder.svg"}
+                alt={`Banner ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
             </div>
-        </section>
-    );
+          ))}
+        </div>
+
+        <button
+          onClick={nextSlide}
+          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 z-10 shadow-md hover:bg-white transition-colors"
+        >
+          <ChevronRight className="w-6 h-6 text-blue-600" />
+        </button>
+
+        {/* Indicator Dots */}
+        <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          {bannerImages.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`w-2 h-2 rounded-full ${index === currentSlide ? "bg-blue-600" : "bg-gray-300"}`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
 }
 
-export default Banner;
+export default Banner

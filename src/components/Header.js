@@ -1,88 +1,106 @@
-import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { User } from "lucide-react";
+"use client"
+
+import { useState, useRef, useEffect } from "react"
+import { Link } from "react-router-dom"
+import { User, HelpCircle, UserPlus } from "lucide-react"
+
 function Header() {
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const dropdownRef = useRef(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = useRef(null)
 
-    // Close dropdown on outside click
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsDropdownOpen(false);
-            }
-        };
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false)
+      }
+    }
 
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
 
-    return (
-        <header className="bg-blue-600 text-white shadow-md">
-            <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-                <div className="text-2xl font-bold">ĐH Tuyển Sinh</div>
-                <nav>
-                    <ul className="flex space-x-6 items-center">
-                        <li>
-                            <Link to="/" className="hover:underline">
-                                Trang chủ
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/announcements" className="hover:underline">
-                                Thông báo
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/timeline" className="hover:underline">
-                                Lịch tuyển sinh
-                            </Link>
-                        </li>
+  return (
+    <header className="bg-white border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-50">
+      <div className="max-w-screen-xl mx-auto px-4 w-full">
+        <div className="flex justify-between items-center">
+          {/* Logo and university name */}
+          <div className="flex items-center">
+          <img src="/hcmute-logo.png" alt="Logo" className="h-12 w-auto mr-2" />
+          </div>
 
-                        {/* Dropdown User */}
-                        <li className="relative" ref={dropdownRef}>
-                            <button
-                                onClick={() => setIsDropdownOpen((prev) => !prev)}
-                                className="flex items-center cursor-pointer"
-                            >
-                                <User className="w-6 h-6" />
-                            </button>
+          {/* Navigation menu */}
+          <nav>
+            <ul className="flex">
+              <li>
+                <Link to="/" className="text-blue-700 px- py-4 block hover:text-blue-900 font-medium text-sm">
+                  TRANG CHỦ
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/nganh-xet-tuyen"
+                  className="text-blue-700 px-3 py-4 block hover:text-blue-900 font-medium text-sm"
+                >
+                  NGÀNH XÉT TUYỂN
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/dien-xet-tuyen"
+                  className="text-blue-700 px-3 py-4 block hover:text-blue-900 font-medium text-sm"
+                >
+                  DIỆN XÉT TUYỂN
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/khoi-xet-tuyen"
+                  className="text-blue-700 px-3 py-4 block hover:text-blue-900 font-medium text-sm"
+                >
+                  KHỐI XÉT TUYỂN
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/dang-ky-xet-tuyen"
+                  className="text-blue-700 px-3 py-4 block hover:text-blue-900 font-medium text-sm"
+                >
+                  ĐĂNG KÝ XÉT TUYỂN
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/ket-qua-xet-tuyen"
+                  className="text-blue-700 px-3 py-4 block hover:text-blue-900 font-medium text-sm"
+                >
+                  KẾT QUẢ XÉT TUYỂN
+                </Link>
+              </li>
+            </ul>
+          </nav>
 
-                            {isDropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg z-50">
-                                    <ul>
-                                        <Link
-                                            to="/register/step1"
-                                            onClick={() => setIsDropdownOpen(false)}
-                                            className="block px-4 py-2 hover:bg-gray-100"
-                                        >
-                                            Đăng ký
-                                        </Link>
-                                        <Link
-                                            to="/login"
-                                            onClick={() => setIsDropdownOpen(false)}
-                                            className="block px-4 py-2 hover:bg-gray-100"
-                                        >
-                                            Đăng nhập
-                                        </Link>
-                                        <Link
-                                            to="/profile"
-                                            onClick={() => setIsDropdownOpen(false)}
-                                            className="block px-4 py-2 hover:bg-gray-100"
-                                        >
-                                            Hồ sơ
-                                        </Link>
-                                    </ul>
-                                </div>
-                            )}
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </header>
-    );
+          {/* Action buttons */}
+          <div className="flex space-x-2">
+            <button className="bg-red-500 text-white px-4 py-3 rounded text-xs flex items-center">
+              <HelpCircle className="w-4 h-4 mr-1" />
+              Hướng dẫn
+            </button>
+            <button className="bg-blue-600 text-white px-4 py-3 rounded text-xs flex items-center">
+              <UserPlus className="w-4 h-4 mr-1" />
+              Đăng ký
+            </button>
+            <button className="bg-gray-100 text-gray-800 px-4 py-3 rounded text-xs flex items-center">
+              <User className="w-4 h-4 mr-1" />
+              Đăng nhập
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+  )
 }
 
-export default Header;
+export default Header
