@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-
+import { toast } from "react-toastify";
 import axios from "axios";
 
 function RegisterStep3() {
@@ -22,8 +22,10 @@ function RegisterStep3() {
                 role: "user",
             });
             if (res.status === 201) {
-                alert("Đăng ký thành công! Đang chuyển đến trang đăng nhập...");
-                navigate("/login"); // Hoặc navigate("/") tuỳ bạn
+                toast.success("Đăng ký tài khoản thành công!");
+                setTimeout(() => {
+                    navigate("/login");
+                }, 500);
             } else {
                 setError(res.data.message);
             }
@@ -47,7 +49,7 @@ function RegisterStep3() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-                <h2 className="text-2xl font-semibold mb-6">Đăng ký - Bước 2</h2>
+                <h2 className="text-2xl font-semibold mb-6">Đăng ký tài khoản</h2>
 
                 <label className="block mb-2 text-sm font-medium text-gray-700">Email</label>
                 <input
