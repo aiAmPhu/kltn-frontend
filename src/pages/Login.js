@@ -24,7 +24,7 @@ const Login = () => {
                 localStorage.setItem("token", token);
                 toast.success("Đăng nhập thành công!");
                 setTimeout(() => {
-                    navigate("/dashboard");
+                    navigate("/");
                 }, 500);
             } else {
                 setError(res.data.message || "Đăng nhập thất bại.");
