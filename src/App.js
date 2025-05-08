@@ -10,6 +10,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AppLayout from "./layouts/AppLayout.jsx";
 import Profile from "./pages/Profile.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {
     return (
@@ -22,8 +23,9 @@ function App() {
                     <Route path="/register/step1" element={<RegisterStep1 />} />
                     <Route path="/register/step2" element={<RegisterStep2 />} />
                     <Route path="/register/step3" element={<RegisterStep3 />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/profile" element={<Profile />} />
+                    <Route element={<ProtectedRoute allowedRoles={["user", "admin"]} />}>
+                        <Route path="/profile" element={<Profile />} />
+                    </Route>
                 </Route>
                 <Route path="/login" element={<Login />} />
             </Routes>
