@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Banner() {
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -21,8 +24,24 @@ function Banner() {
         setCurrentSlide((prev) => (prev === 0 ? bannerImages.length - 1 : prev - 1));
     };
 
+    const location = useLocation();
+    const navigate = useNavigate();
+    const hasShown = useRef(false);
+    useEffect(() => {
+        if (location.state?.error && !hasShown.current) {
+            hasShown.current = true; // Đánh dấu đã hiển thị thông báo
+            if (location.state.error === "unauthorized") {
+                toast.error("Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại!");
+            } else if (location.state.error === "forbidden") {
+                toast.error("Bạn không có quyền truy cập chức năng này!");
+            }
+            // Xóa `state` sau khi xử lý để tránh toast lại
+            navigate(location.pathname, { replace: true, state: {} });
+        }
+    }, [location, navigate]);
+
     return (
-        <div className="relative max-w-6xl mx-auto mt-14 mb-6">
+        <div className="relative max-w-6xl mx-auto mt-20 mb-6">
             <div className="rounded-lg overflow-hidden shadow-md">
                 {/* Navigation Arrows */}
                 <button

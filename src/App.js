@@ -16,6 +16,7 @@ function App() {
     return (
         <Router>
             <Routes>
+                {/* Layout chung không bọc ProtectedRoute */}
                 <Route element={<AppLayout />}>
                     <Route path="/" element={<Banner />} />
                     <Route path="/announcements" element={<Announcements />} />
@@ -23,10 +24,19 @@ function App() {
                     <Route path="/register/step1" element={<RegisterStep1 />} />
                     <Route path="/register/step2" element={<RegisterStep2 />} />
                     <Route path="/register/step3" element={<RegisterStep3 />} />
-                    <Route element={<ProtectedRoute allowedRoles={["user", "admin"]} />}>
-                        <Route path="/profile" element={<Profile />} />
-                    </Route>
                 </Route>
+
+                {/* Route được bảo vệ nằm ngoài layout */}
+                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute allowedRoles={["user"]}>
+                            <Profile />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Route login */}
                 <Route path="/login" element={<Login />} />
             </Routes>
             <ToastContainer />

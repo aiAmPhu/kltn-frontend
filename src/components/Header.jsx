@@ -80,7 +80,7 @@ function Header() {
         navigate("/profile");
     };
     return (
-        <header className="bg-white border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-50">
+        <header className="bg-white border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-50 py-2">
             <div className="max-w-screen-xl mx-auto px-4 w-full">
                 <div className="flex justify-between items-center">
                     {/* Logo and university name */}
