@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Banner from "./components/Banner.jsx";
 import Announcements from "./components/Announcements.jsx";
 import Timeline from "./components/Timeline.jsx";
 import RegisterStep1 from "./pages/Register/RegisterStep1.jsx";
@@ -11,6 +10,9 @@ import "react-toastify/dist/ReactToastify.css";
 import AppLayout from "./layouts/AppLayout.jsx";
 import Profile from "./pages/Profile.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import HomePage from "./components/HomePage.jsx";
+import Majors from "./pages/Major.jsx";
+import Criteria from "./pages/Criteria.jsx";
 
 function App() {
     return (
@@ -18,14 +20,16 @@ function App() {
             <Routes>
                 {/* Layout chung không bọc ProtectedRoute */}
                 <Route element={<AppLayout />}>
-                    <Route path="/" element={<Banner />} />
+                    <Route path="/" element={<HomePage />} />
                     <Route path="/announcements" element={<Announcements />} />
                     <Route path="/timeline" element={<Timeline />} />
                     <Route path="/register/step1" element={<RegisterStep1 />} />
                     <Route path="/register/step2" element={<RegisterStep2 />} />
                     <Route path="/register/step3" element={<RegisterStep3 />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/major" element={<Majors />} />
+                    <Route path="/criteria" element={<Criteria />} />
                 </Route>
-
                 {/* Route được bảo vệ nằm ngoài layout */}
                 <Route
                     path="/profile"
@@ -35,9 +39,6 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-
-                {/* Route login */}
-                <Route path="/login" element={<Login />} />
             </Routes>
             <ToastContainer />
         </Router>

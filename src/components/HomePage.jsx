@@ -9,42 +9,40 @@ function HomePage() {
     const [error, setError] = useState(null);
 
     // Fetch majors when the component mounts
-    useEffect(() => {
-        const fetchMajors = async () => {
-            try {
-                const token = localStorage.getItem("token"); // Assuming JWT token is stored in localStorage
-                const response = await axios.post(
-                    `${process.env.REACT_APP_API_BASE_URL}/majors/getall`,
-                    {}, // Empty payload; adjust if backend expects specific data
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`, // Include token for authentication
-                        },
-                    }
-                );
+    // useEffect(() => {
+    //     const fetchMajors = async () => {
+    //         try {
+    //             const token = localStorage.getItem("token"); // Assuming JWT token is stored in localStorage
+    //             const response = await axios.post(
+    //                 `${process.env.REACT_APP_API_BASE_URL}/majors/getall`,
+    //                 {}, // Empty payload; adjust if backend expects specific data
+    //                 {
+    //                     headers: {
+    //                         Authorization: `Bearer ${token}`, // Include token for authentication
+    //                     },
+    //                 }
+    //             );
 
-                setMajors(response.data); // Assuming the response contains an array of majors
-                setLoading(false);
-            } catch (err) {
-                setError(err.response?.data?.message || err.message);
-                setLoading(false);
-            }
-        };
+    //             setMajors(response.data); // Assuming the response contains an array of majors
+    //             setLoading(false);
+    //         } catch (err) {
+    //             setError(err.response?.data?.message || err.message);
+    //             setLoading(false);
+    //         }
+    //     };
 
-        fetchMajors();
-    }, []);
+    //     fetchMajors();
+    // }, []);
 
     return (
         <div className="bg-gray-50 min-h-screen">
             {/* Banner Component */}
             <Banner />
-
             {/* Main Content Sections */}
             <div className="max-w-6xl mx-auto">
                 {/* Regular University Section */}
                 <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6 mb-6 shadow-md">
                     <h2 className="text-center text-2xl font-bold text-blue-800 mb-4">⭐ ĐẠI HỌC CHÍNH QUY ⭐</h2>
-
                     <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
                         <div className="flex items-center">
                             <span className="text-yellow-500 mr-2 text-xl">⭐</span>

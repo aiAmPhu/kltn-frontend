@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { User, HelpCircle, UserPlus } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -8,6 +8,7 @@ function Header() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
+    const location = useLocation();
     const [user, setUser] = useState(null);
 
     //useEffect xử lý token User
@@ -91,54 +92,28 @@ function Header() {
                     {/* Navigation menu */}
                     <nav>
                         <ul className="flex">
-                            <li>
-                                <Link
-                                    to="/"
-                                    className="text-blue-700 px- py-4 block hover:text-blue-900 font-medium text-sm"
-                                >
-                                    TRANG CHỦ
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/nganh-xet-tuyen"
-                                    className="text-blue-700 px-3 py-4 block hover:text-blue-900 font-medium text-sm"
-                                >
-                                    NGÀNH XÉT TUYỂN
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/dien-xet-tuyen"
-                                    className="text-blue-700 px-3 py-4 block hover:text-blue-900 font-medium text-sm"
-                                >
-                                    DIỆN XÉT TUYỂN
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/khoi-xet-tuyen"
-                                    className="text-blue-700 px-3 py-4 block hover:text-blue-900 font-medium text-sm"
-                                >
-                                    KHỐI XÉT TUYỂN
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/dang-ky-xet-tuyen"
-                                    className="text-blue-700 px-3 py-4 block hover:text-blue-900 font-medium text-sm"
-                                >
-                                    ĐĂNG KÝ XÉT TUYỂN
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/ket-qua-xet-tuyen"
-                                    className="text-blue-700 px-3 py-4 block hover:text-blue-900 font-medium text-sm"
-                                >
-                                    KẾT QUẢ XÉT TUYỂN
-                                </Link>
-                            </li>
+                            {[
+                                { to: "/", label: "TRANG CHỦ" },
+                                { to: "/major", label: "NGÀNH XÉT TUYỂN" },
+                                { to: "/criteria", label: "DIỆN XÉT TUYỂN" },
+                                { to: "/khoi-xet-tuyen", label: "KHỐI XÉT TUYỂN" },
+                                { to: "/dang-ky-xet-tuyen", label: "ĐĂNG KÝ XÉT TUYỂN" },
+                                { to: "/ket-qua-xet-tuyen", label: "KẾT QUẢ XÉT TUYỂN" },
+                            ].map(({ to, label }) => {
+                                const isActive = location.pathname === to;
+                                return (
+                                    <li key={to}>
+                                        <Link
+                                            to={to}
+                                            className={`px-3 py-4 block font-medium text-sm hover:text-blue-900 ${
+                                                isActive ? "text-red-600" : "text-blue-700"
+                                            }`}
+                                        >
+                                            {label}
+                                        </Link>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </nav>
 
