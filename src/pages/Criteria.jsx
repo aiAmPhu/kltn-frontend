@@ -1,3 +1,4 @@
+import React from "react";
 const criterias = [
     {
         code: "01",

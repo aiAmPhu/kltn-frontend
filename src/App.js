@@ -13,6 +13,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import HomePage from "./components/HomePage.jsx";
 import Majors from "./pages/Major.jsx";
 import Criteria from "./pages/Criteria.jsx";
+import MajorDetail from "./pages/MajorDetail.jsx";
 
 function App() {
     return (
@@ -28,6 +29,7 @@ function App() {
                     <Route path="/register/step3" element={<RegisterStep3 />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/major" element={<Majors />} />
+                    <Route path="/majors/:id" element={<MajorDetail />} />
                     <Route path="/criteria" element={<Criteria />} />
                 </Route>
                 {/* Route được bảo vệ nằm ngoài layout */}
