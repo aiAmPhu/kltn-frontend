@@ -14,7 +14,8 @@ import HomePage from "./components/HomePage.jsx";
 import Majors from "./pages/Major.jsx";
 import Criteria from "./pages/Criteria.jsx";
 import MajorDetail from "./pages/MajorDetail.jsx";
-
+import Chatbot from "./pages/Chatbot.jsx";
+import Block from "./pages/Block.jsx";
 function App() {
     return (
         <Router>
@@ -30,7 +31,9 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/major" element={<Majors />} />
                     <Route path="/majors/:id" element={<MajorDetail />} />
+                    <Route path="/block" element={<Block />} />
                     <Route path="/criteria" element={<Criteria />} />
+                    <Route path="/chatbot" element={<Chatbot />} />
                 </Route>
                 {/* Route được bảo vệ nằm ngoài layout */}
                 <Route
