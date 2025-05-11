@@ -26,10 +26,17 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
                 localStorage.removeItem("token");
                 setStatus("unauthorized"); // Hết hạn hoặc token sai
             }
+            console.log("Auth status:", status);
         };
         checkAuth();
     }, [allowedRoles]);
-    if (status === "checking") return null; // loading spinner nếu muốn
+    if (status === "checking") {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <p className="text-gray-500 text-lg">Đang kiểm tra quyền truy cập...</p>
+            </div>
+        );
+    }
     if (status === "authorized") return children;
     // Gửi state để trang chủ đọc và show toast
     return (

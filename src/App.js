@@ -16,6 +16,7 @@ import Criteria from "./pages/Criteria.jsx";
 import MajorDetail from "./pages/MajorDetail.jsx";
 import Chatbot from "./pages/Chatbot.jsx";
 import Block from "./pages/Block.jsx";
+import Wish from "./pages/Wish.jsx";
 function App() {
     return (
         <Router>
@@ -34,6 +35,14 @@ function App() {
                     <Route path="/block" element={<Block />} />
                     <Route path="/criteria" element={<Criteria />} />
                     <Route path="/chatbot" element={<Chatbot />} />
+                    <Route
+                        path="/wish"
+                        element={
+                            <ProtectedRoute allowedRoles={["user"]}>
+                                <Wish />
+                            </ProtectedRoute>
+                        }
+                    />
                 </Route>
                 {/* Route được bảo vệ nằm ngoài layout */}
                 <Route

@@ -97,7 +97,7 @@ function Header() {
                                 { to: "/major", label: "NGÀNH XÉT TUYỂN" },
                                 { to: "/criteria", label: "DIỆN XÉT TUYỂN" },
                                 { to: "/block", label: "KHỐI XÉT TUYỂN" },
-                                { to: "/dang-ky-xet-tuyen", label: "ĐĂNG KÝ XÉT TUYỂN" },
+                                { to: "/wish", label: "ĐĂNG KÝ XÉT TUYỂN" },
                                 { to: "/ket-qua-xet-tuyen", label: "KẾT QUẢ XÉT TUYỂN" },
                             ].map(({ to, label }) => {
                                 const isActive = location.pathname === to;
