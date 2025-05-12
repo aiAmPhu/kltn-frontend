@@ -17,6 +17,7 @@ import MajorDetail from "./pages/MajorDetail.jsx";
 import Chatbot from "./pages/Chatbot.jsx";
 import Block from "./pages/Block.jsx";
 import Wish from "./pages/Wish.jsx";
+import AdmissionResult from "./pages/AdmissionResult.jsx";
 function App() {
     return (
         <Router>
@@ -43,16 +44,24 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
+                    <Route
+                        path="/result"
+                        element={
+                            <ProtectedRoute allowedRoles={["user"]}>
+                                <AdmissionResult />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/profile"
+                        element={
+                            <ProtectedRoute allowedRoles={["user"]}>
+                                <Profile />
+                            </ProtectedRoute>
+                        }
+                    />
                 </Route>
                 {/* Route được bảo vệ nằm ngoài layout */}
-                <Route
-                    path="/profile"
-                    element={
-                        <ProtectedRoute allowedRoles={["user"]}>
-                            <Profile />
-                        </ProtectedRoute>
-                    }
-                />
             </Routes>
             <ToastContainer />
         </Router>
