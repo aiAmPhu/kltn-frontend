@@ -4,23 +4,24 @@ import Timeline from "./components/Timeline.jsx";
 import RegisterStep1 from "./pages/Register/RegisterStep1.jsx";
 import RegisterStep2 from "./pages/Register/RegisterStep2.jsx";
 import RegisterStep3 from "./pages/Register/RegisterStep3.jsx";
-import Login from "./pages/Login.jsx";
+import Login from "./pages/UserPages/Login.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AppLayout from "./layouts/AppLayout.jsx";
-import Profile from "./pages/Profile.jsx";
+import Profile from "./pages/UserPages/Profile.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import HomePage from "./components/HomePage.jsx";
-import Majors from "./pages/Major.jsx";
-import Criteria from "./pages/Criteria.jsx";
-import MajorDetail from "./pages/MajorDetail.jsx";
+import Majors from "./pages/UserPages/Major.jsx";
+import Criteria from "./pages/UserPages/Criteria.jsx";
+import MajorDetail from "./pages/UserPages/MajorDetail.jsx";
 import Chatbot from "./pages/Chatbot.jsx";
-import Block from "./pages/Block.jsx";
-import Wish from "./pages/Wish.jsx";
-import AdmissionResult from "./pages/AdmissionResult.jsx";
+import Block from "./pages/UserPages/Block.jsx";
+import Wish from "./pages/UserPages/Wish.jsx";
+import AdmissionResult from "./pages/UserPages/AdmissionResult.jsx";
+import ChangePassword from "./pages/UserPages/ChangePassword.jsx";
 function App() {
     return (
-        <Router>
+        <>
             <Routes>
                 {/* Layout chung không bọc ProtectedRoute */}
                 <Route element={<AppLayout />}>
@@ -60,11 +61,19 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
+                    <Route
+                        path="/changePassword"
+                        element={
+                            <ProtectedRoute allowedRoles={["user"]}>
+                                <ChangePassword />
+                            </ProtectedRoute>
+                        }
+                    />
                 </Route>
                 {/* Route được bảo vệ nằm ngoài layout */}
             </Routes>
             <ToastContainer />
-        </Router>
+        </>
     );
 }
 

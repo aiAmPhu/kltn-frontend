@@ -37,7 +37,7 @@ function Profile() {
     if (!user) return <div className="text-center mt-10 text-red-500">Không tìm thấy người dùng.</div>;
 
     return (
-        <div className="max-w-3xl mx-auto mt-20 p-6 bg-white rounded-lg shadow-md">
+        <div className="max-w-3xl mx-auto mt-24 p-6 bg-white rounded-lg shadow-md">
             <div className="flex items-center space-x-4 mb-6">
                 <img
                     src={user.pic}
