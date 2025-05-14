@@ -40,6 +40,7 @@ function App() {
                     <Route path="/block" element={<Block />} />
                     <Route path="/criteria" element={<Criteria />} />
                     <Route path="/chatbot" element={<Chatbot />} />
+                    Để giao diện mới chổ này
                     <Route
                         path="/wish"
                         element={

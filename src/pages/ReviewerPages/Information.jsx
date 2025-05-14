@@ -1,42 +1,39 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const LearningProccess = ({ userId }) => {
-    const [learningData, setLearningData] = useState(null);
+const Information = ({ userId }) => {
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [showRejectInput, setShowRejectInput] = useState(false);
     const [rejectionReason, setRejectionReason] = useState("");
+    const [showRejectInput, setShowRejectInput] = useState(false);
     const [actionStatus, setActionStatus] = useState("");
     const token = localStorage.getItem("token");
     useEffect(() => {
-        const fetchLearningData = async () => {
+        const fetchUserInfo = async () => {
             try {
-                const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/learning/getLPByE/${userId}`, {
+                //const token = localStorage.getItem("token");
+                const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adis/getAdi/${userId}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                // const matched = res.data.data.find((item) => item.userId === Number(userId));
-                if (!res) {
-                    setError("Không tìm thấy dữ liệu quá trình học.");
-                } else {
-                    setLearningData(res.data.data);
-                }
+                setUser(res.data);
             } catch (err) {
                 console.error(err);
-                setError("Lỗi khi lấy dữ liệu quá trình học.");
+                setError("Người dùng chưa thiết lập thông tin.");
             } finally {
                 setLoading(false);
             }
         };
-        fetchLearningData();
+
+        fetchUserInfo();
     }, [userId, token]);
 
     const handleAccept = async () => {
         try {
             await axios.put(
-                `${process.env.REACT_APP_API_BASE_URL}/learning/accept/${userId}`,
+                `${process.env.REACT_APP_API_BASE_URL}/adis/accept/${userId}`,
                 {},
                 {
                     headers: {
@@ -47,7 +44,7 @@ const LearningProccess = ({ userId }) => {
             setActionStatus("Đã đồng ý.");
         } catch (err) {
             console.error(err);
-            setActionStatus("Lỗi khi gửi yêu cầu đồng ý.");
+            setActionStatus("Gặp lỗi khi gửi yêu cầu đồng ý.");
         }
     };
 
@@ -57,8 +54,9 @@ const LearningProccess = ({ userId }) => {
             return;
         }
         try {
+            //const token = localStorage.getItem("token");
             await axios.put(
-                `${process.env.REACT_APP_API_BASE_URL}/learning/reject/${userId}`,
+                `${process.env.REACT_APP_API_BASE_URL}/adis/reject/${userId}`,
                 { reason: rejectionReason },
                 {
                     headers: {
@@ -69,43 +67,60 @@ const LearningProccess = ({ userId }) => {
             setActionStatus("Đã từ chối.");
         } catch (err) {
             console.error(err);
-            setActionStatus("Lỗi khi gửi yêu cầu từ chối.");
+            setActionStatus("Gặp lỗi khi gửi yêu cầu từ chối.");
         }
     };
 
-    if (loading) return <p>Đang tải dữ liệu...</p>;
+    const formatDate = (dateStr) => {
+        return new Date(dateStr).toLocaleDateString("vi-VN");
+    };
+
+    if (loading) return <p className="text-gray-500">Đang tải thông tin...</p>;
     if (error) return <p className="text-red-500">{error}</p>;
-    if (!learningData) return null;
+    if (!user) return null;
 
     return (
         <div className="text-gray-800 space-y-4">
             <div>
-                <strong>Lớp 10:</strong> {learningData.grade10_school}, {learningData.grade10_district},{" "}
-                {learningData.grade10_province}
+                <strong>Họ tên:</strong> {user.firstName} {user.lastName}
             </div>
             <div>
-                <strong>Lớp 11:</strong> {learningData.grade11_school}, {learningData.grade11_district},{" "}
-                {learningData.grade11_province}
+                <strong>Ngày sinh:</strong> {formatDate(user.birthDate)}
             </div>
             <div>
-                <strong>Lớp 12:</strong> {learningData.grade12_school}, {learningData.grade12_district},{" "}
-                {learningData.grade12_province}
+                <strong>Giới tính:</strong> {user.gender}
             </div>
             <div>
-                <strong>Năm tốt nghiệp:</strong> {learningData.graduationYear}
+                <strong>Nơi sinh:</strong> {user.birthPlace}
             </div>
             <div>
-                <strong>Đối tượng ưu tiên:</strong> {learningData.priorityGroup}
+                <strong>SĐT:</strong> {user.phone}
             </div>
             <div>
-                <strong>Khu vực:</strong> {learningData.region}
+                <strong>Email:</strong> {user.email}
             </div>
             <div>
-                <strong>Trạng thái:</strong> {learningData.status}
+                <strong>Email phụ huynh:</strong> {user.parentEmail}
             </div>
-            {learningData.feedback && (
+            <div>
+                <strong>Số CCCD:</strong> {user.idNumber}
+            </div>
+            <div>
+                <strong>Ngày cấp:</strong> {formatDate(user.idIssueDate)}
+            </div>
+            <div>
+                <strong>Nơi cấp:</strong> {user.idIssuePlace}
+            </div>
+            <div>
+                <strong>Địa chỉ:</strong> {user.houseNumber} {user.streetName}, {user.commune}, {user.district},{" "}
+                {user.province}
+            </div>
+            <div>
+                <strong>Trạng thái:</strong> {user.status}
+            </div>
+            {user.feedback && (
                 <div>
-                    <strong>Phản hồi:</strong> {learningData.feedback}
+                    <strong>Phản hồi:</strong> {user.feedback}
                 </div>
             )}
 
@@ -119,7 +134,7 @@ const LearningProccess = ({ userId }) => {
                 </button>
             </div>
 
-            {/* Reject input */}
+            {/* Reject reason input */}
             {showRejectInput && (
                 <div className="mt-4 space-y-2">
                     <textarea
@@ -135,10 +150,10 @@ const LearningProccess = ({ userId }) => {
                 </div>
             )}
 
-            {/* Status */}
+            {/* Action status */}
             {actionStatus && <p className="mt-4 text-blue-600">{actionStatus}</p>}
         </div>
     );
 };
 
-export default LearningProccess;
+export default Information;
