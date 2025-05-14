@@ -1,6 +1,7 @@
-import { React, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { FaArrowLeft, FaArrowRight, FaArrowCircleRight } from "react-icons/fa";
 
 function Majors() {
     const [majors, setMajors] = useState([]);
@@ -8,19 +9,34 @@ function Majors() {
     const itemsPerPage = 6;
     const navigate = useNavigate();
 
-    useEffect(() => {
-    const fetchMajors = async () => {
-        try {
-            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getAll`);
-            console.log(response.data); // Kiểm tra dữ liệu trả về
-            setMajors(response.data);
-        } catch (error) {
-            console.error("Lỗi khi fetch majors:", error);
-        }
-    };
+    // Danh sách ảnh banner ngẫu nhiên
+    const majorImages = [
+        "/Major/HCMUTE-1.jpg",
+        "/Major/HCMUTE-2.jpg",
+        "/Major/HCMUTE-3.jpg",
+        "/Major/HCMUTE-4.jpg",
+        "/Major/HCMUTE-5.jpg",
+        "/Major/HCMUTE-6.png",
+        "/Major/HCMUTE-7.png",
+        "/Major/HCMUTE-8.png",
+    ];
 
-    fetchMajors();
-}, []);
+    useEffect(() => {
+        const fetchMajors = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getAll`);
+                const dataWithImages = response.data.map((major) => ({
+                    ...major,
+                    image: major.image || majorImages[Math.floor(Math.random() * majorImages.length)],
+                }));
+                setMajors(dataWithImages);
+            } catch (error) {
+                console.error("Lỗi khi fetch majors:", error);
+            }
+        };
+
+        fetchMajors();
+    }, []);
 
     const totalPages = Math.ceil(majors.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -39,7 +55,7 @@ function Majors() {
                         className="flex flex-col sm:flex-row bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition"
                     >
                         <img
-                            src={major.image || "https://via.placeholder.com/300x200?text=No+Image"}
+                            src={major.image}
                             alt={major.majorName}
                             className="w-full sm:w-1/3 h-48 object-cover"
                         />
@@ -57,7 +73,7 @@ function Majors() {
                                 onClick={() => navigate(`/majors/${major.majorId}`)}
                                 className="inline-block px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
                             >
-                                ➤ Xem chi tiết
+                                <FaArrowCircleRight className="inline mr-1" /> Xem chi tiết
                             </button>
                         </div>
                     </div>
@@ -71,27 +87,41 @@ function Majors() {
                     onClick={() => setCurrentPage((prev) => prev - 1)}
                     className="px-4 py-2 border rounded disabled:opacity-50 hover:bg-gray-100"
                 >
-                    ← Trước
+                    <FaArrowLeft className="inline mr-1" /> Trước
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                        key={i + 1}
-                        onClick={() => setCurrentPage(i + 1)}
-                        className={`px-4 py-2 border rounded ${
-                            currentPage === i + 1
-                                ? "bg-blue-600 text-white"
-                                : "hover:bg-gray-100"
-                        }`}
-                    >
-                        {i + 1}
-                    </button>
-                ))}
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(
+                        (page) =>
+                            page === 1 ||
+                            page === totalPages ||
+                            Math.abs(page - currentPage) <= 2
+                    )
+                    .map((page, index, array) => {
+                        const isDots = index > 0 && page - array[index - 1] > 1;
+                        return (
+                            <React.Fragment key={page}>
+                                {isDots && <span className="px-2 text-gray-500">...</span>}
+                                <button
+                                    onClick={() => setCurrentPage(page)}
+                                    className={`px-4 py-2 border rounded ${
+                                        currentPage === page
+                                            ? "bg-blue-600 text-white"
+                                            : "hover:bg-gray-100"
+                                    }`}
+                                >
+                                    {page}
+                                </button>
+                            </React.Fragment>
+                        );
+                    })}
+
                 <button
                     disabled={currentPage === totalPages}
                     onClick={() => setCurrentPage((prev) => prev + 1)}
                     className="px-4 py-2 border rounded disabled:opacity-50 hover:bg-gray-100"
                 >
-                    Sau →
+                    Sau <FaArrowRight className="inline ml-1" />
                 </button>
             </div>
         </div>
