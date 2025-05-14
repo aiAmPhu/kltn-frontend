@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Announcements from "./components/Announcements.jsx";
 import Timeline from "./components/Timeline.jsx";
-import RegisterStep1 from "./pages/Register/RegisterStep1.jsx";
-import RegisterStep2 from "./pages/Register/RegisterStep2.jsx";
-import RegisterStep3 from "./pages/Register/RegisterStep3.jsx";
-import Login from "./pages/UserPages/Login.jsx";
+import RegisterStep1 from "./pages/UserPages/Register/RegisterStep1.jsx";
+import RegisterStep2 from "./pages/UserPages/Register/RegisterStep2.jsx";
+import RegisterStep3 from "./pages/UserPages/Register/RegisterStep3.jsx";
+import Login from "./pages/Login.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AppLayout from "./layouts/AppLayout.jsx";
@@ -19,6 +19,9 @@ import Block from "./pages/UserPages/Block.jsx";
 import Wish from "./pages/UserPages/Wish.jsx";
 import AdmissionResult from "./pages/UserPages/AdmissionResult.jsx";
 import ChangePassword from "./pages/UserPages/ChangePassword.jsx";
+import ReviewerPage from "./pages/ReviewerPages/ReviewerPage.jsx";
+import AdminPage from "./pages/AdminPages/AdminPage.jsx";
+import UserDetailPage from "./pages/ReviewerPages/UserDetailPage.jsx";
 function App() {
     return (
         <>
@@ -70,7 +73,30 @@ function App() {
                         }
                     />
                 </Route>
-                {/* Route được bảo vệ nằm ngoài layout */}
+                <Route
+                    path="/admin/*"
+                    element={
+                        <ProtectedRoute allowedRoles={["admin"]}>
+                            <AdminPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/reviewer"
+                    element={
+                        <ProtectedRoute allowedRoles={["reviewer"]}>
+                            <ReviewerPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="//reviewer/user/:id"
+                    element={
+                        <ProtectedRoute allowedRoles={["reviewer"]}>
+                            <UserDetailPage />
+                        </ProtectedRoute>
+                    }
+                />
             </Routes>
             <ToastContainer />
         </>

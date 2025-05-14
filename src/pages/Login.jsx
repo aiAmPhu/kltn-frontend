@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import rightImage from "../../assets/rightImageForLogin.png";
-import hcmuteLogo from "../../assets/hcmuteLogo.png";
+import rightImage from "../assets/rightImageForLogin.png";
+import hcmuteLogo from "../assets/hcmuteLogo.png";
 import { Lock, Mail } from "lucide-react";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 import axios from "axios";
 
 const Login = () => {
@@ -27,9 +27,9 @@ const Login = () => {
                 setUser(res.data.user);
                 toast.success("Đăng nhập thành công!");
                 if (res.data.user.role === "admin") {
-                    navigate("/admin/dashboard"); // Ví dụ chuyển đến trang admin
+                    navigate("/admin"); // Ví dụ chuyển đến trang admin
                 } else if (res.data.user.role === "reviewer") {
-                    navigate("/reviewer/dashboard"); // Ví dụ chuyển đến trang người dùng
+                    navigate("/reviewer"); // Ví dụ chuyển đến trang người dùng
                 } else {
                     navigate("/"); // Trang mặc định
                 }

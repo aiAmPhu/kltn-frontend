@@ -26,7 +26,6 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
                 localStorage.removeItem("token");
                 setStatus("unauthorized"); // Hết hạn hoặc token sai
             }
-            console.log("Auth status:", status);
         };
         checkAuth();
     }, [allowedRoles]);

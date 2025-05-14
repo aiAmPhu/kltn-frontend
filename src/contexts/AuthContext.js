@@ -20,7 +20,6 @@ export const AuthProvider = ({ children }) => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (res.status === 200) {
-                    console.log("User trả về từ API:", res.data.user);
                     setUser(res.data.user); // ✅ Lấy user từ backend
                 }
             } catch (err) {
