@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 function Banner() {
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [isLoaded, setIsLoaded] = useState(false);
 
     const bannerImages = [
         "/banner-01.jpg?height=512&width=2560",
@@ -24,9 +24,19 @@ function Banner() {
         setCurrentSlide((prev) => (prev === 0 ? bannerImages.length - 1 : prev - 1));
     };
 
+    // Auto-rotation for slideshow
+    useEffect(() => {
+        const timer = setInterval(() => {
+            nextSlide();
+        }, 5000); // Change slide every 5 seconds
+        
+        return () => clearInterval(timer);
+    }, []);
+
     const location = useLocation();
     const navigate = useNavigate();
     const hasShown = useRef(false);
+    
     useEffect(() => {
         if (location.state?.error && !hasShown.current) {
             hasShown.current = true; // Đánh dấu đã hiển thị thông báo
@@ -42,17 +52,18 @@ function Banner() {
 
     return (
         <div className="relative max-w-6xl mx-auto mt-20 mb-6">
-            <div className="rounded-lg overflow-hidden shadow-md">
+            <div className="rounded-lg overflow-hidden shadow-lg">
                 {/* Navigation Arrows */}
                 <button
                     onClick={prevSlide}
                     className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 z-10 shadow-md hover:bg-white transition-colors"
+                    aria-label="Previous slide"
                 >
                     <ChevronLeft className="w-6 h-6 text-blue-600" />
                 </button>
 
-                {/* Banner Images */}
-                <div className="relative h-[300px] w-full">
+                {/* Banner Images Container - Set aspect ratio to match 2560:512 */}
+                <div className="relative w-full" style={{ aspectRatio: '5/1' }}>
                     {bannerImages.map((image, index) => (
                         <div
                             key={index}
@@ -64,25 +75,37 @@ function Banner() {
                                 src={image || "/placeholder.svg"}
                                 alt={`Banner ${index + 1}`}
                                 className="w-full h-full object-cover"
+                                onLoad={() => index === 0 && setIsLoaded(true)}
                             />
                         </div>
                     ))}
+
+                    {/* Loading state */}
+                    {!isLoaded && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
+                        </div>
+                    )}
                 </div>
 
                 <button
                     onClick={nextSlide}
                     className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 z-10 shadow-md hover:bg-white transition-colors"
+                    aria-label="Next slide"
                 >
                     <ChevronRight className="w-6 h-6 text-blue-600" />
                 </button>
 
                 {/* Indicator Dots */}
-                <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3">
                     {bannerImages.map((_, index) => (
                         <button
                             key={index}
                             onClick={() => setCurrentSlide(index)}
-                            className={`w-2 h-2 rounded-full ${index === currentSlide ? "bg-blue-600" : "bg-gray-300"}`}
+                            className={`w-3 h-3 rounded-full transition-all ${
+                                index === currentSlide ? "bg-blue-600 scale-110" : "bg-white/70 hover:bg-white"
+                            }`}
+                            aria-label={`Go to slide ${index + 1}`}
                         />
                     ))}
                 </div>
