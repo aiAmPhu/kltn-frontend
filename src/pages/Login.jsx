@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import rightImage from "../assets/rightImageForLogin.png";
+import rightImage from "../assets/chibi_hcmute.jpg";
 import hcmuteLogo from "../assets/hcmuteLogo.png";
 import { Lock, Mail } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import axios from "axios";
+import Header from "../components/Header";
 
 const Login = () => {
     const { setUser } = useAuth();
@@ -49,60 +50,78 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="w-full max-w-5xl bg-white shadow-lg flex rounded-lg overflow-hidden">
-                {/* Left - Form */}
-                <div className="w-full md:w-1/2 p-10">
-                    <div className="mb-8 flex justify-center">
-                        <img src={hcmuteLogo} alt="Logo" className="h-24" />
-                    </div>
-                    <h2 className="text-2xl font-bold mb-6 flex justify-center">Đăng nhập</h2>
-
-                    <div className="space-y-4">
-                        <div className="w-full flex items-center border border-gray-300 p-3 rounded-lg mb-4 focus-within:ring focus-within:border-blue-500 bg-white">
-                            <Mail className="w-5 h-5 text-gray-400 mr-3" />
-                            <input
-                                type="text"
-                                placeholder="Tài khoản"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full outline-none"
-                            />
+        <div>
+            <Header />
+            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+                <div className="w-full max-w-5xl bg-white shadow-lg flex rounded-lg overflow-hidden">
+                    {/* Left - Form */}
+                    <div className="w-full md:w-1/2 p-10">
+                        <div className="mb-8 flex justify-center">
+                            <img src={hcmuteLogo} alt="Logo" className="h-24" />
                         </div>
-                        <div className="w-full flex items-center border border-gray-300 p-3 rounded-lg focus-within:ring focus-within:border-blue-500 bg-white">
-                            <Lock className="w-5 h-5 text-gray-400 mr-3" />
-                            <input
-                                type="password"
-                                placeholder="Mật khẩu"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full outline-none"
-                            />
+                        <h2 className="text-2xl font-bold mb-6 flex justify-center">Đăng nhập</h2>
+
+                        <div className="space-y-4">
+                            <div className="w-full flex items-center border border-gray-300 p-3 rounded-lg mb-4 focus-within:ring focus-within:border-blue-500 bg-white">
+                                <Mail className="w-5 h-5 text-gray-400 mr-3" />
+                                <input
+                                    type="text"
+                                    placeholder="Tài khoản"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full outline-none"
+                                />
+                            </div>
+                            <div className="w-full flex items-center border border-gray-300 p-3 rounded-lg focus-within:ring focus-within:border-blue-500 bg-white">
+                                <Lock className="w-5 h-5 text-gray-400 mr-3" />
+                                <input
+                                    type="password"
+                                    placeholder="Mật khẩu"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full outline-none"
+                                />
+                            </div>
+                            {error && <p className="text-red-500 text-sm">{error}</p>}
+
+                            <button
+                                onClick={handleLogin}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
+                            >
+                                Đăng nhập
+                            </button>
+
+                            {/* Forgot password */}
+                        <div className="w-full text-right mt-2">
+                                <button
+                                    className="text-sm text-blue-600 hover:underline"
+                                    onClick={() => navigate("/forgot-password")}
+                                >
+                                    Quên mật khẩu?
+                                </button>
+                            </div>
+
+                            {/* Register redirect */}
+                            <div className="mt-4 text-sm text-center text-gray-600">
+                                Chưa có tài khoản?{" "}
+                                <span
+                                    onClick={() => navigate("/register/step1")}
+                                    className="text-blue-600 hover:underline cursor-pointer font-medium"
+                                >
+                                    Đăng ký ngay
+                                </span>
+                            </div>
                         </div>
-                        {error && <p className="text-red-500 text-sm">{error}</p>}
-
-                        <button
-                            onClick={handleLogin}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
-                        >
-                            Đăng nhập
-                        </button>
-
-                        <button
-                            className="text-sm text-blue-600 hover:underline mt-2 text-left"
-                            onClick={() => navigate("/forgot-password")}
-                        >
-                            Quên mật khẩu?
-                        </button>
                     </div>
-                </div>
 
-                {/* Right - Image */}
-                <div className="hidden md:block w-1/2">
-                    <img src={rightImage} alt="Minh hoạ" className="w-full h-full object-cover" />
+                    {/* Right - Image */}
+                    <div className="hidden md:block w-1/2">
+                        <img src={rightImage} alt="Minh hoạ" className="w-full h-full object-cover" />
+                    </div>
                 </div>
             </div>
         </div>
+        
     );
 };
 

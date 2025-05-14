@@ -4,6 +4,7 @@ import { User, HelpCircle, UserPlus } from "lucide-react";
 import { toast } from "react-toastify";
 import { useAuth } from "../contexts/AuthContext.js";
 import axios from "axios";
+import hcmuteLogo from "../assets/logo_hcmute.png"
 
 function Header() {
     const { user, logout } = useAuth();
@@ -132,10 +133,12 @@ function Header() {
                             <div className="relative" ref={dropdownRef}>
                                 <button
                                     onClick={() => setIsDropdownOpen((prev) => !prev)}
-                                    className="border border-gray-300 rounded px-4 py-2 bg-white text-sm font-medium text-gray-700"
+                                    className="border border-gray-300 rounded px-4 py-3 bg-white text-sm font-medium text-gray-700 flex items-center justify-center gap-2 w-full"
                                 >
-                                    👋 {user.name}
+                                    <img src={hcmuteLogo} alt="Logo" className="w-4 h-4 rounded-full" />
+                                    {user.name}
                                 </button>
+
                                 {isDropdownOpen && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-50">
                                         <button

@@ -1,6 +1,11 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
+import hcmuteLogo from "../../../assets/hcmuteLogo.png";
+import rightImage from "../../../assets/chibi_hcmute.jpg";
+import Header from "../../../components/Header";
+import { FaEnvelope, FaPaperPlane, FaCheckCircle, FaArrowLeft } from "react-icons/fa";
 
 const RegisterStep2 = () => {
     const location = useLocation();
@@ -22,6 +27,7 @@ const RegisterStep2 = () => {
                 otp,
             });
             if (res.status === 200) {
+                toast.success("Xác thực OTP thành công!");
                 navigate("/register/step3", { state: { email } });
             } else {
                 setError(res.data.message || "OTP không hợp lệ!");
@@ -30,6 +36,7 @@ const RegisterStep2 = () => {
         } catch (err) {
             console.error(err);
             setError(err.response?.data?.message || "Xác thực thất bại!");
+            setErrorColor("red");
         }
         setLoadingVerify(false);
     };
@@ -56,45 +63,85 @@ const RegisterStep2 = () => {
 
     useEffect(() => {
         if (!email) {
-            navigate("/register/step1"); // hoặc "/register/step1"
+            navigate("/register/step1");
         }
     }, [email, navigate]);
 
     return (
-        <div className="max-w-md mx-auto mt-12 p-6 bg-white rounded-xl shadow-md">
-            <h2 className="text-xl font-bold mb-4">Xác thực OTP</h2>
-            <p className="mb-2 text-sm text-gray-500">
-                OTP đã gửi đến email: <b>{email}</b>
-            </p>
+        <div>
+            <Header />
+            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+                <div className="w-full max-w-5xl bg-white shadow-lg flex rounded-lg overflow-hidden">
+                    {/* Left - Form */}
+                    <div className="w-full md:w-1/2 p-10">
+                        <div className="mb-8 flex justify-center">
+                            <img src={hcmuteLogo} alt="Logo" className="h-24" />
+                        </div>
+                        <h2 className="text-2xl font-bold mb-4 text-center">Xác thực OTP</h2>
+                        <p className="mb-6 text-center text-sm text-gray-600">
+                            Mã OTP đã gửi đến: <span className="font-medium text-blue-600">{email}</span>
+                        </p>
 
-            <input
-                type="text"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="Nhập mã OTP"
-                className="w-full p-2 border rounded mb-4"
-            />
+                        {/* OTP input with icon */}
+                        <div className="relative mb-4">
+                            <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
+                            <input
+                                type="text"
+                                value={otp}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    if (/^\d*$/.test(value)) {
+                                        setOtp(value);
+                                    }
+                                }}
+                                placeholder="Nhập mã OTP"
+                                className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-500 bg-white"
+                            />
+                        </div>
 
-            {error && (
-                <p className={`text-sm mb-3 ${errorColor === "green" ? "text-green-600" : "text-red-600"}`}>{error}</p>
-            )}
+                        {/* Error or status message */}
+                        {error && (
+                            <p className={`text-sm mb-4 ${errorColor === "green" ? "text-green-600" : "text-red-600"}`}>
+                                {error}
+                            </p>
+                        )}
 
-            <div className="flex space-x-4">
-                <button
-                    onClick={handleVerify}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-                    disabled={loadingVerify}
-                >
-                    {loadingVerify ? "Đang xác thực..." : "Xác thực"}
-                </button>
+                        {/* Action buttons */}
+                        <div className="flex space-x-4">
+                            <button
+                                onClick={handleResendOTP}
+                                disabled={loadingResend}
+                                className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 rounded-lg transition disabled:opacity-60 flex items-center justify-center gap-2"
+                            >
+                                <FaPaperPlane />
+                                {loadingResend ? "Đang gửi lại..." : "Gửi lại OTP"}
+                            </button>
 
-                <button
-                    onClick={handleResendOTP}
-                    className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
-                    disabled={loadingResend}
-                >
-                    {loadingResend ? "Đang gửi lại..." : "Gửi lại OTP"}
-                </button>
+                            <button
+                                onClick={handleVerify}
+                                disabled={loadingVerify}
+                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition disabled:opacity-60 flex items-center justify-center gap-2"
+                            >
+                                <FaCheckCircle />
+                                {loadingVerify ? "Đang xác thực..." : "Xác thực"}
+                            </button>
+                        </div>
+
+                        {/* Back button */}
+                        <button
+                            className="text-sm text-blue-600 hover:underline mt-4 flex items-center gap-1"
+                            onClick={() => navigate("/register/step1")}
+                        >
+                            <FaArrowLeft />
+                            Quay lại nhập email
+                        </button>
+                    </div>
+
+                    {/* Right - Image */}
+                    <div className="hidden md:block w-1/2">
+                        <img src={rightImage} alt="Minh hoạ" className="w-full h-full object-cover" />
+                    </div>
+                </div>
             </div>
         </div>
     );
