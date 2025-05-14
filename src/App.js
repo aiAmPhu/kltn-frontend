@@ -8,7 +8,7 @@ import Login from "./pages/Login.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AppLayout from "./layouts/AppLayout.jsx";
-import Profile from "./pages/UserPages/Profile.jsx";
+import Profile from "./pages/UserPages/ProfilePage/Profile.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import HomePage from "./components/HomePage.jsx";
 import Majors from "./pages/UserPages/Major.jsx";
@@ -22,6 +22,7 @@ import ChangePassword from "./pages/UserPages/ChangePassword.jsx";
 import ReviewerPage from "./pages/ReviewerPages/ReviewerPage.jsx";
 import AdminPage from "./pages/AdminPages/AdminPage.jsx";
 import UserDetailPage from "./pages/ReviewerPages/UserDetailPage.jsx";
+
 function App() {
     return (
         <>
@@ -57,14 +58,7 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-                    <Route
-                        path="/profile"
-                        element={
-                            <ProtectedRoute allowedRoles={["user"]}>
-                                <Profile />
-                            </ProtectedRoute>
-                        }
-                    />
+                    <Route path="/profile" element={<Profile/>} />
                     <Route
                         path="/changePassword"
                         element={
