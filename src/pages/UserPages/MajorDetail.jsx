@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+
 function MajorDetail() {
     const { id } = useParams();
     const [major, setMajor] = useState(null);
     const navigate = useNavigate();
+
     useEffect(() => {
         const fetchMajor = async () => {
             try {
                 const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getMajorByID/${id}`);
+                console.log(res.data); // Kiểm tra dữ liệu trả về
                 setMajor(res.data);
             } catch (err) {
                 console.error("Không thể lấy thông tin ngành:", err);
@@ -16,51 +19,62 @@ function MajorDetail() {
         };
         fetchMajor();
     }, [id]);
-    if (!major) return <div className="text-center py-10">Đang tải thông tin ngành...</div>;
+
     const handleBack = () => {
-        navigate("/major"); // Quay lại trang danh sách các ngành
+        navigate("/major");
     };
-    // Xử lý tình trạng xét tuyển (isActive)
-    const isActive = major ? major.isActive : false;
+
+    if (!major) {
+        return <div className="text-center py-10 text-xl">Đang tải thông tin ngành...</div>;
+    }
+
+    const isActive = major?.isActive;
+
     return (
-        <div className="max-w-screen-xl mx-auto px-4 py-8 mt-12">
-            {major ? (
-                <div className={`border rounded-lg shadow-lg p-6 ${isActive ? "bg-green-100" : "bg-gray-200"}`}>
-                    <div className="flex justify-between items-center mb-6">
-                        <h1 className="text-3xl font-semibold text-blue-700">{major.majorName}</h1>
-                        <span
-                            className={`py-1 px-4 rounded-full text-white font-semibold text-xs ${
-                                isActive ? "bg-green-500" : "bg-gray-500"
-                            }`}
-                        >
-                            {isActive ? "Đang xét tuyển" : "Không xét tuyển"}
-                        </span>
+        <div className="max-w-6xl mx-auto px-4 py-10 mt-12">
+            <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-8">
+                <div className="relative mb-8">
+                    <span
+                        className={`self-end px-4 py-1 rounded-full text-sm font-semibold text-white ${isActive ? "bg-green-500" : "bg-gray-500"}`}
+                    >
+                        {isActive ? "Đang xét tuyển" : "Không xét tuyển"}
+                    </span>
+                    
+                    <h1 className="text-4xl font-bold text-red-600 mt-2 text-center">
+                        {major.majorName}
+                    </h1>
+                </div>
+
+                {/* Mã ngành & tổ hợp môn */}
+                <div className="mb-8">
+                    <p className="font-semibold text-blue-600 text-xl">Mã ngành: {major.majorCodeName}</p>
+                    <p className="font-semibold text-blue-600 text-xl mt-4 mb-2">Tổ hợp môn:</p>
+                    <div className="flex flex-wrap gap-3">
+                        {major.majorCombination.map((comb, idx) => (
+                            <span key={idx} className="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm font-medium">
+                                {comb}
+                            </span>
+                        ))}
                     </div>
+                </div>
 
-                    <p className="text-gray-600 mb-4">{major.majorDescription}</p>
+                {/* Mô tả ngành học */}
+                <div className="mb-10">
+                    <h2 className="text-blue-600 font-semibold text-xl mb-3">MÔ TẢ NGÀNH HỌC</h2>
+                    <p className="text-gray-700 text-base" dangerouslySetInnerHTML={{ __html: major?.majorDescription || "Chưa có mô tả cho ngành này..." }} />
+                </div>
 
-                    <div className="mb-6">
-                        <p className="font-semibold text-blue-600">Mã ngành: {major.majorCodeName}</p>
-                        <p className="font-medium text-blue-500 mt-2">Tổ hợp môn:</p>
-                        <ul className="list-disc pl-5 text-sm text-gray-700">
-                            {major.majorCombination.map((comb, idx) => (
-                                <li key={idx}>{comb}</li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    <div className="text-center">
+                <div className="text-center">
+                    <div className="text-right">
                         <button
                             onClick={handleBack}
-                            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+                            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
                         >
-                            Quay lại
+                            ← Quay lại danh sách ngành
                         </button>
                     </div>
                 </div>
-            ) : (
-                <p className="text-gray-500">Đang tải thông tin ngành...</p>
-            )}
+            </div>
         </div>
     );
 }
