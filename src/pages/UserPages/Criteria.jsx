@@ -32,7 +32,7 @@ function Criteria() {
     return (
         <div className="max-w-6xl mx-auto px-4 py-10 mt-12">
             <h1 className="text-3xl font-bold mb-8 text-blue-700 border-l-8 border-blue-500 pl-4 bg-blue-50 py-2">
-                Các Diện Xét Tuyển
+                CÁC DIỆN XÉT TUYỂN
             </h1>
 
             <div className="overflow-x-auto bg-white border border-gray-200 rounded-lg shadow-md">

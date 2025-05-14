@@ -31,7 +31,9 @@ const AdmissionResult = () => {
 
     return (
         <div className="max-w-4xl mx-auto py-10 px-4 mt-12">
-            <h1 className="text-2xl font-bold text-blue-700 mb-6">Kết quả tuyển sinh</h1>
+            <h1 className="text-3xl font-bold mb-8 text-blue-700 border-l-8 border-blue-500 pl-4 bg-blue-50 py-2">
+                KẾT QUẢ TUYỂN SINH
+            </h1>
 
             {wishes.length === 0 ? (
                 <p>Không có dữ liệu nguyện vọng.</p>
