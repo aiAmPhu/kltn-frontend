@@ -199,7 +199,7 @@ function ProfilePage() {
                                             <FaIdCard className="mr-2" /> Ảnh thẻ
                                         </div>
                                         <img
-                                            src={user?.pic || "https://via.placeholder.com/96x128"}
+                                            src={user?.pic}
                                             alt="Profile"
                                             className="w-24 h-32 object-cover rounded-lg shadow-md border-2 border-gray-300"
                                         />
@@ -210,13 +210,17 @@ function ProfilePage() {
                                         <p className="flex items-center text-gray-800">
                                             <FaUserCheck className="text-blue-600 mr-3" />
                                             <span className="font-medium text-gray-600">Họ và tên:</span>
-                                            <span className="ml-2">{user?.fullName || "Chưa cập nhật"}</span>
+                                            <span className="ml-2">
+                                                {user.fullName === "null null" ? "Chưa cập nhật" : user.fullName}
+                                            </span>
                                         </p>
                                         <p className="flex items-center text-gray-800">
                                             <FaCalendarAlt className="text-blue-600 mr-3" />
                                             <span className="font-medium text-gray-600">Ngày sinh:</span>
                                             <span className="ml-2">
-                                                {user?.birthDate
+                                                {user.birthDate === "null"
+                                                    ? "Chưa cập nhật"
+                                                    : dayjs(user.birthDate).isValid()
                                                     ? dayjs(user.birthDate).format("DD/MM/YYYY")
                                                     : "Chưa cập nhật"}
                                             </span>

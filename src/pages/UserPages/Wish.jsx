@@ -17,7 +17,6 @@ function WishRegistration() {
     const userId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
 
     useEffect(() => {
-        console.log("User ID:", userId);
         const fetchData = async () => {
             try {
                 const [criteriaRes, blockRes, majorRes, wishRes] = await Promise.all([
@@ -43,8 +42,6 @@ function WishRegistration() {
 
     const handleSave = async () => {
         try {
-            console.log("Selected data:", selected);
-            console.log("userId:", userId, "| type:", typeof userId);
             const res = await axios.post(
                 `${process.env.REACT_APP_API_BASE_URL}/wish/add`,
                 {

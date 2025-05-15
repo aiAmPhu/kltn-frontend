@@ -58,7 +58,14 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-                    <Route path="/profile" element={<Profile/>} />
+                    <Route
+                        path="/profile"
+                        element={
+                            <ProtectedRoute allowedRoles={["user"]}>
+                                <Profile />
+                            </ProtectedRoute>
+                        }
+                    />
                     <Route
                         path="/changePassword"
                         element={
