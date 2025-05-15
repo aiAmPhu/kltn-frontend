@@ -1,7 +1,22 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
-import { FaUserCheck, FaInfoCircle, FaGraduationCap, FaFileAlt, FaImage, FaExclamationTriangle, FaCheckCircle, FaTimesCircle, FaIdCard, FaCalendarAlt, FaEnvelope, FaVenusMars, FaPhone, FaAddressCard } from "react-icons/fa";
+import {
+    FaUserCheck,
+    FaInfoCircle,
+    FaGraduationCap,
+    FaFileAlt,
+    FaImage,
+    FaExclamationTriangle,
+    FaCheckCircle,
+    FaTimesCircle,
+    FaIdCard,
+    FaCalendarAlt,
+    FaEnvelope,
+    FaVenusMars,
+    FaPhone,
+    FaAddressCard,
+} from "react-icons/fa";
 import Header from "../../../components/Header";
 import AdmissionInformation from "../../../components/Profile/AdmissionInformation";
 import LearningProcess from "../../../components/Profile/LearningProcess";
@@ -10,33 +25,25 @@ import HighSchoolTranscript from "../../../components/Profile/HighSchoolTranscri
 
 function ProfilePage() {
     const [user, setUser] = useState(null);
-    const [detail, setDetail] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeSection, setActiveSection] = useState(null);
-
     const token = localStorage.getItem("token");
     const userId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
-
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [userRes, detailRes] = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/users/getUserByID/${userId}`, {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/adis/getAdi/${userId}`, {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }),
-                ]);
-                setUser(userRes.data.data);
-                setDetail(detailRes.data);
+                const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adis/getBasicInfo/${userId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                console.log("Thông tin người dùng:", res.data.data);
+                console.log("ID:", userId);
+                setUser(res.data.data); // hoặc setDetail(res.data.data) tùy theo backend bạn trả về
             } catch (err) {
-                console.error("Lỗi khi lấy thông tin người dùng:", err);
+                console.error("Lỗi khi lấy thông tin cơ bản người dùng:", err);
             } finally {
                 setLoading(false);
             }
         };
-
         if (userId) fetchData();
     }, [userId, token]);
 
@@ -44,21 +51,23 @@ function ProfilePage() {
         setActiveSection(section);
     };
 
-    if (loading) return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
-            <div className="text-xl font-semibold text-blue-700">Đang tải dữ liệu...</div>
-        </div>
-    );
-    
-    if (!user) return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
-            <FaExclamationTriangle className="text-5xl text-red-500 mb-4" />
-            <div className="text-xl font-semibold text-red-600">Không tìm thấy người dùng.</div>
-        </div>
-    );
+    if (loading)
+        return (
+            <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
+                <div className="text-xl font-semibold text-blue-700">Đang tải dữ liệu...</div>
+            </div>
+        );
 
-    const status = detail?.status || "waiting";
-    const feedbacks = detail?.rejectionReason ? [detail.rejectionReason] : [];
+    if (!user)
+        return (
+            <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
+                <FaExclamationTriangle className="text-5xl text-red-500 mb-4" />
+                <div className="text-xl font-semibold text-red-600">Không tìm thấy người dùng.</div>
+            </div>
+        );
+
+    const status = user?.status || "waiting";
+    const feedbacks = user?.feedbackSummary;
 
     const getStatusIcon = () => {
         if (status === "accepted") return <FaCheckCircle className="text-4xl text-green-600 mb-4" />;
@@ -85,21 +94,15 @@ function ProfilePage() {
                 {/* Sidebar */}
                 <aside className="w-1/4 bg-gradient-to-b from-blue-800 to-blue-900 text-white p-6 rounded-xl shadow-xl space-y-6 h-full">
                     <div className="text-center">
-                        <img
-                            src="/path-to-hcmute-logo.png"
-                            alt="HCMUTE Logo"
-                            className="w-32 h-auto mx-auto mb-6"
-                        />
-                        <h2 className="text-xl font-bold border-b border-blue-600 pb-2 mb-4">
-                            Quản lý hồ sơ
-                        </h2>
+                        <img src="/path-to-hcmute-logo.png" alt="HCMUTE Logo" className="w-32 h-auto mx-auto mb-6" />
+                        <h2 className="text-xl font-bold border-b border-blue-600 pb-2 mb-4">Quản lý hồ sơ</h2>
                     </div>
                     <nav>
                         <ul className="space-y-2">
                             <li
                                 className={`flex items-center gap-3 cursor-pointer px-4 py-3 rounded-md transition-all duration-200 ${
-                                    activeSection === null 
-                                        ? "bg-blue-600 text-white shadow-md" 
+                                    activeSection === null
+                                        ? "bg-blue-600 text-white shadow-md"
                                         : "hover:bg-blue-700 text-blue-100"
                                 }`}
                                 onClick={() => handleClick(null)}
@@ -142,8 +145,8 @@ function ProfilePage() {
                             </li>
                             <li
                                 className={`flex items-center gap-3 cursor-pointer px-4 py-3 rounded-md transition-all duration-200 ${
-                                    activeSection === "photoid" 
-                                        ? "bg-blue-600 text-white shadow-md" 
+                                    activeSection === "photoid"
+                                        ? "bg-blue-600 text-white shadow-md"
                                         : "hover:bg-blue-700 text-blue-100"
                                 }`}
                                 onClick={() => handleClick("photoid")}
@@ -170,9 +173,7 @@ function ProfilePage() {
 
                             <div className="flex flex-col items-center max-w-md mx-auto">
                                 {getStatusIcon()}
-                                <p className={`text-xl font-semibold ${getStatusColor()}`}>
-                                    {getStatusText()}
-                                </p>
+                                <p className={`text-xl font-semibold ${getStatusColor()}`}>{getStatusText()}</p>
                             </div>
 
                             {status === "rejected" && feedbacks.length > 0 && (
@@ -181,7 +182,13 @@ function ProfilePage() {
                                         <FaExclamationTriangle className="inline-block mr-2" />
                                         Lý do từ chối:
                                     </h3>
-                                    <p className="mt-2 text-base">{detail?.rejectionReason || "Chưa có lý do cụ thể."}</p>
+                                    <p className="mt-2 text-base">
+                                        {user?.feedbackSummary
+                                            ? user.feedbackSummary
+                                                  .split("\n")
+                                                  .map((line, index) => <div key={index}>{line}</div>)
+                                            : "Chưa có lý do cụ thể."}
+                                    </p>
                                 </div>
                             )}
 
@@ -209,48 +216,36 @@ function ProfilePage() {
                                         <p className="flex items-center text-gray-800">
                                             <FaUserCheck className="text-blue-600 mr-3" />
                                             <span className="font-medium text-gray-600">Họ và tên:</span>
-                                            <span className="ml-2">
-                                                {detail?.lastName && detail?.firstName
-                                                    ? `${detail.lastName} ${detail.firstName}`
-                                                    : "Chưa cập nhật"}
-                                            </span>
+                                            <span className="ml-2">{user?.fullName || "Chưa cập nhật"}</span>
                                         </p>
                                         <p className="flex items-center text-gray-800">
                                             <FaCalendarAlt className="text-blue-600 mr-3" />
                                             <span className="font-medium text-gray-600">Ngày sinh:</span>
                                             <span className="ml-2">
-                                                {detail?.birthDate
-                                                    ? dayjs(detail.birthDate).format("DD/MM/YYYY")
+                                                {user?.birthDate
+                                                    ? dayjs(user.birthDate).format("DD/MM/YYYY")
                                                     : "Chưa cập nhật"}
                                             </span>
                                         </p>
                                         <p className="flex items-center text-gray-800">
                                             <FaEnvelope className="text-blue-600 mr-3" />
                                             <span className="font-medium text-gray-600">Email:</span>
-                                            <span className="ml-2">
-                                                {detail?.email || "Chưa cập nhật"}
-                                            </span>
+                                            <span className="ml-2">{user?.email || "Chưa cập nhật"}</span>
                                         </p>
                                         <p className="flex items-center text-gray-800">
                                             <FaVenusMars className="text-blue-600 mr-3" />
                                             <span className="font-medium text-gray-600">Giới tính:</span>
-                                            <span className="ml-2">
-                                                {detail?.gender || "Chưa cập nhật"}
-                                            </span>
+                                            <span className="ml-2">{user?.gender || "Chưa cập nhật"}</span>
                                         </p>
                                         <p className="flex items-center text-gray-800">
                                             <FaPhone className="text-blue-600 mr-3" />
                                             <span className="font-medium text-gray-600">Số điện thoại:</span>
-                                            <span className="ml-2">
-                                                {detail?.phone || "Chưa cập nhật"}
-                                            </span>
+                                            <span className="ml-2">{user?.phoneNumber || "Chưa cập nhật"}</span>
                                         </p>
                                         <p className="flex items-center text-gray-800">
                                             <FaAddressCard className="text-blue-600 mr-3" />
                                             <span className="font-medium text-gray-600">CCCD:</span>
-                                            <span className="ml-2">
-                                                {detail?.idNumber || "Chưa cập nhật"}
-                                            </span>
+                                            <span className="ml-2">{user?.idNumber || "Chưa cập nhật"}</span>
                                         </p>
                                     </div>
                                 </div>
