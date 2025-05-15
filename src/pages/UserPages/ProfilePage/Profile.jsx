@@ -35,8 +35,6 @@ function ProfilePage() {
                 const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adis/getBasicInfo/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                console.log("Thông tin người dùng:", res.data.data);
-                console.log("ID:", userId);
                 setUser(res.data.data); // hoặc setDetail(res.data.data) tùy theo backend bạn trả về
             } catch (err) {
                 console.error("Lỗi khi lấy thông tin cơ bản người dùng:", err);
@@ -182,12 +180,8 @@ function ProfilePage() {
                                         <FaExclamationTriangle className="inline-block mr-2" />
                                         Lý do từ chối:
                                     </h3>
-                                    <p className="mt-2 text-base">
-                                        {user?.feedbackSummary
-                                            ? user.feedbackSummary
-                                                  .split("\n")
-                                                  .map((line, index) => <div key={index}>{line}</div>)
-                                            : "Chưa có lý do cụ thể."}
+                                    <p className="mt-2 text-base whitespace-pre-line">
+                                        {user?.feedbackSummary || "Chưa có lý do cụ thể."}
                                     </p>
                                 </div>
                             )}
