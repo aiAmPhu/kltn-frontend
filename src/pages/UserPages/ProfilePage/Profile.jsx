@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
-import { FaUserCheck, FaInfoCircle, FaGraduationCap, FaFileAlt, FaImage, FaSpinner, FaExclamationTriangle, FaCheckCircle, FaTimesCircle, FaIdCard, FaCalendarAlt, FaEnvelope, FaVenusMars, FaPhone, FaAddressCard } from "react-icons/fa";
+import { FaUserCheck, FaInfoCircle, FaGraduationCap, FaFileAlt, FaImage, FaExclamationTriangle, FaCheckCircle, FaTimesCircle, FaIdCard, FaCalendarAlt, FaEnvelope, FaVenusMars, FaPhone, FaAddressCard } from "react-icons/fa";
 import Header from "../../../components/Header";
 import AdmissionInformation from "../../../components/Profile/AdmissionInformation";
 import LearningProcess from "../../../components/Profile/LearningProcess";
@@ -46,7 +46,6 @@ function ProfilePage() {
 
     if (loading) return (
         <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
-            <FaSpinner className="text-5xl text-blue-600 animate-spin mb-4" />
             <div className="text-xl font-semibold text-blue-700">Đang tải dữ liệu...</div>
         </div>
     );
@@ -62,9 +61,9 @@ function ProfilePage() {
     const feedbacks = detail?.rejectionReason ? [detail.rejectionReason] : [];
 
     const getStatusIcon = () => {
-        if (status === "accepted") return <FaCheckCircle className="text-5xl text-green-600 mb-4" />;
-        if (status === "rejected") return <FaTimesCircle className="text-5xl text-red-600 mb-4" />;
-        return <FaSpinner className="text-5xl text-yellow-600 mb-4" />;
+        if (status === "accepted") return <FaCheckCircle className="text-4xl text-green-600 mb-4" />;
+        if (status === "rejected") return <FaTimesCircle className="text-4xl text-red-600 mb-4" />;
+        return null; // Bỏ FaSpinner cho trạng thái "waiting"
     };
 
     const getStatusColor = () => {
@@ -163,21 +162,21 @@ function ProfilePage() {
                     {activeSection === "photoid" && <PhotoID />}
                     {activeSection === "highschooltranscript" && <HighSchoolTranscript />}
                     {!activeSection && (
-                        <div className="text-center space-y-8">
+                        <div className="space-y-8">
                             {/* Tiêu đề */}
                             <h2 className="text-3xl font-extrabold text-blue-700 uppercase tracking-wide border-l-8 border-blue-500 pl-4 bg-blue-50 py-2">
                                 Trạng thái Hồ Sơ
                             </h2>
 
-                            <div className="flex flex-col items-center justify-center py-6">
+                            <div className="flex flex-col items-center max-w-md mx-auto">
                                 {getStatusIcon()}
-                                <p className={`text-2xl font-semibold ${getStatusColor()}`}>
+                                <p className={`text-xl font-semibold ${getStatusColor()}`}>
                                     {getStatusText()}
                                 </p>
                             </div>
 
                             {status === "rejected" && feedbacks.length > 0 && (
-                                <div className="feedback-list mt-4 bg-red-50 border-l-4 border-red-500 text-red-700 p-6 rounded-lg shadow-lg">
+                                <div className="feedback-list mt-4 bg-red-50 border-l-4 border-red-500 text-red-700 p-6 rounded-lg shadow-lg max-w-md mx-auto">
                                     <h3 className="text-lg font-semibold mb-2">
                                         <FaExclamationTriangle className="inline-block mr-2" />
                                         Lý do từ chối:
@@ -187,21 +186,21 @@ function ProfilePage() {
                             )}
 
                             {/* Thông tin chi tiết */}
-                            <div className="bg-gray-50 p-6 rounded-lg shadow-md">
+                            <div>
                                 <h3 className="text-xl font-bold text-blue-700 mb-6 border-b border-gray-200 pb-2">
                                     Thông tin cá nhân
                                 </h3>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                <div className="grid md:grid-cols-2 gap-6">
                                     {/* Ảnh thẻ */}
                                     <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-sm">
                                         <div className="mb-3 text-blue-700 font-semibold flex items-center">
                                             <FaIdCard className="mr-2" /> Ảnh thẻ
                                         </div>
                                         <img
-                                            src={user?.pic || "https://via.placeholder.com/128x170"}
+                                            src={user?.pic || "https://via.placeholder.com/96x128"}
                                             alt="Profile"
-                                            className="w-36 h-48 object-cover rounded-lg shadow-md border-2 border-gray-300"
+                                            className="w-24 h-32 object-cover rounded-lg shadow-md border-2 border-gray-300"
                                         />
                                     </div>
 
@@ -232,10 +231,6 @@ function ProfilePage() {
                                                 {detail?.email || "Chưa cập nhật"}
                                             </span>
                                         </p>
-                                    </div>
-
-                                    {/* Thông tin liên hệ */}
-                                    <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
                                         <p className="flex items-center text-gray-800">
                                             <FaVenusMars className="text-blue-600 mr-3" />
                                             <span className="font-medium text-gray-600">Giới tính:</span>
