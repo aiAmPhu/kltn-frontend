@@ -1,3 +1,4 @@
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import Announcements from "./components/Announcements.jsx";
@@ -28,6 +29,7 @@ import AdmissionBlockListPage from "./pages/AdminPages/AdmissionBlockPage/Admiss
 import AdmissionCriteriaListPage from "./pages/AdminPages/AdmissionCriteriaPage/AdmissionCriteriaListPage.jsx";
 import AdmissionMajorListPage from "./pages/AdminPages/AdmissionMajorPage/AdmissionMajorListPage.jsx";
 import AdmissionRegionListPage from "./pages/AdminPages/AdmissionRegionPage/AdmissionRegionListPage.jsx";
+import AdmissionObjectListPage from "./pages/AdminPages/AdmissionObjectPage/AdmissionObjectListPage.jsx";
 
 function App() {
     return (
@@ -94,6 +96,7 @@ function App() {
                     <Route path="admission-majors" element={<AdmissionMajorListPage />} />
                     <Route path="admission-criteria" element={<AdmissionCriteriaListPage />} />
                     <Route path="admission-regions" element={<AdmissionRegionListPage />} />
+                    <Route path="admission-objects" element={<AdmissionObjectListPage />} />
                 </Route>
                 <Route
                     path="/reviewer"

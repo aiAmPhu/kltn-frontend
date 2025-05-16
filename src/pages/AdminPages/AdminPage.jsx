@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, Outlet } from "react-router-dom"; // Thêm Outlet
-import { FaBars, FaUsers, FaFileAlt, FaCog, FaSignOutAlt, FaGraduationCap, FaListAlt, FaUniversity, FaMapMarkerAlt } from "react-icons/fa";
+import { FaBars, FaUsers, FaFileAlt, FaCog, FaSignOutAlt, FaGraduationCap, FaListAlt, FaUniversity, FaMapMarkerAlt, FaUserTag } from "react-icons/fa";
 import logo from "../../assets/logo_hcmute.png";
 
 const AdminPage = () => {
@@ -54,6 +54,10 @@ const AdminPage = () => {
           </Link>
           <Link to="/admin/admission-regions" className={linkClass("/admin/admission-regions")}>
             <FaMapMarkerAlt className="text-xl" />
+            {sidebarOpen && <span>Quản lý khu vực ưu tiên</span>}
+          </Link>
+          <Link to="/admin/admission-objects" className={linkClass("/admin/admission-objects")}>
+            <FaUserTag className="text-xl" />
             {sidebarOpen && <span>Quản lý đối tượng ưu tiên</span>}
           </Link>
           <Link to="/admin/reports" className={linkClass("/admin/reports")}>
