@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import InfoModal from "../Modals/UserModal/InfoModal";
 import UserFormModal from "../Modals/UserModal/UserFormModal";
@@ -6,7 +6,9 @@ import { ChevronDownIcon, ChevronUpIcon, ChevronLeftIcon, ChevronRightIcon } fro
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-const UserList = ({ users = [], setUsers }) => {
+const UserList = ({ users: usersProp = [], setUsers: setUsersProp }) => {
+    // Internal state for users, decoupled from props
+    const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [userToEdit, setUserToEdit] = useState(null);
@@ -18,14 +20,13 @@ const UserList = ({ users = [], setUsers }) => {
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
     const [roleCount, setRoleCount] = useState(0);
     const [error, setError] = useState("");
-    
-    // Enhanced pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [usersPerPage, setUsersPerPage] = useState(5);
     const [isLoading, setIsLoading] = useState(true);
-    
-    // Full width adjustment
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+    // Keep a ref to know if initial load is done
+    const hasLoadedRef = useRef(false);
 
     // Debounce search query with cleanup
     useEffect(() => {
@@ -37,8 +38,8 @@ const UserList = ({ users = [], setUsers }) => {
         return () => clearTimeout(timer);
     }, [searchQuery]);
 
-    // Load users from API
-    const loadUsers = async () => {
+    // Load users from API (only on first mount or explicit reload)
+    const loadUsers = useCallback(async () => {
         setIsLoading(true);
         try {
             const token = localStorage.getItem("token");
@@ -46,29 +47,60 @@ const UserList = ({ users = [], setUsers }) => {
             const response = await axios.get(`${API_BASE_URL}/users/getall`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            const userData = response.data.data || response.data;
+            let userData = response.data?.data;
+            if (!userData && Array.isArray(response.data)) {
+                userData = response.data;
+            }
+            if (!userData && Array.isArray(response.data?.users)) {
+                userData = response.data.users;
+            }
+            if (!userData) {
+                throw new Error("Không lấy được danh sách người dùng");
+            }
             setUsers(userData);
-            setFilteredUsers(userData); // Initialize filteredUsers with all users
+            if (typeof setUsersProp === "function") setUsersProp(userData);
             setError("");
         } catch (error) {
-            setError(error.response?.data?.message || "Lỗi khi tải danh sách người dùng");
+            setUsers([]);
+            if (typeof setUsersProp === "function") setUsersProp([]);
+            setError(error.response?.data?.message || error.message || "Lỗi khi tải danh sách người dùng");
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [setUsersProp]);
 
+    // On mount: only load if no data in props, else use props
     useEffect(() => {
-        loadUsers();
+        if (usersProp && Array.isArray(usersProp) && usersProp.length > 0) {
+            setUsers(usersProp);
+            hasLoadedRef.current = true;
+            setIsLoading(false);
+        } else {
+            loadUsers().then(() => {
+                hasLoadedRef.current = true;
+            });
+        }
+        // eslint-disable-next-line
     }, []);
-    
+
+    // If props change (for example, after add/edit), update local users
+    useEffect(() => {
+        if (
+            hasLoadedRef.current &&
+            usersProp &&
+            Array.isArray(usersProp) &&
+            usersProp.length > 0
+        ) {
+            setUsers(usersProp);
+        }
+    }, [usersProp]);
+
     // Handle window resize for full width layout
     useEffect(() => {
         const handleResize = () => {
             setWindowWidth(window.innerWidth);
         };
-        
         window.addEventListener('resize', handleResize);
-        
         return () => {
             window.removeEventListener('resize', handleResize);
         };
@@ -83,30 +115,30 @@ const UserList = ({ users = [], setUsers }) => {
         }
 
         let filtered = [...users];
-        
+
         // Apply role filter
         if (role !== "all") {
-            filtered = filtered.filter((user) => user.role.toLowerCase() === role.toLowerCase());
+            filtered = filtered.filter((user) => user.role?.toLowerCase() === role.toLowerCase());
         }
 
         // Apply search filter
         if (debouncedSearchQuery.trim()) {
             const query = debouncedSearchQuery.toLowerCase().trim();
             filtered = filtered.filter((user) =>
-                user.name.toLowerCase().includes(query) ||
-                user.email.toLowerCase().includes(query)
+                user.name?.toLowerCase().includes(query) ||
+                user.email?.toLowerCase().includes(query)
             );
         }
 
         setFilteredUsers(filtered);
         setRoleCount(filtered.length);
-        
+
         // Adjust current page if necessary
         const maxPage = Math.ceil(filtered.length / usersPerPage);
         if (currentPage > maxPage) {
             setCurrentPage(Math.max(1, maxPage));
         }
-    }, [role, users, debouncedSearchQuery, usersPerPage]);
+    }, [role, users, debouncedSearchQuery, usersPerPage, currentPage]);
 
     const handleRoleChange = (e) => {
         const newRole = e.target.value;
@@ -159,57 +191,57 @@ const UserList = ({ users = [], setUsers }) => {
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
     };
-    
+
     const handleUsersPerPageChange = (e) => {
         setUsersPerPage(Number(e.target.value));
         setCurrentPage(1); // Reset to first page when items per page changes
     };
-    
+
     // Pagination logic
     const indexOfLastUser = currentPage * usersPerPage;
     const indexOfFirstUser = indexOfLastUser - usersPerPage;
     const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
     const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
-    
+
     // Navigate to specific page
     const paginate = (pageNumber) => {
         if (pageNumber > 0 && pageNumber <= totalPages) {
             setCurrentPage(pageNumber);
         }
     };
-    
+
     // Create page range for pagination
     const getPageRange = () => {
         const delta = 1; // Number of pages to show before and after current page
         let range = [];
-        
+
         // Always show first page
         range.push(1);
-        
+
         // Calculate start and end of the main range
         let start = Math.max(2, currentPage - delta);
         let end = Math.min(totalPages - 1, currentPage + delta);
-        
+
         // Add ellipsis after first page if needed
         if (start > 2) {
             range.push("...");
         }
-        
+
         // Add the main range of pages
         for (let i = start; i <= end; i++) {
             range.push(i);
         }
-        
+
         // Add ellipsis before last page if needed
         if (end < totalPages - 1) {
             range.push("...");
         }
-        
+
         // Always show last page if there is more than one page
         if (totalPages > 1) {
             range.push(totalPages);
         }
-        
+
         return range;
     };
 
@@ -219,7 +251,7 @@ const UserList = ({ users = [], setUsers }) => {
                 <div className="mb-6">
                    <h1 className="text-3xl font-bold text-blue-600 text-center">Quản lý Users</h1>
                 </div>
-                
+
                 {error && (
                     <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
                         <div className="flex items-center">
@@ -234,7 +266,7 @@ const UserList = ({ users = [], setUsers }) => {
                         </div>
                     </div>
                 )}
-                
+
                 <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
                     <div className="flex flex-wrap items-center gap-4 flex-grow">
                         {/* Ô tìm kiếm */}
@@ -381,7 +413,7 @@ const UserList = ({ users = [], setUsers }) => {
                         </table>
                     </div>
                 </div>
-                
+
                 <div className="flex flex-col md:flex-row justify-between items-center mt-4">
                     <div className="flex items-center mb-4 md:mb-0">
                         <span className="text-sm text-gray-700 mr-4">
@@ -401,7 +433,7 @@ const UserList = ({ users = [], setUsers }) => {
                             Tổng: <span className="font-medium">{roleCount}</span> người dùng
                         </span>
                     </div>
-                    
+
                     {totalPages > 1 && (
                         <div className="flex items-center justify-center space-x-1">
                             <button
@@ -415,7 +447,7 @@ const UserList = ({ users = [], setUsers }) => {
                             >
                                 <ChevronLeftIcon className="h-5 w-5" />
                             </button>
-                            
+
                             {getPageRange().map((page, index) => (
                                 page === "..." ? (
                                     <span key={`ellipsis-${index}`} className="px-2 py-1">...</span>
@@ -433,7 +465,7 @@ const UserList = ({ users = [], setUsers }) => {
                                     </button>
                                 )
                             ))}
-                            
+
                             <button
                                 onClick={() => paginate(currentPage + 1)}
                                 disabled={currentPage === totalPages}
@@ -456,6 +488,7 @@ const UserList = ({ users = [], setUsers }) => {
                         setUsers={setUsers}
                         onClose={() => setIsModalOpen(false)}
                         isEditing={isEditing}
+                        reloadUsers={loadUsers}
                     />
                 )}
 
