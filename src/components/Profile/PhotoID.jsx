@@ -3,61 +3,43 @@ import axios from "axios";
 
 const PhotoID = () => {
     const token = localStorage.getItem("token");
-    const tokenUser = token ? JSON.parse(atob(token.split(".")[1])) : null;
+    const userId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
     const [personalPic, setPersonalPic] = useState(null);
     const [frontCCCD, setFrontCCCD] = useState(null);
     const [backCCCD, setBackCCCD] = useState(null);
     const [grade10Pic, setGrade10Pic] = useState(null);
     const [grade11Pic, setGrade11Pic] = useState(null);
     const [grade12Pic, setGrade12Pic] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
-    const [user, setUser] = useState(null);
 
     useEffect(() => {
-        let isFetched = false;
-        if (!token || tokenUser?.role !== "user") {
-            // If no token or role is not admin, redirect to login
-            window.location.href = "/404";
-        }
-
         const fetchData = async () => {
             try {
                 // Gọi API để lấy danh sách thông tin từ cơ sở dữ liệu
-                const response = await axios.get("http://localhost:8080/api/photo/getAll");
-
-                // Tìm kiếm thông tin dựa trên tokenUser.email
-                const userPhoto = response.data.data.find((item) => item.email === tokenUser.email);
-                setUser(userPhoto);
-                //const userAdInfo = response.data.items?.find((item) => item.email === tokenUser.email);
-
-                if (!isFetched && userPhoto) {
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/photo/getPhoto/${userId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (response) {
                     // Nếu tìm thấy, cập nhật formData
-                    setPersonalPic(userPhoto.personalPic);
-                    setFrontCCCD(userPhoto.frontCCCD);
-                    setBackCCCD(userPhoto.backCCCD);
-                    setGrade10Pic(userPhoto.grade10Pic);
-                    setGrade11Pic(userPhoto.grade11Pic);
-                    setGrade12Pic(userPhoto.grade12Pic);
-                    setIsEditing(true);
+                    setPersonalPic(response.data.data.personalPic);
+                    setFrontCCCD(response.data.data.frontCCCD);
+                    setBackCCCD(response.data.data.backCCCD);
+                    setGrade10Pic(response.data.data.grade10Pic);
+                    setGrade11Pic(response.data.data.grade11Pic);
+                    setGrade12Pic(response.data.data.grade12Pic);
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         };
         fetchData();
-        return () => {
-            isFetched = true; // Hủy bỏ nếu component bị unmount
-        };
-    }, [tokenUser.email]);
+    }, [token, userId]);
     const handleUpload = async (fieldName, file, setFileUrl) => {
         const formData = new FormData();
         formData.append("image", file);
 
         try {
-            const res = await axios.post("http://localhost:8080/api/upload", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
+            const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/upload/`, formData, {
+                headers: { Authorization: `Bearer ${token}` },
             });
             setFileUrl(res.data.imageUrl); // Cập nhật URL ảnh trả về từ server
             console.log(`${fieldName} uploaded successfully:`, res.data.imageUrl);
@@ -65,59 +47,31 @@ const PhotoID = () => {
             console.error(`Error uploading ${fieldName}:`, err);
         }
     };
-    const handleSubmit = async () => {
-        if (isEditing) {
-            updateInformation();
-        } else {
-            submitInformation();
-        }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        updateInformation();
     };
-    const submitInformation = async () => {
-        const data = {
+    const updateInformation = async () => {
+        console.log("Updating information...");
+        console.log("Personal Pic:", personalPic);
+        const updateData = {
             personalPic,
             frontCCCD,
             backCCCD,
             grade10Pic,
             grade11Pic,
             grade12Pic,
-            email: tokenUser.email,
         };
-
-        // Kiểm tra nếu có bất kỳ giá trị nào là null hoặc undefined
-        const missingFields = Object.entries(data)
-            .filter(([key, value]) => !value) // Lọc các trường có giá trị null, undefined hoặc falsey
-            .map(([key]) => key); // Lấy tên các trường bị thiếu
-
-        if (missingFields.length > 0) {
-            alert(`Please upload the following images: ${missingFields.join(", ")}`);
-            return;
-        }
-
-        console.log("All images uploaded:", data);
         try {
-            // Make a POST request with the form data
-            await axios.post("http://localhost:8080/api/photo/add", data);
-            alert("Data added successfully!");
-            setIsEditing(false);
-        } catch (error) {
-            console.error("Error while submitting data:", error.message);
-            alert(error.message || "Failed to add data. Please try again.");
-        }
-    };
-    const updateInformation = async () => {
-        try {
-            if (user) {
-                const data = {
-                    personalPic,
-                    frontCCCD,
-                    backCCCD,
-                    grade10Pic,
-                    grade11Pic,
-                    grade12Pic,
-                    email: tokenUser.email,
-                };
+            if (userId) {
                 // Gửi yêu cầu cập nhật
-                const updateResponse = await axios.put(`http://localhost:8080/api/photo/update/${user._id}`, data);
+                const updateResponse = await axios.put(
+                    `${process.env.REACT_APP_API_BASE_URL}/photo/update/${userId}`,
+                    updateData,
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
                 // Thông báo thành công
                 alert(updateResponse.data.message || "Data updated successfully!");
             } else {
@@ -159,7 +113,11 @@ const PhotoID = () => {
                         </div>
                         {file && (
                             <div className="mt-4">
-                                <img src={file} alt={label} className="w-32 h-32 rounded-lg shadow-md object-cover" />
+                                <img
+                                    src={typeof file === "string" ? file : URL.createObjectURL(file)}
+                                    alt={label}
+                                    className="w-32 h-32 rounded-lg shadow-md object-cover"
+                                />
                             </div>
                         )}
                     </div>
@@ -171,7 +129,7 @@ const PhotoID = () => {
                     onClick={handleSubmit}
                     className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition"
                 >
-                    {isEditing ? "Cập nhật" : "Lưu thông tin"}
+                    Cập nhật
                 </button>
             </div>
         </div>

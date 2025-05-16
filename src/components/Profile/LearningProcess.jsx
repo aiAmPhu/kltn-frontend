@@ -5,10 +5,6 @@ import { toast } from "react-toastify";
 const LearningProcess = () => {
     const token = localStorage.getItem("token");
     const userId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
-    const [provinces, set_provinces] = useState([]);
-    const [districts, set_districts] = useState({});
-    const [user, setUser] = useState({});
-    const [schools, set_schools] = useState({});
     const [formData, setFormData] = useState({
         grade10_province: "",
         grade10_district: "",
@@ -56,7 +52,6 @@ const LearningProcess = () => {
                 const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/learning/getLPByE/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                setUser(response.data.data);
                 const priorityGroupId = priorityGroupOptions.find(
                     (option) => option.label === response.data.data.priorityGroup
                 )?.value;
