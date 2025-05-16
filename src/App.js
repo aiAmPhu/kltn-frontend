@@ -27,6 +27,7 @@ import UserListPage from "./pages/AdminPages/UserPage/UserListPage.jsx";
 import AdmissionBlockListPage from "./pages/AdminPages/AdmissionBlockPage/AdmissionBlockListPage.jsx";
 import AdmissionCriteriaListPage from "./pages/AdminPages/AdmissionCriteriaPage/AdmissionCriteriaListPage.jsx";
 import AdmissionMajorListPage from "./pages/AdminPages/AdmissionMajorPage/AdmissionMajorListPage.jsx";
+import AdmissionRegionListPage from "./pages/AdminPages/AdmissionRegionPage/AdmissionRegionListPage.jsx";
 
 function App() {
     return (
@@ -46,7 +47,6 @@ function App() {
                     <Route path="/block" element={<Block />} />
                     <Route path="/criteria" element={<Criteria />} />
                     <Route path="/chatbot" element={<Chatbot />} />
-                    Để giao diện mới chổ này
                     <Route
                         path="/wish"
                         element={
@@ -93,6 +93,7 @@ function App() {
                     <Route path="admission-blocks" element={<AdmissionBlockListPage />} />
                     <Route path="admission-majors" element={<AdmissionMajorListPage />} />
                     <Route path="admission-criteria" element={<AdmissionCriteriaListPage />} />
+                    <Route path="admission-regions" element={<AdmissionRegionListPage />} />
                 </Route>
                 <Route
                     path="/reviewer"
