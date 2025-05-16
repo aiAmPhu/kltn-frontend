@@ -24,6 +24,9 @@ import ReviewerPage from "./pages/ReviewerPages/ReviewerPage.jsx";
 import AdminPage from "./pages/AdminPages/AdminPage.jsx";
 import UserDetailPage from "./pages/ReviewerPages/UserDetailPage.jsx";
 import UserListPage from "./pages/AdminPages/UserPage/UserListPage.jsx";
+import AdmissionBlockListPage from "./pages/AdminPages/AdmissionBlockPage/AdmissionBlockListPage.jsx";
+import AdmissionCriteriaListPage from "./pages/AdminPages/AdmissionCriteriaPage/AdmissionCriteriaListPage.jsx";
+import AdmissionMajorListPage from "./pages/AdminPages/AdmissionMajorPage/AdmissionMajorListPage.jsx";
 
 function App() {
     return (
@@ -87,7 +90,9 @@ function App() {
                 >
                     <Route index element={<Navigate to="users" replace />} />
                     <Route path="users" element={<UserListPage />} />
-                  
+                    <Route path="admission-blocks" element={<AdmissionBlockListPage />} />
+                    <Route path="admission-majors" element={<AdmissionMajorListPage />} />
+                    <Route path="admission-criteria" element={<AdmissionCriteriaListPage />} />
                 </Route>
                 <Route
                     path="/reviewer"
