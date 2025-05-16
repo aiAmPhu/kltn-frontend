@@ -1,0 +1,221 @@
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { FaCheck, FaTimes, FaPlus } from "react-icons/fa";
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing }) => {
+    const [majorId, setMajorId] = useState("");
+    const [majorCodeName, setMajorCodeName] = useState("");
+    const [majorName, setMajorName] = useState("");
+    const [majorCombination, setMajorCombination] = useState([]);
+    const [majorDescription, setMajorDescription] = useState("");
+    const [isActive, setIsActive] = useState(true);
+    const [error, setError] = useState("");
+    const [combinationInput, setCombinationInput] = useState("");
+
+    useEffect(() => {
+        if (majorToEdit) {
+            setMajorId(majorToEdit.majorId);
+            setMajorCodeName(majorToEdit.majorCodeName);
+            setMajorName(majorToEdit.majorName);
+            setMajorCombination(majorToEdit.majorCombination || []);
+            setMajorDescription(majorToEdit.majorDescription || "");
+            setIsActive(majorToEdit.isActive);
+        } else {
+            setMajorId("");
+            setMajorCodeName("");
+            setMajorName("");
+            setMajorCombination([]);
+            setMajorDescription("");
+            setIsActive(true);
+        }
+    }, [majorToEdit]);
+
+    const handleAddCombination = () => {
+        if (combinationInput.trim()) {
+            setMajorCombination([...majorCombination, combinationInput.trim()]);
+            setCombinationInput("");
+        }
+    };
+
+    const handleRemoveCombination = (index) => {
+        setMajorCombination(majorCombination.filter((_, i) => i !== index));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const token = localStorage.getItem("token");
+
+        const newMajor = {
+            majorId,
+            majorCodeName,
+            majorName,
+            majorCombination,
+            majorDescription,
+            isActive,
+        };
+
+        try {
+            if (isEditing && majorToEdit) {
+                await axios.put(
+                    `${API_BASE_URL}/adms/update/${majorId}`,
+                    newMajor,
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
+            } else {
+                await axios.post(
+                    `${API_BASE_URL}/adms/add`,
+                    newMajor,
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
+            }
+
+            const response = await axios.get(`${API_BASE_URL}/adms/getall`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setMajors(response.data);
+            onClose();
+        } catch (error) {
+            setError(error.response?.data?.message || "Đã xảy ra lỗi, vui lòng thử lại.");
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-center items-center px-4">
+            <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl">
+                <h2 className="text-2xl font-bold text-blue-600 text-center mb-6">
+                    {isEditing ? "Cập nhật" : "Thêm"} ngành xét tuyển
+                </h2>
+
+                {error && (
+                    <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">
+                        {error}
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Mã ngành</label>
+                        <input
+                            type="text"
+                            value={majorId}
+                            onChange={(e) => setMajorId(e.target.value)}
+                            placeholder="Nhập mã ngành"
+                            required
+                            disabled={isEditing}
+                            className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Mã ngành</label>
+                        <input
+                            type="text"
+                            value={majorCodeName}
+                            onChange={(e) => setMajorCodeName(e.target.value)}
+                            placeholder="Nhập mã ngành"
+                            required
+                            className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Tên ngành</label>
+                        <input
+                            type="text"
+                            value={majorName}
+                            onChange={(e) => setMajorName(e.target.value)}
+                            placeholder="Nhập tên ngành"
+                            required
+                            className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Tổ hợp xét tuyển</label>
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value={combinationInput}
+                                onChange={(e) => setCombinationInput(e.target.value)}
+                                placeholder="Nhập tổ hợp xét tuyển"
+                                className="flex-1 border border-gray-300 rounded-md px-3 py-2"
+                            />
+                            <button
+                                type="button"
+                                onClick={handleAddCombination}
+                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                            >
+                                Thêm
+                            </button>
+                        </div>
+                        {majorCombination.length > 0 && (
+                            <div className="mt-2 space-y-2">
+                                {majorCombination.map((combo, index) => (
+                                    <div key={index} className="flex items-center gap-2">
+                                        <span className="flex-1 bg-gray-50 p-2 rounded">{combo}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveCombination(index)}
+                                            className="text-red-500 hover:text-red-700"
+                                        >
+                                            <FaTimes />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
+                        <textarea
+                            value={majorDescription}
+                            onChange={(e) => setMajorDescription(e.target.value)}
+                            placeholder="Nhập mô tả"
+                            rows="4"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        />
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="checkbox"
+                            id="isActive"
+                            checked={isActive}
+                            onChange={(e) => setIsActive(e.target.checked)}
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
+                            Đang hoạt động
+                        </label>
+                    </div>
+
+                    <div className="flex justify-between mt-6">
+                        <button
+                            type="submit"
+                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-2"
+                        >
+                            {isEditing ? <FaCheck /> : <FaPlus />}
+                            {isEditing ? "Cập nhật" : "Thêm"}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 flex items-center gap-2"
+                        >
+                            <FaTimes /> Đóng
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+export default AdmissionMajorFormModal; 
