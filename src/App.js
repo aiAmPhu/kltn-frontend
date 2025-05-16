@@ -25,11 +25,13 @@ import ReviewerPage from "./pages/ReviewerPages/ReviewerPage.jsx";
 import AdminPage from "./pages/AdminPages/AdminPage.jsx";
 import UserDetailPage from "./pages/ReviewerPages/UserDetailPage.jsx";
 import UserListPage from "./pages/AdminPages/UserPage/UserListPage.jsx";
+import AdmissionYearListPage from "./pages/AdminPages/AdmissionYearPage/AdmissionYearListPage.jsx";
 import AdmissionBlockListPage from "./pages/AdminPages/AdmissionBlockPage/AdmissionBlockListPage.jsx";
 import AdmissionCriteriaListPage from "./pages/AdminPages/AdmissionCriteriaPage/AdmissionCriteriaListPage.jsx";
 import AdmissionMajorListPage from "./pages/AdminPages/AdmissionMajorPage/AdmissionMajorListPage.jsx";
 import AdmissionRegionListPage from "./pages/AdminPages/AdmissionRegionPage/AdmissionRegionListPage.jsx";
 import AdmissionObjectListPage from "./pages/AdminPages/AdmissionObjectPage/AdmissionObjectListPage.jsx";
+import AdmissionQuantityListPage from "./pages/AdminPages/AdmissionQuantityPage/AdmissionQuantityListPage.jsx";
 
 function App() {
     return (
@@ -92,11 +94,13 @@ function App() {
                 >
                     <Route index element={<Navigate to="users" replace />} />
                     <Route path="users" element={<UserListPage />} />
+                    <Route path="admission-years" element={<AdmissionYearListPage />} />
                     <Route path="admission-blocks" element={<AdmissionBlockListPage />} />
                     <Route path="admission-majors" element={<AdmissionMajorListPage />} />
                     <Route path="admission-criteria" element={<AdmissionCriteriaListPage />} />
                     <Route path="admission-regions" element={<AdmissionRegionListPage />} />
                     <Route path="admission-objects" element={<AdmissionObjectListPage />} />
+                    <Route path="admission-quantities" element={<AdmissionQuantityListPage />} />
                 </Route>
                 <Route
                     path="/reviewer"

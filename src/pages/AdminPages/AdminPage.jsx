@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, Outlet } from "react-router-dom"; // Thêm Outlet
-import { FaBars, FaUsers, FaFileAlt, FaCog, FaSignOutAlt, FaGraduationCap, FaListAlt, FaUniversity, FaMapMarkerAlt, FaUserTag } from "react-icons/fa";
+import { FaBars, FaUsers, FaFileAlt, FaCog, FaSignOutAlt, FaGraduationCap, FaListAlt, FaUniversity, FaMapMarkerAlt, FaUserTag, FaChartBar, FaCalendarAlt } from "react-icons/fa";
 import logo from "../../assets/logo_hcmute.png";
 
 const AdminPage = () => {
@@ -40,6 +40,10 @@ const AdminPage = () => {
             <FaUsers className="text-xl" />
             {sidebarOpen && <span>Quản lý người dùng</span>}
           </Link>
+          <Link to="/admin/admission-years" className={linkClass("/admin/admission-years")}>
+            <FaCalendarAlt className="text-xl" />
+            {sidebarOpen && <span>Quản lý năm tuyển sinh</span>}
+          </Link>
           <Link to="/admin/admission-blocks" className={linkClass("/admin/admission-blocks")}>
             <FaGraduationCap className="text-xl" />
             {sidebarOpen && <span>Quản lý khối xét tuyển</span>}
@@ -60,13 +64,9 @@ const AdminPage = () => {
             <FaUserTag className="text-xl" />
             {sidebarOpen && <span>Quản lý đối tượng ưu tiên</span>}
           </Link>
-          <Link to="/admin/reports" className={linkClass("/admin/reports")}>
-            <FaFileAlt className="text-xl" />
-            {sidebarOpen && <span>Báo cáo hệ thống</span>}
-          </Link>
-          <Link to="/admin/settings" className={linkClass("/admin/settings")}>
-            <FaCog className="text-xl" />
-            {sidebarOpen && <span>Cài đặt hệ thống</span>}
+          <Link to="/admin/admission-quantities" className={linkClass("/admin/admission-quantities")}>
+            <FaChartBar className="text-xl" />
+            {sidebarOpen && <span>Quản lý chỉ tiêu</span>}
           </Link>
         </nav>
 
