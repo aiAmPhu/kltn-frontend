@@ -1,160 +1,151 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const LearningProcess = () => {
     const token = localStorage.getItem("token");
-    const tokenUser = token ? JSON.parse(atob(token.split(".")[1])) : null;
-    const [provinces, setProvinces] = useState([]);
-    const [districts, setDistricts] = useState({});
+    const userId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
+    const [provinces, set_provinces] = useState([]);
+    const [districts, set_districts] = useState({});
     const [user, setUser] = useState({});
-    const [schools, setSchools] = useState({});
-    const [isEditing, setIsEditing] = useState(false);
+    const [schools, set_schools] = useState({});
     const [formData, setFormData] = useState({
-        grade10: { province: "", district: "", school: "" },
-        grade11: { province: "", district: "", school: "" },
-        grade12: { province: "", district: "", school: "" },
+        grade10_province: "",
+        grade10_district: "",
+        grade10_school: "",
+        grade11_province: "",
+        grade11_district: "",
+        grade11_school: "",
+        grade12_province: "",
+        grade12_district: "",
+        grade12_school: "",
         graduationYear: "",
-        email: tokenUser.email,
+        region: "",
         priorityGroup: "",
     });
     const [errors, setErrors] = useState({
-        grade10: {},
-        grade11: {},
-        grade12: {},
+        ggrade10_province: "",
+        grade10_district: "",
+        grade10_school: "",
+        grade11_province: "",
+        grade11_district: "",
+        grade11_school: "",
+        grade12_province: "",
+        grade12_district: "",
+        grade12_school: "",
         graduationYear: "",
         priorityGroup: "",
+        region: "",
     });
+    const priorityGroupOptions = [
+        { value: "OBJ001", label: "Ưu tiên khu vực miền núi" },
+        { value: "OBJ002", label: "Không ưu tiên" },
+    ];
+
+    const regionOptions = [
+        { value: "R001", label: "Miền Bắc" },
+        { value: "R002", label: "Miền Trung" },
+        { value: "R003", label: "Miền Nam" },
+    ];
 
     // Fetch provinces on initial render
     useEffect(() => {
-        let isFetched = false;
-        if (!token || tokenUser?.role !== "user") {
-            // If no token or role is not admin, redirect to login
-            window.location.href = "/404";
-        }
-
         const fetchData = async () => {
             try {
                 // Gọi API để lấy danh sách thông tin từ cơ sở dữ liệu
-                const response = await axios.get("http://localhost:8080/api/learning/getAll");
-
-                // Tìm kiếm thông tin dựa trên tokenUser.email
-                const userLP = response.data.data.find((item) => item.email === tokenUser.email);
-                setUser(userLP);
-                //const userAdInfo = response.data.items?.find((item) => item.email === tokenUser.email);
-
-                if (!isFetched && userLP) {
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/learning/getLPByE/${userId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setUser(response.data.data);
+                const priorityGroupId = priorityGroupOptions.find(
+                    (option) => option.label === response.data.data.priorityGroup
+                )?.value;
+                const regionId = regionOptions.find((option) => option.label === response.data.data.region)?.value;
+                if (response) {
                     // Nếu tìm thấy, cập nhật formData
                     setFormData({
-                        grade10: userLP.grade10,
-                        grade11: userLP.grade11,
-                        grade12: userLP.grade12,
-                        graduationYear: userLP.graduationYear,
-                        priorityGroup: userLP.priorityGroup,
-                        email: userLP.email,
+                        grade10_province: response.data.data.grade10_province ?? "",
+                        grade10_district: response.data.data.grade10_district ?? "",
+                        grade10_school: response.data.data.grade10_school ?? "",
+                        grade11_province: response.data.data.grade11_province ?? "",
+                        grade11_district: response.data.data.grade11_district ?? "",
+                        grade11_school: response.data.data.grade11_school ?? "",
+                        grade12_province: response.data.data.grade12_province ?? "",
+                        grade12_district: response.data.data.grade11_district ?? "",
+                        grade12_school: response.data.data.grade12_school ?? "",
+                        graduationYear: response.data.data.graduationYear ?? "",
+                        priorityGroup: priorityGroupId ?? "",
+                        region: regionId ?? "",
                     });
-                    setIsEditing(true);
                 }
+                console.log("Dữ liệu người dùng:", response.data.data);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         };
         fetchData();
-        return () => {
-            isFetched = true; // Hủy bỏ nếu component bị unmount
-        };
-    }, [tokenUser.email]);
-    const handleInputChange = (event, grade, field) => {
-        const value = event.target.value;
-        setFormData((prev) => ({
-            ...prev,
-            [grade]: {
-                ...prev[grade],
-                [field]: value,
-            },
-        }));
-    };
+        return () => {};
+    }, [userId.email]);
 
     // Validate form data
     const validateForm = () => {
-        const newErrors = { grade10: {}, grade11: {}, grade12: {}, graduationYear: "", priorityGroup: "" };
-
         ["grade10", "grade11", "grade12"].forEach((grade) => {
-            if (!formData[grade].province) {
-                newErrors[grade].province = "Vui lòng chọn Tỉnh/Thành phố.";
-            }
-            if (!formData[grade].district) {
-                newErrors[grade].district = "Vui lòng chọn Huyện/Quận.";
-            }
-            if (!formData[grade].school) {
-                newErrors[grade].school = "Vui lòng chọn Trường THPT.";
-            }
+            ["province", "district", "school"].forEach((field) => {
+                const key = `${grade}_${field}`;
+                if (!formData[key]) {
+                    errors[key] = `Vui lòng chọn ${
+                        field === "province" ? "Tỉnh/Thành phố" : field === "district" ? "Huyện/Quận" : "Trường THPT"
+                    }.`;
+                }
+            });
         });
-
         if (!formData.priorityGroup) {
-            newErrors.priorityGroup = "Vui lòng chọn Đối Tượng Ưu Tiên.";
+            errors.priorityGroup = "Vui lòng chọn Đối Tượng Ưu Tiên.";
         }
-
-        setErrors(newErrors);
-        return Object.values(newErrors).every((gradeErrors) =>
-            typeof gradeErrors === "object" ? Object.keys(gradeErrors).length === 0 : !gradeErrors
-        );
+        if (!formData.region) {
+            errors.region = "Vui lòng chọn Khu Vực Ưu Tiên.";
+        }
+        if (!formData.graduationYear) {
+            errors.graduationYear = "Vui lòng chọn Năm Tốt Nghiệp.";
+        }
+        setErrors(errors);
+        // Kiểm tra có lỗi nào không
+        return Object.values(errors).every((err) => err === "");
     };
 
     // Handle form submission
     const handleSubmit = (e) => {
         e.preventDefault(); // Ngăn không cho trang bị load lại
         if (validateForm()) {
-            if (isEditing) {
-                updateInformation();
-            } else {
-                submitInformation();
-            }
+            updateInformation();
         } else {
             alert("Vui lòng kiểm tra lại thông tin nhập!");
         }
     };
-    const submitInformation = async () => {
-        if (validateForm()) {
-            try {
-                console.log(formData);
-                // Make a POST request with the form data
-                await axios.post("http://localhost:8080/api/learning/add", formData);
 
-                // Notify the user of success
-                alert("Data added successfully!");
-
-                // Reset the editing state or perform any other necessary actions
-                setIsEditing(false); // Assuming `setIsEditing` is a state function in your component
-            } catch (error) {
-                // Handle and log the error, provide feedback to the user
-                console.error("Error while submitting data:", error.message);
-                alert(error.message || "Failed to add data. Please try again.");
-            }
-        } else {
-            alert("Vui lòng kiểm tra lại thông tin nhập!");
-        }
-    };
     const updateInformation = async () => {
         // Kiểm tra nếu không có lỗi
         try {
-            if (user) {
+            if (userId) {
                 // Gửi yêu cầu cập nhật
                 const updateResponse = await axios.put(
-                    `http://localhost:8080/api/learning/update/${user._id}`,
-                    formData
+                    `${process.env.REACT_APP_API_BASE_URL}/learning/update/${userId}`,
+                    formData,
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
                 );
+                console.log("Cập nhật thông tin thành công:", formData);
                 // Thông báo thành công
-                alert(updateResponse.data.message || "Data updated successfully!");
+                toast.success(updateResponse.data.message || "Cập nhật thông tin thành công!");
             } else {
-                alert("No data available.");
+                toast.error("Lỗi khi cập nhật thông tin.");
             }
         } catch (error) {
-            console.error("Error while submitting data:", error.response?.data?.message || error.message);
-            alert("Failed to update data. Please try again.");
+            console.error("Lỗi trong quá trình cập nhật thông tin:", error.response?.data?.message || error.message);
+            toast.error("Lỗi khi cập nhật thông tin, hãy thử lại.");
         }
     };
-    // Render inputs for each grade
     const renderGradeInputs = (grade) => (
         <div className="mb-6">
             <h2 className="text-xl font-semibold mb-4 text-blue-600">Lớp {grade}</h2>
@@ -164,13 +155,13 @@ const LearningProcess = () => {
                     <label className="block font-medium mb-1 text-gray-700">Tỉnh/Thành phố</label>
                     <input
                         type="text"
-                        value={formData[`grade${grade}`]?.province || ""}
-                        onChange={(e) => handleInputChange(e, `grade${grade}`, "province")}
+                        value={formData[`grade${grade}_province`] || ""}
+                        onChange={(e) => setFormData({ ...formData, [`grade${grade}_province`]: e.target.value })}
                         className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         placeholder="Nhập Tỉnh/Thành phố"
                     />
-                    {errors[`grade${grade}`]?.province && (
-                        <p className="text-red-500 text-sm">{errors[`grade${grade}`].province}</p>
+                    {errors[`grade${grade}_province`] && (
+                        <p className="text-red-500 text-sm">{errors[`grade${grade}_province`]}</p>
                     )}
                 </div>
 
@@ -179,14 +170,13 @@ const LearningProcess = () => {
                     <label className="block font-medium mb-1 text-gray-700">Huyện/Quận</label>
                     <input
                         type="text"
-                        value={formData[`grade${grade}`].district}
-                        onChange={(e) => handleInputChange(e, `grade${grade}`, "district")}
-                        //onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                        value={formData[`grade${grade}_district`] || ""}
+                        onChange={(e) => setFormData({ ...formData, [`grade${grade}_district`]: e.target.value })}
                         className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         placeholder="Nhập Huyện/Quận"
                     />
-                    {errors[`grade${grade}`]?.district && (
-                        <p className="text-red-500 text-sm">{errors[`grade${grade}`].district}</p>
+                    {errors[`grade${grade}_district`] && (
+                        <p className="text-red-500 text-sm">{errors[`grade${grade}_district`]}</p>
                     )}
                 </div>
 
@@ -195,19 +185,18 @@ const LearningProcess = () => {
                     <label className="block font-medium mb-1 text-gray-700">Trường THPT</label>
                     <input
                         type="text"
-                        value={formData[`grade${grade}`].school}
-                        onChange={(e) => handleInputChange(e, `grade${grade}`, "school")}
-                        //onChange={(e) => setFormData({ ...formData, school: e.target.value })}
-                        disabled={!formData[`grade${grade}`].district}
+                        value={formData[`grade${grade}_school`] || ""}
+                        onChange={(e) => setFormData({ ...formData, [`grade${grade}_school`]: e.target.value })}
+                        disabled={!formData[`grade${grade}_district`]}
                         className={`w-full px-4 py-2 border-2 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none ${
-                            !formData[`grade${grade}`].district
+                            !formData[`grade${grade}_district`]
                                 ? "bg-gray-200 text-gray-600 cursor-not-allowed"
                                 : "border-gray-300"
                         }`}
                         placeholder="Nhập trường THPT"
                     />
-                    {errors[`grade${grade}`]?.school && (
-                        <p className="text-red-500 text-sm">{errors[`grade${grade}`].school}</p>
+                    {errors[`grade${grade}_school`] && (
+                        <p className="text-red-500 text-sm">{errors[`grade${grade}_school`]}</p>
                     )}
                 </div>
             </div>
@@ -219,7 +208,9 @@ const LearningProcess = () => {
             <section className="mb-8">
                 <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Quá Trình Học Tập Của Thí Sinh</h1>
                 <div className="p-8 bg-white rounded-lg shadow-xl max-w-4xl mx-auto">
-                    {["10", "11", "12"].map((grade) => renderGradeInputs(grade))}
+                    {["10", "11", "12"].map((grade) => (
+                        <React.Fragment key={grade}>{renderGradeInputs(grade)}</React.Fragment>
+                    ))}
 
                     <div className="mb-6">
                         <label className="block font-medium mb-1 text-gray-700">Đối Tượng Ưu Tiên</label>
@@ -229,15 +220,26 @@ const LearningProcess = () => {
                             className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         >
                             <option value="">Chọn đối tượng ưu tiên</option>
-                            <option value="DT1">Nhóm 1</option>
-                            <option value="DT2">Nhóm 2</option>
-                            <option value="DT3">Nhóm 3</option>
-                            <option value="DT4">Nhóm 4</option>
-                            <option value="DT5">Nhóm 5</option>
-                            <option value="DT6">Nhóm 6</option>
-                            <option value="DT7">Nhóm 7</option>
+                            <option value="OBJ001">Nhóm 1</option>
+                            <option value="OBJ002">Nhóm 2</option>
                         </select>
                         {errors.priorityGroup && <p className="text-red-500 text-sm">{errors.priorityGroup}</p>}
+                    </div>
+                    <div className="mb-6">
+                        <label className="block font-medium mb-1 text-gray-700">Khu vực ưu tiên</label>
+                        <select
+                            value={formData.region}
+                            onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        >
+                            <option value="">Chọn khu vực ưu tiên</option>
+                            <option value="R001">Khu vực 1</option>
+                            <option value="R002">Khu vực 2</option>
+                            <option value="R003">Khu vực 3</option>
+                            <option value="R004">Khu vực 4</option>
+                            <option value="R005">Khu vực 5</option>
+                        </select>
+                        {errors.region && <p className="text-red-500 text-sm">{errors.region}</p>}
                     </div>
                     <div className="mb-6">
                         <label className="block font-medium mb-1 text-gray-700">Năm tốt ngiệp</label>
@@ -255,7 +257,7 @@ const LearningProcess = () => {
                         className="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium hover:bg-blue-600 transition duration-200"
                         onClick={handleSubmit}
                     >
-                        {isEditing ? "Cập nhật" : "Gửi thông tin"}
+                        Cập nhật
                     </button>
                 </div>
             </section>
