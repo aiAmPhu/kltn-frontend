@@ -15,6 +15,7 @@ const UserList = ({ users = [], setUsers }) => {
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
     const [roleCount, setRoleCount] = useState(0);
     const [error, setError] = useState("");
     
@@ -26,6 +27,16 @@ const UserList = ({ users = [], setUsers }) => {
     // Full width adjustment
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
+    // Debounce search query with cleanup
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+            setCurrentPage(1); // Reset to first page when search changes
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
     // Load users from API
     const loadUsers = async () => {
         setIsLoading(true);
@@ -35,7 +46,9 @@ const UserList = ({ users = [], setUsers }) => {
             const response = await axios.get(`${API_BASE_URL}/users/getall`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setUsers(response.data.data || response.data);
+            const userData = response.data.data || response.data;
+            setUsers(userData);
+            setFilteredUsers(userData); // Initialize filteredUsers with all users
             setError("");
         } catch (error) {
             setError(error.response?.data?.message || "Lỗi khi tải danh sách người dùng");
@@ -61,32 +74,44 @@ const UserList = ({ users = [], setUsers }) => {
         };
     }, []);
 
-    // Update filteredUsers and roleCount when role or users change
+    // Update filteredUsers and roleCount when filters change
     useEffect(() => {
-        if (!Array.isArray(users)) return;
-
-        let filtered = [];
-        if (role === "all") {
-            filtered = users;
-        } else {
-            filtered = users.filter((user) => user.role === role);
+        if (!users || !Array.isArray(users)) {
+            setFilteredUsers([]);
+            setRoleCount(0);
+            return;
         }
 
-        if (searchQuery) {
+        let filtered = [...users];
+        
+        // Apply role filter
+        if (role !== "all") {
+            filtered = filtered.filter((user) => user.role.toLowerCase() === role.toLowerCase());
+        }
+
+        // Apply search filter
+        if (debouncedSearchQuery.trim()) {
+            const query = debouncedSearchQuery.toLowerCase().trim();
             filtered = filtered.filter((user) =>
-                user.name.toLowerCase().includes(searchQuery.toLowerCase())
+                user.name.toLowerCase().includes(query) ||
+                user.email.toLowerCase().includes(query)
             );
         }
 
         setFilteredUsers(filtered);
         setRoleCount(filtered.length);
         
-        // Reset to first page when filters change
-        setCurrentPage(1);
-    }, [role, users, searchQuery]);
+        // Adjust current page if necessary
+        const maxPage = Math.ceil(filtered.length / usersPerPage);
+        if (currentPage > maxPage) {
+            setCurrentPage(Math.max(1, maxPage));
+        }
+    }, [role, users, debouncedSearchQuery, usersPerPage]);
 
     const handleRoleChange = (e) => {
-        setRole(e.target.value);
+        const newRole = e.target.value;
+        setRole(newRole);
+        setCurrentPage(1); // Reset to first page when role changes
         setIsDropdownOpen(false);
     };
 
