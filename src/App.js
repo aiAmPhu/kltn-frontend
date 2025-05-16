@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import Announcements from "./components/Announcements.jsx";
 import Timeline from "./components/Timeline.jsx";
 import RegisterStep1 from "./pages/UserPages/Register/RegisterStep1.jsx";
@@ -22,6 +23,7 @@ import ChangePassword from "./pages/UserPages/ChangePassword.jsx";
 import ReviewerPage from "./pages/ReviewerPages/ReviewerPage.jsx";
 import AdminPage from "./pages/AdminPages/AdminPage.jsx";
 import UserDetailPage from "./pages/ReviewerPages/UserDetailPage.jsx";
+import UserListPage from "./pages/AdminPages/UserPage/UserListPage.jsx";
 
 function App() {
     return (
@@ -82,7 +84,11 @@ function App() {
                             <AdminPage />
                         </ProtectedRoute>
                     }
-                />
+                >
+                    <Route index element={<Navigate to="users" replace />} />
+                    <Route path="users" element={<UserListPage />} />
+                  
+                </Route>
                 <Route
                     path="/reviewer"
                     element={
