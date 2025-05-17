@@ -32,7 +32,9 @@ import AdmissionMajorListPage from "./pages/AdminPages/AdmissionMajorPage/Admiss
 import AdmissionRegionListPage from "./pages/AdminPages/AdmissionRegionPage/AdmissionRegionListPage.jsx";
 import AdmissionObjectListPage from "./pages/AdminPages/AdmissionObjectPage/AdmissionObjectListPage.jsx";
 import AdmissionQuantityListPage from "./pages/AdminPages/AdmissionQuantityPage/AdmissionQuantityListPage.jsx";
-
+import PermissionListPage from "./pages/AdminPages/PermissionPage/PermissionListPage.jsx";
+import ListAcceptedPage from "./pages/AdminPages/ListAcceptedPage/ListAcceptedPage.jsx";
+import FilterPage from "./pages/AdminPages/FilterPage/FilterPage.jsx";
 function App() {
     return (
         <>
@@ -101,6 +103,9 @@ function App() {
                     <Route path="admission-regions" element={<AdmissionRegionListPage />} />
                     <Route path="admission-objects" element={<AdmissionObjectListPage />} />
                     <Route path="admission-quantities" element={<AdmissionQuantityListPage />} />
+                    <Route path="permissions" element={<PermissionListPage />} />
+                    <Route path="list-accepted" element={<ListAcceptedPage />} />
+                    <Route path="filter" element={<FilterPage />} />
                 </Route>
                 <Route
                     path="/reviewer"

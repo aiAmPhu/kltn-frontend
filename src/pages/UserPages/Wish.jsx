@@ -6,6 +6,7 @@ function WishRegistration() {
     const [blockList, setBlockList] = useState([]);
     const [majorList, setMajorList] = useState([]);
     const [userWishes, setUserWishes] = useState([]);
+    const [acceptedWishes, setAcceptedWishes] = useState([]);
     const [availableBlocks, setAvailableBlocks] = useState([]);
     const [selected, setSelected] = useState({
         criteriaId: "",
@@ -15,6 +16,7 @@ function WishRegistration() {
 
     const token = localStorage.getItem("token");
     const userId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
+    const userRole = token ? JSON.parse(atob(token.split(".")[1])).role : null;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -33,12 +35,29 @@ function WishRegistration() {
                 setBlockList(blockRes.data);
                 setMajorList(majorRes.data);
                 setUserWishes(wishRes.data.wishes);
+
+                // Fetch accepted wishes if user is admin
+                if (userRole === 'admin') {
+                    try {
+                        const acceptedRes = await axios.get(
+                            `${process.env.REACT_APP_API_BASE_URL}/wish/getAccepted`,
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${token}`,
+                                },
+                            }
+                        );
+                        setAcceptedWishes(acceptedRes.data);
+                    } catch (error) {
+                        console.error("Lỗi khi tải danh sách nguyện vọng đã chấp nhận:", error);
+                    }
+                }
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu:", error);
             }
         };
         fetchData();
-    }, [userId]);
+    }, [userId, userRole]);
 
     const handleSave = async () => {
         try {
@@ -86,6 +105,34 @@ function WishRegistration() {
             <h1 className="text-3xl font-bold mb-8 text-blue-700 border-l-8 border-blue-500 pl-4 bg-blue-50 py-2">
                 ĐĂNG KÝ NGUYỆN VỌNG XÉT TUYỂN
             </h1>
+
+            {userRole === 'admin' && acceptedWishes.length > 0 && (
+                <div className="mb-8 bg-green-50 p-4 rounded-lg">
+                    <h2 className="text-lg font-semibold text-green-800 mb-2">Nguyện vọng đã được chấp nhận</h2>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full bg-white">
+                            <thead>
+                                <tr className="bg-green-100">
+                                    <th className="px-4 py-2 text-left">Người dùng</th>
+                                    <th className="px-4 py-2 text-left">Ngành</th>
+                                    <th className="px-4 py-2 text-left">Diện xét tuyển</th>
+                                    <th className="px-4 py-2 text-left">Khối xét tuyển</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {acceptedWishes.map((wish, index) => (
+                                    <tr key={index} className="border-b hover:bg-green-50">
+                                        <td className="px-4 py-2">{wish.userName}</td>
+                                        <td className="px-4 py-2">{wish.majorId}</td>
+                                        <td className="px-4 py-2">{wish.criteriaId}</td>
+                                        <td className="px-4 py-2">{wish.admissionBlockId}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
 
             {userWishes.length > 0 && (
                 <div className="mb-8">
