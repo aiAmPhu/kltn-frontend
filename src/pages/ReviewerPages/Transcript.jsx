@@ -8,7 +8,6 @@ const Transcript = ({ userId }) => {
     const [showRejectInput, setShowRejectInput] = useState(false);
     const [rejectionReason, setRejectionReason] = useState("");
     const [actionStatus, setActionStatus] = useState("");
-    const [subjectMap, setSubjectMap] = useState({});
     const token = localStorage.getItem("token");
     useEffect(() => {
         const fetchTranscript = async () => {
@@ -35,8 +34,8 @@ const Transcript = ({ userId }) => {
     const handleAccept = async () => {
         try {
             const token = localStorage.getItem("token");
-            await axios.post(
-                `${process.env.REACT_APP_API_BASE_URL}/adis/accept/${userId}`,
+            await axios.put(
+                `${process.env.REACT_APP_API_BASE_URL}/transcripts/accept/${userId}`,
                 {},
                 {
                     headers: { Authorization: `Bearer ${token}` },
@@ -55,10 +54,10 @@ const Transcript = ({ userId }) => {
         }
         try {
             const token = localStorage.getItem("token");
-            await axios.post(
-                `${process.env.REACT_APP_API_BASE_URL}/adis/reject/${userId}`,
+            await axios.put(
+                `${process.env.REACT_APP_API_BASE_URL}/transcripts/reject/${userId}`,
                 {
-                    reason: rejectionReason,
+                    feedback: rejectionReason,
                 },
                 {
                     headers: { Authorization: `Bearer ${token}` },

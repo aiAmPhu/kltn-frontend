@@ -51,13 +51,14 @@ const Information = ({ userId }) => {
     const handleReject = async () => {
         if (!rejectionReason.trim()) {
             setActionStatus("Vui lòng nhập lý do từ chối.");
+            console.log(rejectionReason);
             return;
         }
         try {
             //const token = localStorage.getItem("token");
             await axios.put(
                 `${process.env.REACT_APP_API_BASE_URL}/adis/reject/${userId}`,
-                { reason: rejectionReason },
+                { feedback: rejectionReason },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

@@ -59,7 +59,7 @@ const LearningProccess = ({ userId }) => {
         try {
             await axios.put(
                 `${process.env.REACT_APP_API_BASE_URL}/learning/reject/${userId}`,
-                { reason: rejectionReason },
+                { feedback: rejectionReason },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

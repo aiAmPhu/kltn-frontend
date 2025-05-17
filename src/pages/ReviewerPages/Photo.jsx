@@ -51,7 +51,7 @@ const Photo = ({ userId }) => {
             await axios.put(
                 `${process.env.REACT_APP_API_BASE_URL}/photo/reject/${userId}`,
                 {
-                    reason: rejectionReason,
+                    feedback: rejectionReason,
                 },
                 {
                     headers: { Authorization: `Bearer ${token}` },
