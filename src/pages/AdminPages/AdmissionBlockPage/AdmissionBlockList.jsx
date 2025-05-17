@@ -3,6 +3,7 @@ import axios from "axios";
 import InfoModal from "../Modals/AdmissionBlockModal/InfoModal";
 import AdmissionBlockFormModal from "../Modals/AdmissionBlockModal/AdmissionBlockFormModal";
 import { ChevronDownIcon, ChevronUpIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { FaFileExport, FaFileImport } from "react-icons/fa";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -17,6 +18,8 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [blocksPerPage, setBlocksPerPage] = useState(5);
     const [isLoading, setIsLoading] = useState(true);
+    const [importError, setImportError] = useState("");
+    const [importSuccess, setImportSuccess] = useState("");
 
     // Load admission blocks from API
     const loadAdmissionBlocks = async () => {
@@ -132,6 +135,62 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
         return range;
     };
 
+    const handleExport = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get(`${API_BASE_URL}/adbs/export`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            // Create a blob from the response data
+            const blob = new Blob([JSON.stringify(response.data, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'admission_blocks.json');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            setError(error.response?.data?.message || "Lỗi khi xuất dữ liệu");
+        }
+    };
+
+    const handleImport = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        try {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const adBlocks = JSON.parse(e.target.result);
+                    const token = localStorage.getItem("token");
+                    
+                    const response = await axios.post(
+                        `${API_BASE_URL}/adbs/import`,
+                        { adBlocks },
+                        { headers: { Authorization: `Bearer ${token}` } }
+                    );
+
+                    setImportSuccess(`Import thành công: ${response.data.results.success.length} khối, ${response.data.results.errors.length} lỗi`);
+                    setImportError("");
+                    
+                    // Refresh the list
+                    await loadAdmissionBlocks();
+                } catch (error) {
+                    setImportError(error.response?.data?.message || "Lỗi khi import dữ liệu");
+                    setImportSuccess("");
+                }
+            };
+            reader.readAsText(file);
+        } catch (error) {
+            setImportError("Lỗi khi đọc file");
+            setImportSuccess("");
+        }
+    };
+
     return (
         <div className="w-full bg-white shadow-md">
             <div className="p-6">
@@ -155,6 +214,18 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                                 <p className="text-sm text-red-700">{error}</p>
                             </div>
                         </div>
+                    </div>
+                )}
+
+                {importError && (
+                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                        <p className="text-sm text-red-700">{importError}</p>
+                    </div>
+                )}
+
+                {importSuccess && (
+                    <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
+                        <p className="text-sm text-green-700">{importSuccess}</p>
                     </div>
                 )}
 
@@ -185,21 +256,38 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                         </div>
                     </div>
 
-                    <button
-                        onClick={handleAddBlock}
-                        className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors flex items-center whitespace-nowrap"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5 mr-1"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={handleExport}
+                            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors flex items-center gap-2"
                         >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        Thêm khối xét tuyển
-                    </button>
+                            <FaFileExport /> Xuất
+                        </button>
+                        <label className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors flex items-center gap-2 cursor-pointer">
+                            <FaFileImport /> Nhập
+                            <input
+                                type="file"
+                                accept=".json"
+                                onChange={handleImport}
+                                className="hidden"
+                            />
+                        </label>
+                        <button
+                            onClick={handleAddBlock}
+                            className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors flex items-center whitespace-nowrap"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5 mr-1"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                            Thêm khối xét tuyển
+                        </button>
+                    </div>
                 </div>
 
                 <div className="border border-gray-300 rounded-md overflow-hidden">
