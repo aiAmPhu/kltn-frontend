@@ -17,10 +17,10 @@ const UserDetailPage = () => {
     const [activeTab, setActiveTab] = useState("info");
 
     const menuItems = [
+        { path: "photo", label: "Ảnh cần thiết", icon: <FaImages className="text-lg" /> },
         { path: "info", label: "Thông tin", icon: <FaUser className="text-lg" /> },
         { path: "progress", label: "Quá trình học", icon: <FaGraduationCap className="text-lg" /> },
         { path: "transcript", label: "Học bạ", icon: <FaFileAlt className="text-lg" /> },
-        { path: "photo", label: "Ảnh cần thiết", icon: <FaImages className="text-lg" /> },
     ];
 
     const handleLogout = () => {

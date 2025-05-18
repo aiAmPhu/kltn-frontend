@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaCheckCircle, FaTimesCircle, FaClock, FaImages } from "react-icons/fa";
+import { FaCheckCircle, FaTimesCircle, FaClock, FaImages, FaTimes, FaExclamationTriangle } from "react-icons/fa";
 
 const statusMap = {
     accepted: {
@@ -33,6 +33,7 @@ const Photo = ({ userId }) => {
     const [showRejectInput, setShowRejectInput] = useState(false);
     const [rejectionReason, setRejectionReason] = useState("");
     const [actionStatus, setActionStatus] = useState("");
+    const [selectedImage, setSelectedImage] = useState(null);
     const token = localStorage.getItem("token");
     useEffect(() => {
         const fetchData = async () => {
@@ -88,18 +89,128 @@ const Photo = ({ userId }) => {
         }
     };
 
+    const renderImage = (label, url) => (
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+            <h3 className="font-semibold text-lg mb-2">{label}</h3>
+            <div 
+                className="cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => setSelectedImage({ label, url })}
+            >
+                <img 
+                    src={url} 
+                    alt={label} 
+                    className="w-48 h-48 object-cover rounded-lg border border-gray-200" 
+                />
+            </div>
+        </div>
+    );
+
+    const checkImageSize = (url) => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                const ratio = img.width / img.height;
+                const isCorrectRatio = Math.abs(ratio - (300/436)) < 0.05; // Cho phép sai số 5%
+                resolve({
+                    width: img.width,
+                    height: img.height,
+                    ratio,
+                    isCorrectRatio
+                });
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+    };
+
+    const ImageModal = ({ image, onClose }) => {
+        const [imageSize, setImageSize] = useState(null);
+        const [loading, setLoading] = useState(true);
+
+        useEffect(() => {
+            if (image?.label === "Ảnh chân dung") {
+                setLoading(true);
+                checkImageSize(image.url).then(result => {
+                    setImageSize(result);
+                    setLoading(false);
+                });
+            }
+        }, [image]);
+
+        if (!image) return null;
+        
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-auto">
+                    <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                        <h3 className="text-xl font-semibold text-gray-800">{image.label}</h3>
+                        <button 
+                            onClick={onClose}
+                            className="text-gray-500 hover:text-gray-700 transition-colors"
+                        >
+                            <FaTimes className="w-6 h-6" />
+                        </button>
+                    </div>
+                    <div className="p-4">
+                        {image.label === "Ảnh chân dung" ? (
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="relative w-[300px] h-[436px] bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <img 
+                                            src={image.url} 
+                                            alt={image.label} 
+                                            className="w-[225px] h-[327px] object-cover rounded-lg border border-gray-200" 
+                                        />
+                                    </div>
+                                    <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                                        3x4 cm
+                                    </div>
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                    Kích thước chuẩn: 3x4 cm (300x436 pixels)
+                                </div>
+                                {loading ? (
+                                    <div className="text-sm text-gray-500">Đang kiểm tra kích thước...</div>
+                                ) : imageSize && (
+                                    <div className={`p-3 rounded-lg ${imageSize.isCorrectRatio ? 'bg-green-50' : 'bg-red-50'} w-full`}>
+                                        <div className="flex items-center gap-2">
+                                            {imageSize.isCorrectRatio ? (
+                                                <FaCheckCircle className="w-5 h-5 text-green-500" />
+                                            ) : (
+                                                <FaExclamationTriangle className="w-5 h-5 text-red-500" />
+                                            )}
+                                            <div className="text-sm">
+                                                <div className="font-medium">
+                                                    {imageSize.isCorrectRatio ? 'Đúng tỷ lệ 3x4' : 'Không đúng tỷ lệ 3x4'}
+                                                </div>
+                                                <div className="text-gray-600">
+                                                    Kích thước hiện tại: {imageSize.width}x{imageSize.height} pixels
+                                                    <br />
+                                                    Tỷ lệ: {(imageSize.ratio * 100).toFixed(1)}%
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <img 
+                                src={image.url} 
+                                alt={image.label} 
+                                className="w-full h-auto max-h-[60vh] object-contain rounded-lg"
+                            />
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     if (loading) return <p>Đang tải ảnh...</p>;
     if (error) return <p className="text-red-500">{error}</p>;
     if (!photoData) return null;
 
     const statusInfo = getStatusInfo(photoData.status);
-
-    const renderImage = (label, url) => (
-        <div className="bg-white p-4 rounded-lg shadow-sm">
-            <h3 className="font-semibold text-lg mb-2">{label}</h3>
-            <img src={url} alt={label} className="w-full max-w-md rounded-lg border border-gray-200" />
-        </div>
-    );
 
     return (
         <div className="flex flex-col h-full bg-gray-50">
@@ -111,8 +222,9 @@ const Photo = ({ userId }) => {
                             <FaImages className="w-6 h-6 text-blue-500" />
                             Hồ sơ ảnh
                         </h2>
-                        <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {renderImage("Ảnh chân dung", photoData.personalPic)}
+                            {renderImage("Giấy khai sinh", photoData.birthCertificate)}
                             {renderImage("Mặt trước CCCD", photoData.frontCCCD)}
                             {renderImage("Mặt sau CCCD", photoData.backCCCD)}
                             {renderImage("Ảnh học bạ lớp 10", photoData.grade10Pic)}
@@ -193,6 +305,14 @@ const Photo = ({ userId }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Image Preview Modal */}
+            {selectedImage && (
+                <ImageModal 
+                    image={selectedImage} 
+                    onClose={() => setSelectedImage(null)} 
+                />
+            )}
         </div>
     );
 };

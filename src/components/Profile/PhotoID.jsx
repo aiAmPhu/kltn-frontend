@@ -5,6 +5,7 @@ const PhotoID = () => {
     const token = localStorage.getItem("token");
     const userId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
     const [personalPic, setPersonalPic] = useState(null);
+    const [birthCertificate, setBirthCertificate] = useState(null);
     const [frontCCCD, setFrontCCCD] = useState(null);
     const [backCCCD, setBackCCCD] = useState(null);
     const [grade10Pic, setGrade10Pic] = useState(null);
@@ -21,6 +22,7 @@ const PhotoID = () => {
                 if (response) {
                     // Nếu tìm thấy, cập nhật formData
                     setPersonalPic(response.data.data.personalPic);
+                    setBirthCertificate(response.data.data.birthCertificate);
                     setFrontCCCD(response.data.data.frontCCCD);
                     setBackCCCD(response.data.data.backCCCD);
                     setGrade10Pic(response.data.data.grade10Pic);
@@ -56,6 +58,7 @@ const PhotoID = () => {
         console.log("Personal Pic:", personalPic);
         const updateData = {
             personalPic,
+            birthCertificate,
             frontCCCD,
             backCCCD,
             grade10Pic,
@@ -88,6 +91,7 @@ const PhotoID = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl">
                 {[
                     { label: "Ảnh thẻ 3x4", file: personalPic, setFile: setPersonalPic },
+                    { label: "Giấy khai sinh", file: birthCertificate, setFile: setBirthCertificate },
                     { label: "Mặt trước CCCD", file: frontCCCD, setFile: setFrontCCCD },
                     { label: "Mặt sau CCCD", file: backCCCD, setFile: setBackCCCD },
                     { label: "Điểm học bạ lớp 10", file: grade10Pic, setFile: setGrade10Pic },
