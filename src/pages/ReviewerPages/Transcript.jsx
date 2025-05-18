@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaCheckCircle, FaTimesCircle, FaClock, FaBook } from "react-icons/fa";
+import { FaCheckCircle, FaTimesCircle, FaClock, FaBook, FaImages, FaTimes } from "react-icons/fa";
 
 const statusMap = {
     accepted: {
@@ -28,33 +28,43 @@ function getStatusInfo(status) {
 
 const Transcript = ({ userId }) => {
     const [data, setData] = useState(null);
+    const [photoData, setPhotoData] = useState(null);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
     const [showRejectInput, setShowRejectInput] = useState(false);
     const [rejectionReason, setRejectionReason] = useState("");
     const [actionStatus, setActionStatus] = useState("");
+    const [selectedImage, setSelectedImage] = useState(null);
     const token = localStorage.getItem("token");
 
     useEffect(() => {
-        const fetchTranscript = async () => {
+        const fetchData = async () => {
             try {
-                const res = await axios.get(
-                    `${process.env.REACT_APP_API_BASE_URL}/transcripts/getTranscriptByE/${userId}`,
-                    {
+                const [transcriptRes, photoRes] = await Promise.all([
+                    axios.get(
+                        `${process.env.REACT_APP_API_BASE_URL}/transcripts/getTranscriptByE/${userId}`,
+                        {
+                            headers: { Authorization: `Bearer ${token}` },
+                        }
+                    ),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/photo/getPhoto/${userId}`, {
                         headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
+                    })
+                ]);
 
-                if (!res) setError("Không tìm thấy học bạ.");
-                else setData(res.data.data);
+                if (!transcriptRes) setError("Không tìm thấy học bạ.");
+                else {
+                    setData(transcriptRes.data.data);
+                    setPhotoData(photoRes.data.data);
+                }
             } catch (err) {
                 console.error(err);
-                setError("Lỗi khi tải học bạ.");
+                setError("Lỗi khi tải dữ liệu.");
             } finally {
                 setLoading(false);
             }
         };
-        fetchTranscript();
+        fetchData();
     }, [userId, token]);
 
     const handleAccept = async () => {
@@ -91,6 +101,34 @@ const Transcript = ({ userId }) => {
         } catch {
             setActionStatus("Lỗi khi từ chối.");
         }
+    };
+
+    const ImageModal = ({ image, onClose }) => {
+        if (!image) return null;
+        
+        return (
+            <div className="fixed inset-0 z-50 pointer-events-none">
+                <div className="absolute inset-0 bg-black bg-opacity-50 pointer-events-auto" onClick={onClose}></div>
+                <div className="absolute right-0 top-0 h-full w-[500px] bg-white transform transition-transform duration-300 ease-in-out pointer-events-auto">
+                    <div className="p-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                        <h3 className="text-xl font-semibold text-gray-800">{image.label}</h3>
+                        <button 
+                            onClick={onClose}
+                            className="text-gray-500 hover:text-gray-700 transition-colors"
+                        >
+                            <FaTimes className="w-6 h-6" />
+                        </button>
+                    </div>
+                    <div className="p-4">
+                        <img 
+                            src={image.url} 
+                            alt={image.label} 
+                            className="w-full h-auto object-contain rounded-lg"
+                        />
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     if (loading) return <p>Đang tải học bạ...</p>;
@@ -138,6 +176,61 @@ const Transcript = ({ userId }) => {
                 {/* Khu vực trạng thái, phản hồi và hành động bên phải */}
                 <div className="w-full md:w-1/3 lg:w-1/2 flex flex-col gap-4 md:sticky md:top-4 self-start" style={{zIndex: 10}}>
                     <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col gap-4 h-fit">
+                        {/* Ảnh học bạ */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 text-lg font-semibold text-gray-700">
+                                <FaImages className="w-5 h-5 text-blue-500" />
+                                <span>Ảnh học bạ</span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="space-y-2">
+                                    <div className="text-sm font-medium text-gray-600">Lớp 10</div>
+                                    {photoData?.grade10Pic ? (
+                                        <img 
+                                            src={photoData.grade10Pic} 
+                                            alt="Học bạ lớp 10" 
+                                            className="w-full h-24 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                                            onClick={() => setSelectedImage({ url: photoData.grade10Pic, label: "Học bạ lớp 10" })}
+                                        />
+                                    ) : (
+                                        <div className="w-full h-24 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
+                                            Chưa có ảnh
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="text-sm font-medium text-gray-600">Lớp 11</div>
+                                    {photoData?.grade11Pic ? (
+                                        <img 
+                                            src={photoData.grade11Pic} 
+                                            alt="Học bạ lớp 11" 
+                                            className="w-full h-24 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                                            onClick={() => setSelectedImage({ url: photoData.grade11Pic, label: "Học bạ lớp 11" })}
+                                        />
+                                    ) : (
+                                        <div className="w-full h-24 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
+                                            Chưa có ảnh
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="text-sm font-medium text-gray-600">Lớp 12</div>
+                                    {photoData?.grade12Pic ? (
+                                        <img 
+                                            src={photoData.grade12Pic} 
+                                            alt="Học bạ lớp 12" 
+                                            className="w-full h-24 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                                            onClick={() => setSelectedImage({ url: photoData.grade12Pic, label: "Học bạ lớp 12" })}
+                                        />
+                                    ) : (
+                                        <div className="w-full h-24 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
+                                            Chưa có ảnh
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Trạng thái và phản hồi */}
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center gap-2">
@@ -206,6 +299,14 @@ const Transcript = ({ userId }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Image Modal */}
+            {selectedImage && (
+                <ImageModal 
+                    image={selectedImage} 
+                    onClose={() => setSelectedImage(null)} 
+                />
+            )}
         </div>
     );
 };

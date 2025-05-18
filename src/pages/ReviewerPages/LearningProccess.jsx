@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaCheckCircle, FaTimesCircle, FaClock, FaGraduationCap } from "react-icons/fa";
+import { FaCheckCircle, FaTimesCircle, FaClock, FaGraduationCap, FaIdCard, FaBirthdayCake, FaTimes } from "react-icons/fa";
 
 const statusMap = {
     accepted: {
@@ -28,34 +28,43 @@ function getStatusInfo(status) {
 
 const LearningProccess = ({ userId }) => {
     const [learningData, setLearningData] = useState(null);
+    const [photoData, setPhotoData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [showRejectInput, setShowRejectInput] = useState(false);
     const [rejectionReason, setRejectionReason] = useState("");
     const [actionStatus, setActionStatus] = useState("");
+    const [selectedImage, setSelectedImage] = useState(null);
     const token = localStorage.getItem("token");
+
     useEffect(() => {
-        const fetchLearningData = async () => {
+        const fetchData = async () => {
             try {
-                const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/learning/getLPByE/${userId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                // const matched = res.data.data.find((item) => item.userId === Number(userId));
-                if (!res) {
+                const [learningRes, photoRes] = await Promise.all([
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/learning/getLPByE/${userId}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/photo/getPhoto/${userId}`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    })
+                ]);
+
+                if (!learningRes) {
                     setError("Không tìm thấy dữ liệu quá trình học.");
                 } else {
-                    setLearningData(res.data.data);
+                    setLearningData(learningRes.data.data);
+                    setPhotoData(photoRes.data.data);
                 }
             } catch (err) {
                 console.error(err);
-                setError("Lỗi khi lấy dữ liệu quá trình học.");
+                setError("Lỗi khi lấy dữ liệu.");
             } finally {
                 setLoading(false);
             }
         };
-        fetchLearningData();
+        fetchData();
     }, [userId, token]);
 
     const handleAccept = async () => {
@@ -96,6 +105,34 @@ const LearningProccess = ({ userId }) => {
             console.error(err);
             setActionStatus("Lỗi khi gửi yêu cầu từ chối.");
         }
+    };
+
+    const ImageModal = ({ image, onClose }) => {
+        if (!image) return null;
+        
+        return (
+            <div className="fixed inset-0 z-50 pointer-events-none">
+                <div className="absolute inset-0 bg-black bg-opacity-50 pointer-events-auto" onClick={onClose}></div>
+                <div className="absolute right-0 top-0 h-full w-[500px] bg-white transform transition-transform duration-300 ease-in-out pointer-events-auto">
+                    <div className="p-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                        <h3 className="text-xl font-semibold text-gray-800">{image.label}</h3>
+                        <button 
+                            onClick={onClose}
+                            className="text-gray-500 hover:text-gray-700 transition-colors"
+                        >
+                            <FaTimes className="w-6 h-6" />
+                        </button>
+                    </div>
+                    <div className="p-4">
+                        <img 
+                            src={image.url} 
+                            alt={image.label} 
+                            className="w-full h-auto object-contain rounded-lg"
+                        />
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     if (loading) return <p>Đang tải dữ liệu...</p>;
@@ -154,6 +191,48 @@ const LearningProccess = ({ userId }) => {
                 {/* Khu vực trạng thái, phản hồi và hành động bên phải */}
                 <div className="w-full md:w-1/3 lg:w-1/2 flex flex-col gap-4 md:sticky md:top-4 self-start" style={{zIndex: 10}}>
                     <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col gap-4 h-fit">
+                        {/* Ảnh CCCD và giấy khai sinh */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 text-lg font-semibold text-gray-700">
+                                <FaIdCard className="w-5 h-5 text-blue-500" />
+                                <span>Ảnh CCCD và giấy khai sinh</span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <div className="text-sm font-medium text-gray-600">CCCD mặt trước</div>
+                                    {photoData?.frontCCCD ? (
+                                        <img 
+                                            src={photoData.frontCCCD} 
+                                            alt="CCCD mặt trước" 
+                                            className="w-full h-24 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                                            onClick={() => setSelectedImage({ url: photoData.frontCCCD, label: "CCCD mặt trước" })}
+                                        />
+                                    ) : (
+                                        <div className="w-full h-24 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
+                                            Chưa có ảnh
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="text-sm font-medium text-gray-600">Giấy khai sinh</div>
+                                    {photoData?.birthCertificate ? (
+                                        <div className="relative w-full h-24 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
+                                            <img 
+                                                src={photoData.birthCertificate} 
+                                                alt="Giấy khai sinh" 
+                                                className="absolute inset-0 w-full h-full object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                                                onClick={() => setSelectedImage({ url: photoData.birthCertificate, label: "Giấy khai sinh" })}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="w-full h-24 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
+                                            Chưa có ảnh
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Trạng thái và phản hồi */}
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center gap-2">
@@ -222,6 +301,14 @@ const LearningProccess = ({ userId }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Image Modal */}
+            {selectedImage && (
+                <ImageModal 
+                    image={selectedImage} 
+                    onClose={() => setSelectedImage(null)} 
+                />
+            )}
         </div>
     );
 };
