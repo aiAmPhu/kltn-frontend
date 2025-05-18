@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { FaUser, FaGraduationCap, FaFileAlt, FaImages, FaSignOutAlt, FaBars, FaArrowLeft } from "react-icons/fa";
+import { FaUser, FaGraduationCap, FaFileAlt, FaImages, FaSignOutAlt, FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
+import logo from "../../assets/logo_hcmute.png";
 
 // Import các tab component
 import Information from "./Information";
@@ -16,10 +17,10 @@ const UserDetailPage = () => {
     const [activeTab, setActiveTab] = useState("info");
 
     const menuItems = [
-        { path: "info", label: "Thông tin", icon: <FaUser /> },
-        { path: "progress", label: "Quá trình học", icon: <FaGraduationCap /> },
-        { path: "transcript", label: "Học bạ", icon: <FaFileAlt /> },
-        { path: "photo", label: "Ảnh cần thiết", icon: <FaImages /> },
+        { path: "info", label: "Thông tin", icon: <FaUser className="text-lg" /> },
+        { path: "progress", label: "Quá trình học", icon: <FaGraduationCap className="text-lg" /> },
+        { path: "transcript", label: "Học bạ", icon: <FaFileAlt className="text-lg" /> },
+        { path: "photo", label: "Ảnh cần thiết", icon: <FaImages className="text-lg" /> },
     ];
 
     const handleLogout = () => {
@@ -36,86 +37,131 @@ const UserDetailPage = () => {
         return location.pathname.includes(`/${path}`);
     };
 
+    // Hover tràn hết chiều rộng sidebar
+    const linkClass = (path) =>
+        `group flex items-center w-full ${
+            isSidebarOpen ? "space-x-3 px-3" : "justify-center px-0"
+        } py-2 rounded-lg transition-all duration-200 ${
+            isActivePath(path)
+                ? "bg-blue-800 font-semibold"
+                : "hover:bg-blue-700 hover:text-white hover:scale-[1.03] hover:shadow-md"
+        } focus:outline-none`;
+
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="flex h-screen">
             {/* Sidebar */}
             <div
-                className={`fixed top-0 left-0 h-full bg-gradient-to-b from-blue-600 to-blue-800 text-white transition-all duration-300 ease-in-out shadow-xl ${
-                    isSidebarOpen ? "w-72" : "w-20"
-                }`}
+                className={`${
+                    isSidebarOpen ? "w-64" : "w-16"
+                } bg-[#00548f] text-white flex flex-col transition-all duration-300 ease-in-out border-r border-blue-900/30`}
             >
-                <div className="p-6">
-                    <div className="flex items-center justify-between mb-10">
-                        {isSidebarOpen && (
-                            <h1 className="text-2xl font-bold tracking-tight">Reviewer Panel</h1>
-                        )}
-                        <button
-                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                            className="p-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                        >
-                            <FaBars className="text-xl" />
-                        </button>
-                    </div>
+                {/* Logo */}
+                <div className="flex flex-col items-center py-4">
+                    <img
+                        src={logo}
+                        alt="HCMUTE Logo"
+                        className={`${
+                            isSidebarOpen ? "w-20" : "w-8"
+                        } mb-3 transition-all duration-300`}
+                    />
+                    {isSidebarOpen && (
+                        <span className="text-xs font-bold tracking-wide">HCMUTE</span>
+                    )}
+                </div>
 
-                    <nav className="space-y-3">
-                        {menuItems.map((item) => (
-                            <button
-                                key={item.path}
-                                onClick={() => handleNavigation(item.path)}
-                                className={`w-full flex items-center p-4 rounded-xl transition-all duration-200 ${
+                {/* Menu items */}
+                <nav className={`flex-1 ${isSidebarOpen ? "px-2" : "px-1"} space-y-1`}>
+                    {menuItems.map((item) => (
+                        <button
+                            key={item.path}
+                            onClick={() => handleNavigation(item.path)}
+                            className={linkClass(item.path)}
+                            tabIndex={0}
+                            style={{
+                                outline: "none",
+                                cursor: "pointer",
+                                width: "100%",
+                                display: "flex",
+                                alignItems: "center",
+                            }}
+                        >
+                            <span
+                                className={`transition-colors duration-150 ${
                                     isActivePath(item.path)
-                                        ? "bg-white text-blue-600 shadow-lg"
-                                        : "hover:bg-blue-700"
+                                        ? "text-white"
+                                        : "text-blue-100 group-hover:text-white"
                                 }`}
                             >
-                                <span className="text-xl">{item.icon}</span>
-                                {isSidebarOpen && (
-                                    <span className="ml-4 font-medium">{item.label}</span>
-                                )}
-                            </button>
-                        ))}
-                    </nav>
-                </div>
-
-                <div className="absolute bottom-0 w-full p-6">
-                    <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center p-4 rounded-xl hover:bg-blue-700 transition-colors duration-200"
-                    >
-                        <FaSignOutAlt className="text-xl" />
-                        {isSidebarOpen && <span className="ml-4 font-medium">Đăng xuất</span>}
-                    </button>
-                </div>
+                                {item.icon}
+                            </span>
+                            {isSidebarOpen && (
+                                <span
+                                    className={`truncate text-sm transition-colors duration-150 ${
+                                        isActivePath(item.path)
+                                            ? "font-semibold"
+                                            : "font-normal group-hover:text-white"
+                                    }`}
+                                >
+                                    {item.label}
+                                </span>
+                            )}
+                        </button>
+                    ))}
+                </nav>
             </div>
 
             {/* Main Content */}
-            <div
-                className={`transition-all duration-300 ease-in-out ${
-                    isSidebarOpen ? "ml-72" : "ml-20"
-                }`}
-            >
+            <div className="flex-1 flex flex-col">
                 {/* Topbar */}
-                <div className="bg-white shadow-sm border-b border-gray-100">
-                    <div className="max-w-7xl mx-auto px-6 py-4">
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center space-x-4">
-                                <h2 className="text-2xl font-bold text-gray-800">
-                                    Chi tiết User: <span className="text-blue-600">{id}</span>
-                                </h2>
-                            </div>
-                            <button
-                                onClick={() => navigate("/reviewer")}
-                                className="flex items-center px-4 py-2 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors duration-200"
-                            >
-                                <FaArrowLeft className="mr-2" />
-                                Quay lại
-                            </button>
-                        </div>
+                <div className="bg-[#00548f] text-white py-3 px-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                            className={`
+                                ml-3 flex items-center justify-center
+                                w-9 h-9 rounded-full
+                                bg-white/20 hover:bg-white/30
+                                text-white transition
+                                focus:outline-none
+                                border border-white/30
+                                shadow
+                            `}
+                            title={isSidebarOpen ? "Thu gọn menu" : "Mở rộng menu"}
+                            style={{
+                                backdropFilter: "blur(2px)",
+                            }}
+                        >
+                            {isSidebarOpen ? (
+                                <FaAngleDoubleLeft className="text-lg" />
+                            ) : (
+                                <FaAngleDoubleRight className="text-lg" />
+                            )}
+                        </button>
+                        <span className="text-lg font-semibold">
+                            Chi tiết User: <span className="text-blue-200">{id}</span>
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => navigate("/reviewer")}
+                            className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white"
+                        >
+                            <FaAngleDoubleLeft className="text-lg" />
+                            <span>Quay lại</span>
+                        </button>
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 transition text-white"
+                            title="Đăng xuất"
+                        >
+                            <FaSignOutAlt className="text-xl" />
+                            <span>Đăng xuất</span>
+                        </button>
                     </div>
                 </div>
 
                 {/* Content Area */}
-                <div className="max-w-7xl mx-auto p-6">
+                <div className="p-6 overflow-y-auto bg-gray-100 h-full">
                     <div className="bg-white rounded-xl shadow-sm p-6">
                         <div className="overflow-y-auto max-h-[70vh]">
                             {activeTab === "info" && <Information userId={id} />}
