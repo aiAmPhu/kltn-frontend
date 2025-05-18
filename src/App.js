@@ -35,6 +35,12 @@ import AdmissionQuantityListPage from "./pages/AdminPages/AdmissionQuantityPage/
 import PermissionListPage from "./pages/AdminPages/PermissionPage/PermissionListPage.jsx";
 import ListAcceptedPage from "./pages/AdminPages/ListAcceptedPage/ListAcceptedPage.jsx";
 import FilterPage from "./pages/AdminPages/FilterPage/FilterPage.jsx";
+// Import các component con của UserDetailPage
+import Information from "./pages/ReviewerPages/Information.jsx";
+import LearningProccess from "./pages/ReviewerPages/LearningProccess.jsx";
+import Transcript from "./pages/ReviewerPages/Transcript.jsx";
+import Photo from "./pages/ReviewerPages/Photo.jsx";
+
 function App() {
     return (
         <>
@@ -116,13 +122,19 @@ function App() {
                     }
                 />
                 <Route
-                    path="//reviewer/user/:id"
+                    path="/reviewer/user/:id/*"
                     element={
                         <ProtectedRoute allowedRoles={["reviewer"]}>
                             <UserDetailPage />
                         </ProtectedRoute>
                     }
-                />
+                >
+                    <Route index element={<Navigate to="info" replace />} />
+                    <Route path="info" element={<Information />} />
+                    <Route path="progress" element={<LearningProccess />} />
+                    <Route path="transcript" element={<Transcript />} />
+                    <Route path="photo" element={<Photo />} />
+                </Route>
             </Routes>
             <ToastContainer />
         </>
