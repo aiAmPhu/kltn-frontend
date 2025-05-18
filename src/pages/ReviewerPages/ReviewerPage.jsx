@@ -12,6 +12,14 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 
+// Hàm loại bỏ dấu tiếng Việt cho tìm kiếm không phân biệt dấu
+function removeVietnameseTones(str) {
+  if (!str) return "";
+  str = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  str = str.replace(/đ/g, "d").replace(/Đ/g, "D");
+  return str;
+}
+
 const ReviewerPage = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -99,13 +107,20 @@ const ReviewerPage = () => {
   const getFilteredUsers = () => {
     let result = users;
 
-    // Search: tìm theo tên hoặc userId (không phân biệt hoa thường, loại bỏ khoảng trắng thừa)
+    // Search: tìm theo tên hoặc userId (không phân biệt hoa thường, loại bỏ khoảng trắng thừa, không phân biệt dấu tiếng Việt)
     if (searchTerm.trim() !== "") {
-      const search = searchTerm.trim().toLowerCase();
+      const search = removeVietnameseTones(searchTerm.trim().toLowerCase());
       result = result.filter(
-        (user) =>
-          (user.name && user.name.toLowerCase().includes(search)) ||
-          (user.userId && user.userId.toString().includes(search))
+        (user) => {
+          // So sánh tên không dấu, không phân biệt hoa thường
+          const name = user.name ? removeVietnameseTones(user.name.toLowerCase()) : "";
+          // So sánh userId như cũ
+          const userIdStr = user.userId ? user.userId.toString() : "";
+          return (
+            (name && name.includes(search)) ||
+            (userIdStr && userIdStr.includes(search))
+          );
+        }
       );
     }
 
@@ -130,9 +145,9 @@ const ReviewerPage = () => {
         if (isNaN(aValue)) aValue = 0;
         if (isNaN(bValue)) bValue = 0;
       } else {
-        // String sort for name, status
-        aValue = aValue.toString().toLowerCase();
-        bValue = bValue.toString().toLowerCase();
+        // String sort for name, status (không phân biệt dấu tiếng Việt)
+        aValue = removeVietnameseTones(aValue.toString().toLowerCase());
+        bValue = removeVietnameseTones(bValue.toString().toLowerCase());
       }
 
       if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
@@ -311,8 +326,7 @@ const ReviewerPage = () => {
                     <option value="userId_desc">ID giảm dần</option>
                     <option value="name_asc">Tên A-Z</option>
                     <option value="name_desc">Tên Z-A</option>
-                    <option value="status_asc">Trạng thái A-Z</option>
-                    <option value="status_desc">Trạng thái Z-A</option>
+                   
                   </select>
                 </div>
               </div>
