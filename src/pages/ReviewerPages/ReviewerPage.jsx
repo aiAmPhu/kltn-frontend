@@ -66,12 +66,6 @@ const ReviewerPage = () => {
         const photos = photosRes.data.data || [];
         const information = informationRes.data || [];
 
-        console.log('Users:', users);
-        console.log('Transcripts:', transcripts);
-        console.log('Learning:', learning);
-        console.log('Photos:', photos);
-        console.log('Information:', information);
-
         // Combine all status information
         const usersWithStatus = users.map(user => {
           const transcript = transcripts.find(t => t.userId === user.userId);
@@ -88,7 +82,6 @@ const ReviewerPage = () => {
             adiStatus: info?.status || 'waiting'
           };
 
-          console.log('User with status:', userWithStatus);
           return userWithStatus;
         });
 
@@ -270,7 +263,7 @@ const ReviewerPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="flex-grow flex items-center justify-center">
-        <div className="w-full max-w-5xl mx-auto px-2 sm:px-4 py-8">
+        <div className="w-full max-w-7xl mx-auto px-2 sm:px-8 py-8">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col">
             {/* Header */}
             <div className="px-6 py-5 border-b border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -326,7 +319,6 @@ const ReviewerPage = () => {
                     <option value="userId_desc">ID giảm dần</option>
                     <option value="name_asc">Tên A-Z</option>
                     <option value="name_desc">Tên Z-A</option>
-                   
                   </select>
                 </div>
               </div>
