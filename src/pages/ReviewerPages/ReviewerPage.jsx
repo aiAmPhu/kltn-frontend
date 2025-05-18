@@ -34,16 +34,60 @@ const ReviewerPage = () => {
       setLoading(true);
       setError("");
       try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_API_BASE_URL}/users/getAll`,
-          {
+        const [usersRes, transcriptsRes, learningRes, photosRes, informationRes] = await Promise.all([
+          axios.get(`${process.env.REACT_APP_API_BASE_URL}/users/getAll`, {
             headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setUsers(res.data.data || []);
+          }),
+          axios.get(`${process.env.REACT_APP_API_BASE_URL}/transcripts/getAll`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${process.env.REACT_APP_API_BASE_URL}/learning/getAll`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${process.env.REACT_APP_API_BASE_URL}/photo/getAll`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${process.env.REACT_APP_API_BASE_URL}/adis/getall`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        const users = usersRes.data.data || [];
+        const transcripts = transcriptsRes.data.data || [];
+        const learning = learningRes.data.data || [];
+        const photos = photosRes.data.data || [];
+        const information = informationRes.data || [];
+
+        console.log('Users:', users);
+        console.log('Transcripts:', transcripts);
+        console.log('Learning:', learning);
+        console.log('Photos:', photos);
+        console.log('Information:', information);
+
+        // Combine all status information
+        const usersWithStatus = users.map(user => {
+          const transcript = transcripts.find(t => t.userId === user.userId);
+          const learningData = learning.find(l => l.userId === user.userId);
+          const photo = photos.find(p => p.userId === user.userId);
+          const info = information.find(i => i.userId === user.userId);
+
+          const userWithStatus = {
+            ...user,
+            status: info?.status || 'waiting',
+            transcriptStatus: transcript?.status || 'waiting',
+            learningStatus: learningData?.status || 'waiting',
+            photoStatus: photo?.status || 'waiting',
+            adiStatus: info?.status || 'waiting'
+          };
+
+          console.log('User with status:', userWithStatus);
+          return userWithStatus;
+        });
+
+        setUsers(usersWithStatus);
       } catch (err) {
         setError("Lỗi khi tải danh sách người dùng 😓");
-        console.error(err);
+        console.error('Error fetching data:', err);
       } finally {
         setLoading(false);
       }
@@ -155,22 +199,28 @@ const ReviewerPage = () => {
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case "approved":
+    if (!status) return "bg-yellow-100 text-yellow-800 border-yellow-200";
+    
+    switch (status.toLowerCase()) {
+      case "accepted":
         return "bg-green-100 text-green-800 border-green-200";
       case "rejected":
         return "bg-red-100 text-red-800 border-red-200";
+      case "waiting":
       default:
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
     }
   };
 
   const getStatusText = (status) => {
-    switch (status) {
-      case "approved":
+    if (!status) return "Đang chờ";
+    
+    switch (status.toLowerCase()) {
+      case "accepted":
         return "Đã duyệt";
       case "rejected":
         return "Từ chối";
+      case "waiting":
       default:
         return "Đang chờ";
     }
@@ -243,8 +293,8 @@ const ReviewerPage = () => {
                     className="px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                   >
                     <option value="all">Tất cả trạng thái</option>
-                    <option value="pending">Đang chờ</option>
-                    <option value="approved">Đã duyệt</option>
+                    <option value="waiting">Đang chờ</option>
+                    <option value="accepted">Đã duyệt</option>
                     <option value="rejected">Từ chối</option>
                   </select>
                   {/* Sort dropdown */}
@@ -359,13 +409,41 @@ const ReviewerPage = () => {
                                 </h3>
                               </div>
                               {/* Status */}
-                              <div className="md:col-span-3 flex items-center">
+                              <div className="md:col-span-3 flex flex-col gap-2">
                                 <span
                                   className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
                                     user.status
                                   )}`}
                                 >
-                                  {getStatusText(user.status)}
+                                  Thông tin: {getStatusText(user.status)}
+                                </span>
+                                <span
+                                  className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
+                                    user.transcriptStatus
+                                  )}`}
+                                >
+                                  Học bạ: {getStatusText(user.transcriptStatus)}
+                                </span>
+                                <span
+                                  className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
+                                    user.learningStatus
+                                  )}`}
+                                >
+                                  Quá trình: {getStatusText(user.learningStatus)}
+                                </span>
+                                <span
+                                  className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
+                                    user.photoStatus
+                                  )}`}
+                                >
+                                  Ảnh: {getStatusText(user.photoStatus)}
+                                </span>
+                                <span
+                                  className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
+                                    user.adiStatus
+                                  )}`}
+                                >
+                                  ADI: {getStatusText(user.adiStatus)}
                                 </span>
                               </div>
                             </div>

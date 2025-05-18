@@ -117,7 +117,22 @@ const Information = ({ userId }) => {
                 {user.province}
             </div>
             <div>
-                <strong>Trạng thái:</strong> {user.status}
+                <strong>Trạng thái:</strong>{" "}
+                <span
+                    className={`px-2 py-1 rounded-full text-sm ${
+                        user.status === "accepted"
+                            ? "bg-green-100 text-green-800"
+                            : user.status === "rejected"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-yellow-100 text-yellow-800"
+                    }`}
+                >
+                    {user.status === "accepted"
+                        ? "Đã chấp nhận"
+                        : user.status === "rejected"
+                        ? "Đã từ chối"
+                        : "Đang chờ xét duyệt"}
+                </span>
             </div>
             {user.feedback && (
                 <div>
