@@ -378,7 +378,7 @@ const ReviewerPage = () => {
                           {renderSortIcon("name")}
                         </div>
                         <div
-                          className="col-span-3 cursor-pointer flex items-center"
+                          className="col-span-3 cursor-pointer flex items-center justify-center"
                           onClick={() => handleSortChange("status")}
                         >
                           Trạng thái
@@ -424,7 +424,7 @@ const ReviewerPage = () => {
                               </div>
                               {/* Status */}
                               <div className="md:col-span-3 flex flex-col gap-2">
-                                <span
+                                {/* <span
                                   className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
                                     user.status
                                   )}`}
@@ -451,13 +451,35 @@ const ReviewerPage = () => {
                                   )}`}
                                 >
                                   Ảnh: {getStatusText(user.photoStatus)}
-                                </span>
+                                </span> */}
                                 <span
-                                  className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
+                                  className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(
                                     user.adiStatus
-                                  )}`}
+                                  )} ${
+                                    user.adiStatus === "accepted"
+                                      ? "bg-green-50 text-green-700 border-green-200"
+                                      : user.adiStatus === "rejected"
+                                      ? "bg-red-50 text-red-700 border-red-200"
+                                      : "bg-yellow-50 text-yellow-700 border-yellow-200"
+                                  }`}
+                                  style={{ minWidth: 120, justifyContent: "center" }}
                                 >
-                                  ADI: {getStatusText(user.adiStatus)}
+                                  {user.adiStatus === "accepted" && (
+                                    <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  )}
+                                  {user.adiStatus === "rejected" && (
+                                    <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  )}
+                                  {user.adiStatus !== "accepted" && user.adiStatus !== "rejected" && (
+                                    <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0z" />
+                                    </svg>
+                                  )}
+                                  <span>{getStatusText(user.adiStatus)}</span>
                                 </span>
                               </div>
                             </div>
