@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaUpload, FaCheck, FaTimes } from "react-icons/fa";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const PhotoID = () => {
     const token = localStorage.getItem("token");
@@ -13,7 +15,6 @@ const PhotoID = () => {
     const [grade11Pic, setGrade11Pic] = useState(null);
     const [grade12Pic, setGrade12Pic] = useState(null);
     const [isLoading, setIsLoading] = useState({});
-    const [message, setMessage] = useState({ type: '', text: '' });
     const [hasData, setHasData] = useState(false);
 
     useEffect(() => {
@@ -44,7 +45,15 @@ const PhotoID = () => {
 
     const handleUpload = async (fieldName, file, setFileUrl) => {
         if (!file) {
-            setMessage({ type: 'error', text: 'Vui lòng chọn file để tải lên' });
+            toast.error('Vui lòng chọn file để tải lên', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                style: { marginTop: '60px' }
+            });
             return;
         }
 
@@ -57,11 +66,27 @@ const PhotoID = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setFileUrl(res.data.imageUrl);
-            setMessage({ type: 'success', text: `Tải lên ${fieldName} thành công!` });
+            toast.success(`Tải lên ${fieldName} thành công!`, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                style: { marginTop: '60px' }
+            });
             console.log(`${fieldName} uploaded successfully:`, res.data.imageUrl);
         } catch (err) {
             console.error(`Error uploading ${fieldName}:`, err);
-            setMessage({ type: 'error', text: `Tải lên ${fieldName} thất bại. Vui lòng thử lại.` });
+            toast.error(`Tải lên ${fieldName} thất bại. Vui lòng thử lại.`, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                style: { marginTop: '60px' }
+            });
         } finally {
             setIsLoading(prev => ({ ...prev, [fieldName]: false }));
         }
@@ -86,12 +111,28 @@ const PhotoID = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
-            setMessage({ type: 'success', text: 'Lưu hồ sơ ảnh thành công!' });
+            toast.success('Lưu hồ sơ ảnh thành công!', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                style: { marginTop: '60px' }
+            });
             setHasData(true);
             return true;
         } catch (error) {
             console.error("Error adding photo ID:", error);
-            setMessage({ type: 'error', text: 'Lưu hồ sơ ảnh thất bại. Vui lòng thử lại.' });
+            toast.error('Lưu hồ sơ ảnh thất bại. Vui lòng thử lại.', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                style: { marginTop: '60px' }
+            });
             return false;
         } finally {
             setIsLoading(prev => ({ ...prev, submit: false }));
@@ -117,11 +158,27 @@ const PhotoID = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
-            setMessage({ type: 'success', text: 'Cập nhật hồ sơ ảnh thành công!' });
+            toast.success('Cập nhật hồ sơ ảnh thành công!', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                style: { marginTop: '60px' }
+            });
             return true;
         } catch (error) {
             console.error("Error updating photo ID:", error);
-            setMessage({ type: 'error', text: 'Cập nhật hồ sơ ảnh thất bại. Vui lòng thử lại.' });
+            toast.error('Cập nhật hồ sơ ảnh thất bại. Vui lòng thử lại.', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                style: { marginTop: '60px' }
+            });
             return false;
         } finally {
             setIsLoading(prev => ({ ...prev, submit: false }));
@@ -140,17 +197,6 @@ const PhotoID = () => {
     return (
         <div className="p-6 bg-gray-100 min-h-screen flex flex-col items-center">
             <h2 className="text-3xl font-bold mb-6 text-blue-600">Hồ sơ ảnh</h2>
-            
-            {message.text && (
-                <div className={`w-full max-w-4xl mb-6 p-4 rounded-lg ${
-                    message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                }`}>
-                    <div className="flex items-center gap-2">
-                        {message.type === 'success' ? <FaCheck /> : <FaTimes />}
-                        <span>{message.text}</span>
-                    </div>
-                </div>
-            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl">
                 {[
