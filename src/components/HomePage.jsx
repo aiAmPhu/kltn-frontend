@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
-import { HelpCircle, UserPlus, GraduationCap, Award, BookOpen } from "lucide-react";
+import { HelpCircle, UserPlus, GraduationCap, Award, BookOpen, MessageCircle, ChevronDown } from "lucide-react";
 import axios from "axios";
 import Banner from "./Banner.jsx";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 function HomePage() {
     const [majors, setMajors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showChatMenu, setShowChatMenu] = useState(false);
+    const navigate = useNavigate();
+    const { user } = useAuth();
 
     const majorImages = [
         "/Major/HCMUTE-1.jpg",
@@ -34,6 +39,24 @@ function HomePage() {
         fetchMajors();
     }, []);
 
+    const handleChatClick = (type) => {
+        if (!user) {
+            alert('Vui lòng đăng nhập để sử dụng tính năng chat');
+            return;
+        }
+        
+        switch(type) {
+            case 'admin':
+                navigate('/chat');
+                break;
+            case 'reviewer':
+                navigate('/reviewer/chat');
+                break;
+            default:
+                break;
+        }
+        setShowChatMenu(false);
+    };
 
     return (
         <div className="bg-gray-50 min-h-screen">
@@ -42,11 +65,13 @@ function HomePage() {
             <div className="max-w-6xl mx-auto px-4 py-6">
                 {/* Đại học chính quy */}
                 <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6 mb-6 shadow-md">
-                    <h2 className="text-center text-2xl font-bold text-blue-800 mb-6 flex items-center justify-center">
-                        <GraduationCap className="w-8 h-8 mr-2 text-blue-700" />
-                        ĐẠI HỌC CHÍNH QUY
-                        <GraduationCap className="w-8 h-8 ml-2 text-blue-700" />
-                    </h2>
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-2xl font-bold text-blue-800 flex items-center">
+                            <GraduationCap className="w-8 h-8 mr-2 text-blue-700" />
+                            ĐẠI HỌC CHÍNH QUY
+                            <GraduationCap className="w-8 h-8 ml-2 text-blue-700" />
+                        </h2>
+                    </div>
                     
                     {loading ? (
                         <div className="text-center p-8">
@@ -82,6 +107,41 @@ function HomePage() {
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Floating Chat Button */}
+            <div className="fixed bottom-6 right-6 z-50">
+                <div className="relative">
+                    <button
+                        onClick={() => setShowChatMenu(!showChatMenu)}
+                        className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
+                    >
+                        <MessageCircle className="w-6 h-6" />
+                        <span className="hidden md:inline">Chat</span>
+                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showChatMenu ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {/* Chat Menu Dropdown */}
+                    {showChatMenu && (
+                        <div className="absolute bottom-full right-0 mb-2 w-48 bg-white rounded-lg shadow-xl py-2 border border-gray-200">
+                            <button
+                                onClick={() => handleChatClick('admin')}
+                                className="w-full px-4 py-2 text-left hover:bg-purple-50 flex items-center space-x-2 transition-colors duration-200"
+                            >
+                                <MessageCircle className="w-4 h-4 text-purple-500" />
+                                <span className="text-gray-700">Chat với Admin</span>
+                            </button>
+                            <div className="h-px bg-gray-200 my-1"></div>
+                            <button
+                                onClick={() => handleChatClick('reviewer')}
+                                className="w-full px-4 py-2 text-left hover:bg-purple-50 flex items-center space-x-2 transition-colors duration-200"
+                            >
+                                <MessageCircle className="w-4 h-4 text-purple-500" />
+                                <span className="text-gray-700">Chat với Reviewer</span>
+                            </button>
                         </div>
                     )}
                 </div>

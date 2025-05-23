@@ -35,6 +35,9 @@ import AdmissionQuantityListPage from "./pages/AdminPages/AdmissionQuantityPage/
 import PermissionListPage from "./pages/AdminPages/PermissionPage/PermissionListPage.jsx";
 import ListAcceptedPage from "./pages/AdminPages/ListAcceptedPage/ListAcceptedPage.jsx";
 import FilterPage from "./pages/AdminPages/FilterPage/FilterPage.jsx";
+import ChatPage from "./pages/AdminPages/ChatPage/ChatPage.jsx";
+import UserChat from "./pages/UserPages/Chat.jsx";
+import ReviewerChat from "./pages/ReviewerPages/Chat.jsx";
 // Import các component con của UserDetailPage
 import Information from "./pages/ReviewerPages/Information.jsx";
 import LearningProccess from "./pages/ReviewerPages/LearningProccess.jsx";
@@ -59,6 +62,8 @@ function App() {
                     <Route path="/block" element={<Block />} />
                     <Route path="/criteria" element={<Criteria />} />
                     <Route path="/chatbot" element={<Chatbot />} />
+                    
+                    {/* Protected User Routes */}
                     <Route
                         path="/wish"
                         element={
@@ -91,7 +96,17 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
+                    <Route
+                        path="/chat"
+                        element={
+                            <ProtectedRoute allowedRoles={["user"]}>
+                                <UserChat />
+                            </ProtectedRoute>
+                        }
+                    />
                 </Route>
+
+                {/* Admin Routes */}
                 <Route
                     path="/admin/*"
                     element={
@@ -112,7 +127,10 @@ function App() {
                     <Route path="permissions" element={<PermissionListPage />} />
                     <Route path="list-accepted" element={<ListAcceptedPage />} />
                     <Route path="filter" element={<FilterPage />} />
+                    <Route path="chat" element={<ChatPage />} />
                 </Route>
+
+                {/* Reviewer Routes */}
                 <Route
                     path="/reviewer"
                     element={
@@ -120,7 +138,12 @@ function App() {
                             <ReviewerPage />
                         </ProtectedRoute>
                     }
-                />
+                >
+                    <Route index element={<Navigate to="chat" replace />} />
+                    <Route path="chat" element={<ReviewerChat />} />
+                </Route>
+
+                {/* Reviewer User Detail Routes */}
                 <Route
                     path="/reviewer/user/:id/*"
                     element={

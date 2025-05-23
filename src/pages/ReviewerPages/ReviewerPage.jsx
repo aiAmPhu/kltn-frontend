@@ -10,6 +10,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaSignOutAlt,
+  FaComments,
 } from "react-icons/fa";
 
 // Hàm loại bỏ dấu tiếng Việt cho tìm kiếm không phân biệt dấu
@@ -259,6 +260,15 @@ const ReviewerPage = () => {
     }
     return <span className="ml-1 text-blue-600">&#8595;</span>;
   };
+
+  const menuItems = [
+    {
+      to: "/reviewer/chat",
+      icon: <FaComments className="text-lg" />,
+      label: "Chat với người dùng",
+    },
+    // ... other menu items ...
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

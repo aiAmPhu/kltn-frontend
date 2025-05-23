@@ -16,6 +16,7 @@ import {
   FaFilter,
   FaAngleDoubleLeft,
   FaAngleDoubleRight,
+  FaComments,
 } from "react-icons/fa";
 import logo from "../../assets/logo_hcmute.png";
 
@@ -74,6 +75,11 @@ const menuItems = [
     to: "/admin/list-accepted",
     icon: <FaCheckCircle className="text-lg" />,
     label: "Xem danh sách trúng tuyển",
+  },
+  {
+    to: "/admin/chat",
+    icon: <FaComments className="text-lg" />,
+    label: "Chat với người dùng",
   },
 ];
 
