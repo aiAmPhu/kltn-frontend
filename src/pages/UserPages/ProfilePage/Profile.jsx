@@ -37,18 +37,27 @@ function ProfilePage() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeSection, setActiveSection] = useState(null);
+    const [idPhoto, setIdPhoto] = useState(null);
     const token = localStorage.getItem("token");
     const userId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adis/getBasicInfo/${userId}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                setUser(res.data.data);
+                const [userRes, photoRes] = await Promise.all([
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/adis/getBasicInfo/${userId}`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/photo/getPhoto/${userId}`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    })
+                ]);
+                setUser(userRes.data.data);
+                if (photoRes.data.data) {
+                    setIdPhoto(photoRes.data.data.personalPic);
+                }
             } catch (err) {
-                console.error("Lỗi khi lấy thông tin cơ bản người dùng:", err);
+                console.error("Lỗi khi lấy thông tin:", err);
             } finally {
                 setLoading(false);
             }
@@ -184,9 +193,19 @@ function ProfilePage() {
                                 <div className="grid md:grid-cols-2 gap-8">
                                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                                         <div className="flex flex-col items-center">
-                                            <div className="w-32 h-40 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-                                                <FaIdCard className="text-4xl text-gray-400" />
-                                            </div>
+                                            {idPhoto ? (
+                                                <div className="w-32 h-40 bg-gray-100 rounded-lg mb-4 overflow-hidden">
+                                                    <img 
+                                                        src={idPhoto} 
+                                                        alt="Ảnh thẻ" 
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div className="w-32 h-40 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
+                                                    <FaIdCard className="text-4xl text-gray-400" />
+                                                </div>
+                                            )}
                                             <h4 className="text-lg font-semibold text-gray-800 mb-2">Ảnh thẻ</h4>
                                             <p className="text-sm text-gray-500">Kích thước: 3x4 cm</p>
                                         </div>
