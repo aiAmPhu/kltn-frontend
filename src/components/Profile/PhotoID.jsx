@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { FaUpload, FaCheck, FaTimes } from "react-icons/fa";
 
 const PhotoID = () => {
     const token = localStorage.getItem("token");
@@ -11,16 +12,17 @@ const PhotoID = () => {
     const [grade10Pic, setGrade10Pic] = useState(null);
     const [grade11Pic, setGrade11Pic] = useState(null);
     const [grade12Pic, setGrade12Pic] = useState(null);
+    const [isLoading, setIsLoading] = useState({});
+    const [message, setMessage] = useState({ type: '', text: '' });
+    const [hasData, setHasData] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Gọi API để lấy danh sách thông tin từ cơ sở dữ liệu
                 const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/photo/getPhoto/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                if (response) {
-                    // Nếu tìm thấy, cập nhật formData
+                if (response.data.data) {
                     setPersonalPic(response.data.data.personalPic);
                     setBirthCertificate(response.data.data.birthCertificate);
                     setFrontCCCD(response.data.data.frontCCCD);
@@ -28,76 +30,138 @@ const PhotoID = () => {
                     setGrade10Pic(response.data.data.grade10Pic);
                     setGrade11Pic(response.data.data.grade11Pic);
                     setGrade12Pic(response.data.data.grade12Pic);
+                    setHasData(true);
+                } else {
+                    setHasData(false);
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
+                setHasData(false);
             }
         };
         fetchData();
     }, [token, userId]);
+
     const handleUpload = async (fieldName, file, setFileUrl) => {
+        if (!file) {
+            setMessage({ type: 'error', text: 'Vui lòng chọn file để tải lên' });
+            return;
+        }
+
         const formData = new FormData();
         formData.append("image", file);
 
         try {
+            setIsLoading(prev => ({ ...prev, [fieldName]: true }));
             const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/upload/`, formData, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setFileUrl(res.data.imageUrl); // Cập nhật URL ảnh trả về từ server
+            setFileUrl(res.data.imageUrl);
+            setMessage({ type: 'success', text: `Tải lên ${fieldName} thành công!` });
             console.log(`${fieldName} uploaded successfully:`, res.data.imageUrl);
         } catch (err) {
             console.error(`Error uploading ${fieldName}:`, err);
+            setMessage({ type: 'error', text: `Tải lên ${fieldName} thất bại. Vui lòng thử lại.` });
+        } finally {
+            setIsLoading(prev => ({ ...prev, [fieldName]: false }));
         }
     };
+
+    const addPhotoID = async () => {
+        try {
+            setIsLoading(prev => ({ ...prev, submit: true }));
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_BASE_URL}/photo/add`,
+                {
+                    userId,
+                    personalPic,
+                    birthCertificate,
+                    frontCCCD,
+                    backCCCD,
+                    grade10Pic,
+                    grade11Pic,
+                    grade12Pic,
+                },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            setMessage({ type: 'success', text: 'Lưu hồ sơ ảnh thành công!' });
+            setHasData(true);
+            return true;
+        } catch (error) {
+            console.error("Error adding photo ID:", error);
+            setMessage({ type: 'error', text: 'Lưu hồ sơ ảnh thất bại. Vui lòng thử lại.' });
+            return false;
+        } finally {
+            setIsLoading(prev => ({ ...prev, submit: false }));
+        }
+    };
+
+    const updatePhotoID = async () => {
+        try {
+            setIsLoading(prev => ({ ...prev, submit: true }));
+            const updateData = {
+                personalPic,
+                birthCertificate,
+                frontCCCD,
+                backCCCD,
+                grade10Pic,
+                grade11Pic,
+                grade12Pic,
+            };
+            const response = await axios.put(
+                `${process.env.REACT_APP_API_BASE_URL}/photo/update/${userId}`,
+                updateData,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            setMessage({ type: 'success', text: 'Cập nhật hồ sơ ảnh thành công!' });
+            return true;
+        } catch (error) {
+            console.error("Error updating photo ID:", error);
+            setMessage({ type: 'error', text: 'Cập nhật hồ sơ ảnh thất bại. Vui lòng thử lại.' });
+            return false;
+        } finally {
+            setIsLoading(prev => ({ ...prev, submit: false }));
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        updateInformation();
-    };
-    const updateInformation = async () => {
-        console.log("Updating information...");
-        console.log("Personal Pic:", personalPic);
-        const updateData = {
-            personalPic,
-            birthCertificate,
-            frontCCCD,
-            backCCCD,
-            grade10Pic,
-            grade11Pic,
-            grade12Pic,
-        };
-        try {
-            if (userId) {
-                // Gửi yêu cầu cập nhật
-                const updateResponse = await axios.put(
-                    `${process.env.REACT_APP_API_BASE_URL}/photo/update/${userId}`,
-                    updateData,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
-                // Thông báo thành công
-                alert(updateResponse.data.message || "Data updated successfully!");
-            } else {
-                alert("No data available.");
-            }
-        } catch (error) {
-            console.error("Error while submitting data:", error.response?.data?.message || error.message);
-            alert("Failed to update data. Please try again.");
+        if (!hasData) {
+            await addPhotoID();
+        } else {
+            await updatePhotoID();
         }
     };
+
     return (
         <div className="p-6 bg-gray-100 min-h-screen flex flex-col items-center">
             <h2 className="text-3xl font-bold mb-6 text-blue-600">Hồ sơ ảnh</h2>
+            
+            {message.text && (
+                <div className={`w-full max-w-4xl mb-6 p-4 rounded-lg ${
+                    message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                }`}>
+                    <div className="flex items-center gap-2">
+                        {message.type === 'success' ? <FaCheck /> : <FaTimes />}
+                        <span>{message.text}</span>
+                    </div>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl">
                 {[
-                    { label: "Ảnh thẻ 3x4", file: personalPic, setFile: setPersonalPic },
-                    { label: "Giấy khai sinh", file: birthCertificate, setFile: setBirthCertificate },
-                    { label: "Mặt trước CCCD", file: frontCCCD, setFile: setFrontCCCD },
-                    { label: "Mặt sau CCCD", file: backCCCD, setFile: setBackCCCD },
-                    { label: "Điểm học bạ lớp 10", file: grade10Pic, setFile: setGrade10Pic },
-                    { label: "Điểm học bạ lớp 11", file: grade11Pic, setFile: setGrade11Pic },
-                    { label: "Điểm học bạ lớp 12", file: grade12Pic, setFile: setGrade12Pic },
-                ].map(({ label, file, setFile }, index) => (
+                    { label: "Ảnh thẻ 3x4", file: personalPic, setFile: setPersonalPic, fieldName: "Ảnh thẻ 3x4" },
+                    { label: "Giấy khai sinh", file: birthCertificate, setFile: setBirthCertificate, fieldName: "Giấy khai sinh" },
+                    { label: "Mặt trước CCCD", file: frontCCCD, setFile: setFrontCCCD, fieldName: "Mặt trước CCCD" },
+                    { label: "Mặt sau CCCD", file: backCCCD, setFile: setBackCCCD, fieldName: "Mặt sau CCCD" },
+                    { label: "Điểm học bạ lớp 10", file: grade10Pic, setFile: setGrade10Pic, fieldName: "Điểm học bạ lớp 10" },
+                    { label: "Điểm học bạ lớp 11", file: grade11Pic, setFile: setGrade11Pic, fieldName: "Điểm học bạ lớp 11" },
+                    { label: "Điểm học bạ lớp 12", file: grade12Pic, setFile: setGrade12Pic, fieldName: "Điểm học bạ lớp 12" },
+                ].map(({ label, file, setFile, fieldName }, index) => (
                     <div key={index} className="p-4 bg-white shadow-md rounded-lg flex flex-col items-center gap-4">
                         <label className="font-semibold text-gray-700">{label}</label>
                         <div className="flex flex-col items-center gap-2 w-full">
@@ -109,10 +173,12 @@ const PhotoID = () => {
                             />
                             <button
                                 type="button"
-                                onClick={() => handleUpload(label, file, setFile)}
-                                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                                onClick={() => handleUpload(fieldName, file, setFile)}
+                                disabled={isLoading[fieldName]}
+                                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition flex items-center gap-2 disabled:opacity-50"
                             >
-                                Tải lên
+                                <FaUpload />
+                                {isLoading[fieldName] ? 'Đang tải...' : 'Tải lên'}
                             </button>
                         </div>
                         {file && (
@@ -131,9 +197,10 @@ const PhotoID = () => {
                 <button
                     type="button"
                     onClick={handleSubmit}
-                    className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition"
+                    disabled={isLoading.submit}
+                    className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition flex items-center gap-2 disabled:opacity-50"
                 >
-                    Cập nhật
+                    {isLoading.submit ? 'Đang xử lý...' : hasData ? 'Cập nhật' : 'Lưu'}
                 </button>
             </div>
         </div>

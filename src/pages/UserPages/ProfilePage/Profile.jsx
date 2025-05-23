@@ -124,14 +124,14 @@ function ProfilePage() {
                                         onClick={() => handleClick(item.id)}
                                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                                             activeSection === item.id
-                                                ? "bg-blue-600 text-white shadow-md"
+                                        ? "bg-blue-600 text-white shadow-md"
                                                 : "hover:bg-blue-50 text-gray-700"
-                                        }`}
-                                    >
+                                }`}
+                            >
                                         <span className="text-lg">{item.icon}</span>
                                         <span className="font-medium">{item.label}</span>
                                     </button>
-                                </li>
+                            </li>
                             ))}
                         </ul>
                     </nav>
@@ -148,8 +148,8 @@ function ProfilePage() {
                             <div className="flex items-center justify-between">
                                 <h2 className="text-3xl font-bold text-gray-800">
                                     <FaClipboardList className="inline-block mr-3 text-blue-600" />
-                                    Trạng thái Hồ Sơ
-                                </h2>
+                                Trạng thái Hồ Sơ
+                            </h2>
                                 <div className="flex items-center gap-2">
                                     <FaHistory className="text-gray-400" />
                                     <span className="text-sm text-gray-500">
@@ -199,8 +199,8 @@ function ProfilePage() {
                                                 <div>
                                                     <p className="text-sm text-gray-500">Họ và tên</p>
                                                     <p className="font-medium">
-                                                        {user.fullName === "null null" ? "Chưa cập nhật" : user.fullName}
-                                                    </p>
+                                                {user.fullName === "null null" ? "Chưa cập nhật" : user.fullName}
+                                        </p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
@@ -208,11 +208,11 @@ function ProfilePage() {
                                                 <div>
                                                     <p className="text-sm text-gray-500">Ngày sinh</p>
                                                     <p className="font-medium">
-                                                        {user.birthDate === "null"
-                                                            ? "Chưa cập nhật"
-                                                            : dayjs(user.birthDate).isValid()
-                                                            ? dayjs(user.birthDate).format("DD/MM/YYYY")
-                                                            : "Chưa cập nhật"}
+                                                {user.birthDate === "null"
+                                                    ? "Chưa cập nhật"
+                                                    : dayjs(user.birthDate).isValid()
+                                                    ? dayjs(user.birthDate).format("DD/MM/YYYY")
+                                                    : "Chưa cập nhật"}
                                                     </p>
                                                 </div>
                                             </div>

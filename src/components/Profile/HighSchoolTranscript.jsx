@@ -1,13 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { FaCheck, FaTimes } from "react-icons/fa";
 
 const HighSchoolTranscript = () => {
     const token = localStorage.getItem("token");
     const userId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
     const [grades, setGrades] = useState({});
     const [errors, setErrors] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
+    const [message, setMessage] = useState({ type: '', text: '' });
+    const [hasData, setHasData] = useState(false);
     const inputsRef = useRef([]);
+
     const subjects = [
         "Toán",
         "Vật Lý",
@@ -26,7 +30,7 @@ const HighSchoolTranscript = () => {
     const years = [
         {
             label: "Lớp 10",
-            year: "grade10", // dùng để match với `Score.year`
+            year: "grade10",
             color: "bg-green-100",
             fields: [
                 { label: "Học kỳ 1", key: "score1" },
@@ -47,12 +51,11 @@ const HighSchoolTranscript = () => {
             year: "grade12",
             color: "bg-red-100",
             fields: [
-                { label: "Học kỳ 1", key: "score1" }, // chỉ có 1 học kỳ
+                { label: "Học kỳ 1", key: "score1" },
             ],
         },
     ];
 
-    // Sử dụng useEffect để lấy dữ liệu từ API
     useEffect(() => {
         const fetchTranscript = async () => {
             try {
@@ -63,28 +66,32 @@ const HighSchoolTranscript = () => {
                     }
                 );
                 const apiScores = response.data.data?.scores || [];
-                const initialGrades = {};
-                // Lấy ra tất cả các môn từ API (sẽ có nhiều entry cho cùng môn)
-                const uniqueSubjects = [...new Set(apiScores.map((item) => item.subject.trim()))];
-                uniqueSubjects.forEach((subject, subjectIndex) => {
-                    initialGrades[subjectIndex] = {};
-                    years.forEach((year, yearIndex) => {
-                        const yearLabel = year.label;
-                        const scoresForYear = apiScores.find(
-                            (item) => item.subject.trim() === subject && item.year === yearLabel
-                        );
-                        if (scoresForYear) {
-                            initialGrades[subjectIndex][yearIndex] = {};
-
-                            year.fields.forEach((field) => {
-                                initialGrades[subjectIndex][yearIndex][field.key] = scoresForYear[field.key] ?? "";
-                            });
-                        }
+                if (apiScores.length > 0) {
+                    const initialGrades = {};
+                    const uniqueSubjects = [...new Set(apiScores.map((item) => item.subject.trim()))];
+                    uniqueSubjects.forEach((subject, subjectIndex) => {
+                        initialGrades[subjectIndex] = {};
+                        years.forEach((year, yearIndex) => {
+                            const yearLabel = year.label;
+                            const scoresForYear = apiScores.find(
+                                (item) => item.subject.trim() === subject && item.year === yearLabel
+                            );
+                            if (scoresForYear) {
+                                initialGrades[subjectIndex][yearIndex] = {};
+                                year.fields.forEach((field) => {
+                                    initialGrades[subjectIndex][yearIndex][field.key] = scoresForYear[field.key] ?? "";
+                                });
+                            }
+                        });
                     });
-                });
-                setGrades(initialGrades);
+                    setGrades(initialGrades);
+                    setHasData(true);
+                } else {
+                    setHasData(false);
+                }
             } catch (error) {
                 console.error("Lỗi khi lấy học bạ:", error);
+                setHasData(false);
             }
         };
         fetchTranscript();
@@ -114,14 +121,47 @@ const HighSchoolTranscript = () => {
         }
     };
 
-    const handleSaveTranscript = async (e) => {
-        e.preventDefault();
-        updateInformation();
+    const addTranscript = async () => {
+        try {
+            setIsLoading(true);
+            const scores = {};
+            subjects.forEach((subject, subjectIndex) => {
+                const subjectScores = [];
+                years.forEach((year, yearIndex) => {
+                    year.fields.forEach((field) => {
+                        const score = grades?.[subjectIndex]?.[yearIndex]?.[field.key];
+                        subjectScores.push({
+                            year: year.label,
+                            semester: field.label,
+                            score: parseFloat(score) || 0,
+                        });
+                    });
+                });
+                scores[subject] = subjectScores;
+            });
+
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_BASE_URL}/transcripts/add`,
+                { userId, scores },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            setMessage({ type: 'success', text: 'Lưu học bạ thành công!' });
+            setHasData(true);
+            return true;
+        } catch (error) {
+            console.error("Error adding transcript:", error);
+            setMessage({ type: 'error', text: 'Lưu học bạ thất bại. Vui lòng thử lại.' });
+            return false;
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    const updateInformation = async () => {
+    const updateTranscript = async () => {
         try {
-            let isValid = true;
+            setIsLoading(true);
             const scores = {};
             subjects.forEach((subject, subjectIndex) => {
                 const subjectScores = [];
@@ -129,7 +169,7 @@ const HighSchoolTranscript = () => {
                     year.fields.forEach((field) => {
                         const score = grades?.[subjectIndex]?.[yearIndex]?.[field.key];
                         if (score === undefined || score === "" || isNaN(score)) {
-                            isValid = false;
+                            throw new Error("Vui lòng nhập đầy đủ và hợp lệ tất cả điểm!");
                         }
                         subjectScores.push({
                             year: year.label,
@@ -140,23 +180,49 @@ const HighSchoolTranscript = () => {
                 });
                 scores[subject] = subjectScores;
             });
-            if (!isValid) {
-                toast.error("Vui lòng nhập đầy đủ và hợp lệ tất cả điểm!");
-                return;
-            }
-            const data = { scores };
-            await axios.put(`${process.env.REACT_APP_API_BASE_URL}/transcripts/update/${userId}`, data, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            toast.success("Cập nhật học bạ thành công!");
+
+            const response = await axios.put(
+                `${process.env.REACT_APP_API_BASE_URL}/transcripts/update/${userId}`,
+                { scores },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            setMessage({ type: 'success', text: 'Cập nhật học bạ thành công!' });
+            return true;
         } catch (error) {
-            console.error("Lỗi khi cập nhật học bạ:", error.response?.data.message || error.message);
-            toast.error("Có lỗi xảy ra khi lưu học bạ.");
+            console.error("Error updating transcript:", error);
+            setMessage({ type: 'error', text: error.message || 'Cập nhật học bạ thất bại. Vui lòng thử lại.' });
+            return false;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!hasData) {
+            await addTranscript();
+        } else {
+            await updateTranscript();
         }
     };
 
     return (
         <div className="p-6">
+            <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Học bạ THPT</h1>
+
+            {message.text && (
+                <div className={`w-full max-w-4xl mx-auto mb-6 p-4 rounded-lg ${
+                    message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                }`}>
+                    <div className="flex items-center gap-2">
+                        {message.type === 'success' ? <FaCheck /> : <FaTimes />}
+                        <span>{message.text}</span>
+                    </div>
+                </div>
+            )}
+
             <table className="w-full border-collapse border border-gray-300 text-sm">
                 <thead>
                     <tr>
@@ -219,10 +285,11 @@ const HighSchoolTranscript = () => {
             </table>
             <div className="mt-4 text-right">
                 <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                    onClick={handleSaveTranscript}
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
+                    onClick={handleSubmit}
+                    disabled={isLoading}
                 >
-                    Cập nhật
+                    {isLoading ? 'Đang xử lý...' : hasData ? 'Cập nhật' : 'Lưu'}
                 </button>
             </div>
         </div>

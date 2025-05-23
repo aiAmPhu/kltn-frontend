@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { FaCheck, FaTimes } from "react-icons/fa";
 
 const LearningProcess = () => {
     const token = localStorage.getItem("token");
@@ -19,20 +19,11 @@ const LearningProcess = () => {
         region: "",
         priorityGroup: "",
     });
-    const [errors, setErrors] = useState({
-        ggrade10_province: "",
-        grade10_district: "",
-        grade10_school: "",
-        grade11_province: "",
-        grade11_district: "",
-        grade11_school: "",
-        grade12_province: "",
-        grade12_district: "",
-        grade12_school: "",
-        graduationYear: "",
-        priorityGroup: "",
-        region: "",
-    });
+    const [errors, setErrors] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
+    const [message, setMessage] = useState({ type: '', text: '' });
+    const [hasData, setHasData] = useState(false);
+
     const priorityGroupOptions = [
         { value: "OBJ001", label: "Ưu tiên khu vực miền núi" },
         { value: "OBJ002", label: "Không ưu tiên" },
@@ -44,20 +35,17 @@ const LearningProcess = () => {
         { value: "R003", label: "Miền Nam" },
     ];
 
-    // Fetch provinces on initial render
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Gọi API để lấy danh sách thông tin từ cơ sở dữ liệu
                 const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/learning/getLPByE/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                const priorityGroupId = priorityGroupOptions.find(
-                    (option) => option.label === response.data.data.priorityGroup
-                )?.value;
-                const regionId = regionOptions.find((option) => option.label === response.data.data.region)?.value;
-                if (response) {
-                    // Nếu tìm thấy, cập nhật formData
+                if (response.data.data) {
+                    const priorityGroupId = priorityGroupOptions.find(
+                        (option) => option.label === response.data.data.priorityGroup
+                    )?.value;
+                    const regionId = regionOptions.find((option) => option.label === response.data.data.region)?.value;
                     setFormData({
                         grade10_province: response.data.data.grade10_province ?? "",
                         grade10_district: response.data.data.grade10_district ?? "",
@@ -72,80 +60,106 @@ const LearningProcess = () => {
                         priorityGroup: priorityGroupId ?? "",
                         region: regionId ?? "",
                     });
+                    setHasData(true);
+                } else {
+                    setHasData(false);
                 }
-                console.log("Dữ liệu người dùng:", response.data.data);
             } catch (error) {
                 console.error("Error fetching data:", error);
+                setHasData(false);
             }
         };
         fetchData();
-        return () => {};
-    }, [userId.email]);
+    }, [userId]);
 
-    // Validate form data
     const validateForm = () => {
+        const newErrors = {};
         ["grade10", "grade11", "grade12"].forEach((grade) => {
             ["province", "district", "school"].forEach((field) => {
                 const key = `${grade}_${field}`;
                 if (!formData[key]) {
-                    errors[key] = `Vui lòng chọn ${
+                    newErrors[key] = `Vui lòng chọn ${
                         field === "province" ? "Tỉnh/Thành phố" : field === "district" ? "Huyện/Quận" : "Trường THPT"
                     }.`;
                 }
             });
         });
         if (!formData.priorityGroup) {
-            errors.priorityGroup = "Vui lòng chọn Đối Tượng Ưu Tiên.";
+            newErrors.priorityGroup = "Vui lòng chọn Đối Tượng Ưu Tiên.";
         }
         if (!formData.region) {
-            errors.region = "Vui lòng chọn Khu Vực Ưu Tiên.";
+            newErrors.region = "Vui lòng chọn Khu Vực Ưu Tiên.";
         }
         if (!formData.graduationYear) {
-            errors.graduationYear = "Vui lòng chọn Năm Tốt Nghiệp.";
+            newErrors.graduationYear = "Vui lòng chọn Năm Tốt Nghiệp.";
         }
-        setErrors(errors);
-        // Kiểm tra có lỗi nào không
-        return Object.values(errors).every((err) => err === "");
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
-    // Handle form submission
-    const handleSubmit = (e) => {
-        e.preventDefault(); // Ngăn không cho trang bị load lại
-        if (validateForm()) {
-            updateInformation();
-        } else {
-            alert("Vui lòng kiểm tra lại thông tin nhập!");
-        }
-    };
-
-    const updateInformation = async () => {
-        // Kiểm tra nếu không có lỗi
+    const addLearningProcess = async () => {
         try {
-            if (userId) {
-                // Gửi yêu cầu cập nhật
-                const updateResponse = await axios.put(
-                    `${process.env.REACT_APP_API_BASE_URL}/learning/update/${userId}`,
-                    formData,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
-                console.log("Cập nhật thông tin thành công:", formData);
-                // Thông báo thành công
-                toast.success(updateResponse.data.message || "Cập nhật thông tin thành công!");
-            } else {
-                toast.error("Lỗi khi cập nhật thông tin.");
-            }
+            setIsLoading(true);
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_BASE_URL}/learning/add`,
+                {
+                    userId,
+                    ...formData
+                },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            setMessage({ type: 'success', text: 'Lưu thông tin thành công!' });
+            setHasData(true);
+            return true;
         } catch (error) {
-            console.error("Lỗi trong quá trình cập nhật thông tin:", error.response?.data?.message || error.message);
-            toast.error("Lỗi khi cập nhật thông tin, hãy thử lại.");
+            console.error("Error adding learning process:", error);
+            setMessage({ type: 'error', text: 'Lưu thông tin thất bại. Vui lòng thử lại.' });
+            return false;
+        } finally {
+            setIsLoading(false);
         }
     };
+
+    const updateLearningProcess = async () => {
+        try {
+            setIsLoading(true);
+            const response = await axios.put(
+                `${process.env.REACT_APP_API_BASE_URL}/learning/update/${userId}`,
+                formData,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            setMessage({ type: 'success', text: 'Cập nhật thông tin thành công!' });
+            return true;
+        } catch (error) {
+            console.error("Error updating learning process:", error);
+            setMessage({ type: 'error', text: 'Cập nhật thông tin thất bại. Vui lòng thử lại.' });
+            return false;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!validateForm()) {
+            setMessage({ type: 'error', text: 'Vui lòng kiểm tra lại thông tin!' });
+            return;
+        }
+        if (!hasData) {
+            await addLearningProcess();
+        } else {
+            await updateLearningProcess();
+        }
+    };
+
     const renderGradeInputs = (grade) => (
         <div className="mb-6">
             <h2 className="text-xl font-semibold mb-4 text-blue-600">Lớp {grade}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Tỉnh/Thành phố */}
                 <div>
                     <label className="block font-medium mb-1 text-gray-700">Tỉnh/Thành phố</label>
                     <input
@@ -160,7 +174,6 @@ const LearningProcess = () => {
                     )}
                 </div>
 
-                {/* Huyện/Quận */}
                 <div>
                     <label className="block font-medium mb-1 text-gray-700">Huyện/Quận</label>
                     <input
@@ -175,7 +188,6 @@ const LearningProcess = () => {
                     )}
                 </div>
 
-                {/* Trường THPT */}
                 <div>
                     <label className="block font-medium mb-1 text-gray-700">Trường THPT</label>
                     <input
@@ -202,6 +214,18 @@ const LearningProcess = () => {
         <div className="flex-1 p-6">
             <section className="mb-8">
                 <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Quá Trình Học Tập Của Thí Sinh</h1>
+
+                {message.text && (
+                    <div className={`w-full max-w-4xl mx-auto mb-6 p-4 rounded-lg ${
+                        message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    }`}>
+                        <div className="flex items-center gap-2">
+                            {message.type === 'success' ? <FaCheck /> : <FaTimes />}
+                            <span>{message.text}</span>
+                        </div>
+                    </div>
+                )}
+
                 <div className="p-8 bg-white rounded-lg shadow-xl max-w-4xl mx-auto">
                     {["10", "11", "12"].map((grade) => (
                         <React.Fragment key={grade}>{renderGradeInputs(grade)}</React.Fragment>
@@ -245,14 +269,15 @@ const LearningProcess = () => {
                             className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             placeholder="Năm tốt nghiệp"
                         />
-                        {errors.priorityReason && <p className="text-red-500 text-sm">{errors.priorityReason}</p>}
+                        {errors.graduationYear && <p className="text-red-500 text-sm">{errors.graduationYear}</p>}
                     </div>
                     <button
                         type="button"
-                        className="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium hover:bg-blue-600 transition duration-200"
                         onClick={handleSubmit}
+                        disabled={isLoading}
+                        className="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium hover:bg-blue-600 transition duration-200 disabled:opacity-50"
                     >
-                        Cập nhật
+                        {isLoading ? 'Đang xử lý...' : hasData ? 'Cập nhật' : 'Lưu'}
                     </button>
                 </div>
             </section>
