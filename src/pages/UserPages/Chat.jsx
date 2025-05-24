@@ -1,26 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
-import { FaPaperPlane } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { FaPaperPlane, FaSmile } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
+import EmojiPicker from 'emoji-picker-react';
 
-const Chat = () => {
+const Chat = ({ chatType, onClose }) => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [error, setError] = useState(null);
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const socketRef = useRef();
     const messagesEndRef = useRef(null);
     const typingTimeoutRef = useRef(null);
-    const navigate = useNavigate();
+    const roomIdRef = useRef(null);
     const { user } = useAuth();
 
     useEffect(() => {
-        if (!user) {
-            navigate('/login');
-            return;
-        }
+        if (!user) return;
 
         // Initialize socket connection
         socketRef.current = io(process.env.REACT_APP_API_BASE_URL.replace('/api', ''), {
@@ -30,26 +28,30 @@ const Chat = () => {
         });
 
         // Join room
-        socketRef.current.emit('join_room', `admin-${user.userId}`);
+        roomIdRef.current = `${chatType}-${user.userId}`;
+        socketRef.current.emit('join_room', roomIdRef.current);
 
         // Load chat history
-        fetchChatHistory();
+        fetchChatHistory(roomIdRef.current);
 
         // Socket event listeners
         socketRef.current.on('receive_message', handleNewMessage);
         socketRef.current.on('user_typing', handleUserTyping);
+        socketRef.current.on('message_status', handleMessageStatus);
 
         return () => {
             if (socketRef.current) {
+                // Emit leave_room event before disconnecting
+                socketRef.current.emit('leave_room', roomIdRef.current);
                 socketRef.current.disconnect();
             }
         };
-    }, [user, navigate]);
+    }, [user, chatType]);
 
-    const fetchChatHistory = async () => {
+    const fetchChatHistory = async (roomId) => {
         try {
             const response = await axios.get(
-                `${process.env.REACT_APP_API_BASE_URL}/chat/history/admin-${user.userId}`,
+                `${process.env.REACT_APP_API_BASE_URL}/chat/history/${roomId}`,
                 {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 }
@@ -63,8 +65,19 @@ const Chat = () => {
     };
 
     const handleNewMessage = (message) => {
-        setMessages(prev => [...prev, message]);
+        setMessages(prev => {
+            // Check if message already exists
+            const exists = prev.some(msg => msg.id === message.id);
+            if (exists) return prev;
+            return [...prev, message];
+        });
         scrollToBottom();
+    };
+
+    const handleMessageStatus = ({ messageId, status }) => {
+        setMessages(prev => prev.map(msg => 
+            msg.id === messageId ? { ...msg, status } : msg
+        ));
     };
 
     const handleUserTyping = ({ userId, isTyping }) => {
@@ -74,22 +87,19 @@ const Chat = () => {
     const handleTyping = () => {
         if (!socketRef.current || !user) return;
 
+        const roomId = `${chatType}-${user.userId}`;
         socketRef.current.emit('typing', {
-            roomId: `admin-${user.userId}`,
-            userId: user.userId,
+            roomId,
             isTyping: true
         });
 
-        // Clear previous timeout
         if (typingTimeoutRef.current) {
             clearTimeout(typingTimeoutRef.current);
         }
 
-        // Set new timeout
         typingTimeoutRef.current = setTimeout(() => {
             socketRef.current.emit('typing', {
-                roomId: `admin-${user.userId}`,
-                userId: user.userId,
+                roomId,
                 isTyping: false
             });
         }, 1000);
@@ -100,13 +110,15 @@ const Chat = () => {
         if (!newMessage.trim() || !user) return;
 
         try {
-            // Get admin ID from environment variable or use a default admin ID
-            const adminId = process.env.REACT_APP_ADMIN_ID || 1; // Default to 1 if not set
+            const roomId = `${chatType}-${user.userId}`;
+            const receiverId = chatType === 'admin' ? 
+                (process.env.REACT_APP_ADMIN_ID || 1) : 
+                (process.env.REACT_APP_REVIEWER_ID || 2);
 
             const messageData = {
-                roomId: `admin-${user.userId}`,
+                roomId,
                 content: newMessage,
-                receiverId: parseInt(adminId, 10) // Ensure receiverId is a number
+                receiverId: parseInt(receiverId, 10)
             };
 
             const response = await axios.post(
@@ -118,7 +130,11 @@ const Chat = () => {
             );
 
             // Add the sent message to the messages list
-            setMessages(prev => [...prev, response.data]);
+            setMessages(prev => {
+                const exists = prev.some(msg => msg.id === response.data.id);
+                if (exists) return prev;
+                return [...prev, response.data];
+            });
             
             // Emit the message through socket
             socketRef.current.emit('send_message', messageData);
@@ -139,28 +155,32 @@ const Chat = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
+    const formatTimestamp = (timestamp) => {
+        const date = new Date(timestamp);
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        if (date.toDateString() === today.toDateString()) {
+            return `Today at ${date.toLocaleTimeString()}`;
+        } else if (date.toDateString() === yesterday.toDateString()) {
+            return `Yesterday at ${date.toLocaleTimeString()}`;
+        } else {
+            return date.toLocaleString();
+        }
+    };
+
     if (!user) {
         return null;
     }
 
     return (
-        <div className="flex flex-col h-[calc(100vh-4rem)] bg-gray-100">
-            {/* Chat Header */}
-            <div className="p-4 border-b bg-white">
-                <h2 className="text-xl font-semibold">Chat with Admin</h2>
-                {isTyping && (
-                    <p className="text-sm text-gray-500">Admin is typing...</p>
-                )}
-                {error && (
-                    <p className="text-sm text-red-500">{error}</p>
-                )}
-            </div>
-
+        <div className="flex flex-col h-full bg-gray-100">
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.map((message, index) => (
                     <div
-                        key={index}
+                        key={message.id || index}
                         className={`flex ${
                             message.senderId === user.userId
                                 ? 'justify-end'
@@ -175,9 +195,17 @@ const Chat = () => {
                             }`}
                         >
                             <p>{message.content}</p>
-                            <p className="text-xs mt-1 opacity-70">
-                                {new Date(message.timestamp).toLocaleTimeString()}
-                            </p>
+                            <div className="flex items-center justify-between mt-1">
+                                <p className="text-xs opacity-70">
+                                    {formatTimestamp(message.timestamp)}
+                                </p>
+                                {message.senderId === user.userId && (
+                                    <span className="text-xs ml-2">
+                                        {message.status === 'read' ? '✓✓' : 
+                                         message.status === 'delivered' ? '✓✓' : '✓'}
+                                    </span>
+                                )}
+                            </div>
                         </div>
                     </div>
                 ))}
@@ -187,6 +215,23 @@ const Chat = () => {
             {/* Message Input */}
             <form onSubmit={sendMessage} className="p-4 border-t bg-white">
                 <div className="flex space-x-2">
+                    <button
+                        type="button"
+                        className="text-gray-500 hover:text-gray-700"
+                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    >
+                        <FaSmile />
+                    </button>
+                    {showEmojiPicker && (
+                        <div className="absolute bottom-20 left-4">
+                            <EmojiPicker
+                                onEmojiClick={(emojiObject) => {
+                                    setNewMessage(prev => prev + emojiObject.emoji);
+                                    setShowEmojiPicker(false);
+                                }}
+                            />
+                        </div>
+                    )}
                     <input
                         type="text"
                         value={newMessage}
@@ -204,6 +249,14 @@ const Chat = () => {
                         <FaPaperPlane />
                     </button>
                 </div>
+                {error && (
+                    <p className="text-sm text-red-500 mt-2">{error}</p>
+                )}
+                {isTyping && (
+                    <p className="text-sm text-gray-500 mt-2">
+                        {chatType === 'admin' ? 'Admin' : 'Reviewer'} is typing...
+                    </p>
+                )}
             </form>
         </div>
     );

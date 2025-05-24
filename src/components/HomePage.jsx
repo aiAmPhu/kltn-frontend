@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
-import { HelpCircle, UserPlus, GraduationCap, Award, BookOpen, MessageCircle, ChevronDown } from "lucide-react";
+import { HelpCircle, UserPlus, GraduationCap, Award, BookOpen, MessageCircle, ChevronDown, X } from "lucide-react";
 import axios from "axios";
 import Banner from "./Banner.jsx";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import Chat from "../pages/UserPages/Chat.jsx";
 
 function HomePage() {
     const [majors, setMajors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showChatMenu, setShowChatMenu] = useState(false);
+    const [showChat, setShowChat] = useState(false);
+    const [chatType, setChatType] = useState(null);
     const navigate = useNavigate();
     const { user } = useAuth();
 
@@ -45,16 +48,8 @@ function HomePage() {
             return;
         }
         
-        switch(type) {
-            case 'admin':
-                navigate('/chat');
-                break;
-            case 'reviewer':
-                navigate('/reviewer/chat');
-                break;
-            default:
-                break;
-        }
+        setChatType(type);
+        setShowChat(true);
         setShowChatMenu(false);
     };
 
@@ -146,6 +141,26 @@ function HomePage() {
                     )}
                 </div>
             </div>
+
+            {/* Chat Popup */}
+            {showChat && (
+                <div className="fixed bottom-24 right-6 w-96 h-[600px] bg-white rounded-lg shadow-xl z-50 flex flex-col">
+                    <div className="p-4 border-b bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-t-lg flex justify-between items-center">
+                        <h2 className="text-lg font-semibold">
+                            {chatType === 'admin' ? 'Chat với Admin' : 'Chat với Reviewer'}
+                        </h2>
+                        <button
+                            onClick={() => setShowChat(false)}
+                            className="text-white hover:text-gray-200 transition-colors"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                        <Chat chatType={chatType} onClose={() => setShowChat(false)} />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
