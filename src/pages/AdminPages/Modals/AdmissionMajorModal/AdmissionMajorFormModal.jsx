@@ -12,7 +12,24 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
     const [majorDescription, setMajorDescription] = useState("");
     const [isActive, setIsActive] = useState(true);
     const [error, setError] = useState("");
-    const [combinationInput, setCombinationInput] = useState("");
+    const [admissionBlocks, setAdmissionBlocks] = useState([]);
+    const [selectedBlock, setSelectedBlock] = useState("");
+
+    useEffect(() => {
+        const fetchAdmissionBlocks = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get(`${API_BASE_URL}/adms/blocks`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setAdmissionBlocks(response.data);
+            } catch (error) {
+                setError("Lỗi khi tải danh sách khối xét tuyển");
+            }
+        };
+
+        fetchAdmissionBlocks();
+    }, []);
 
     useEffect(() => {
         if (majorToEdit) {
@@ -33,9 +50,9 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
     }, [majorToEdit]);
 
     const handleAddCombination = () => {
-        if (combinationInput.trim()) {
-            setMajorCombination([...majorCombination, combinationInput.trim()]);
-            setCombinationInput("");
+        if (selectedBlock && !majorCombination.includes(selectedBlock)) {
+            setMajorCombination([...majorCombination, selectedBlock]);
+            setSelectedBlock("");
         }
     };
 
@@ -139,13 +156,18 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Tổ hợp xét tuyển</label>
                         <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={combinationInput}
-                                onChange={(e) => setCombinationInput(e.target.value)}
-                                placeholder="Nhập tổ hợp xét tuyển"
+                            <select
+                                value={selectedBlock}
+                                onChange={(e) => setSelectedBlock(e.target.value)}
                                 className="flex-1 border border-gray-300 rounded-md px-3 py-2"
-                            />
+                            >
+                                <option value="">Chọn khối xét tuyển</option>
+                                {admissionBlocks.map((block) => (
+                                    <option key={block.admissionBlockId} value={block.admissionBlockId}>
+                                        {block.admissionBlockName} ({block.admissionBlockSubject1}, {block.admissionBlockSubject2}, {block.admissionBlockSubject3})
+                                    </option>
+                                ))}
+                            </select>
                             <button
                                 type="button"
                                 onClick={handleAddCombination}
@@ -156,18 +178,23 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
                         </div>
                         {majorCombination.length > 0 && (
                             <div className="mt-2 space-y-2">
-                                {majorCombination.map((combo, index) => (
-                                    <div key={index} className="flex items-center gap-2">
-                                        <span className="flex-1 bg-gray-50 p-2 rounded">{combo}</span>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleRemoveCombination(index)}
-                                            className="text-red-500 hover:text-red-700"
-                                        >
-                                            <FaTimes />
-                                        </button>
-                                    </div>
-                                ))}
+                                {majorCombination.map((combo, index) => {
+                                    const block = admissionBlocks.find(b => b.admissionBlockId === combo);
+                                    return (
+                                        <div key={index} className="flex items-center gap-2">
+                                            <span className="flex-1 bg-gray-50 p-2 rounded">
+                                                {block ? `${block.admissionBlockName} (${block.admissionBlockSubject1}, ${block.admissionBlockSubject2}, ${block.admissionBlockSubject3})` : combo}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveCombination(index)}
+                                                className="text-red-500 hover:text-red-700"
+                                            >
+                                                <FaTimes />
+                                            </button>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
