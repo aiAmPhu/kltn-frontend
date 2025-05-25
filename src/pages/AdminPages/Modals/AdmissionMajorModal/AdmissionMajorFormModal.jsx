@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaCheck, FaTimes, FaPlus } from "react-icons/fa";
+import { Editor } from '@tinymce/tinymce-react';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -105,7 +106,7 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
     return (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-center items-center px-4">
             <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                <h2 className="text-2xl font-bold text-blue-600 text-center mb-6">
+                <h2 className="text-2xl font-bold text-blue-600 text-center sticky top-0 bg-white py-2 z-10 border-b">
                     {isEditing ? "Cập nhật" : "Thêm"} ngành xét tuyển
                 </h2>
 
@@ -201,13 +202,28 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
-                        <textarea
-                            value={majorDescription}
-                            onChange={(e) => setMajorDescription(e.target.value)}
-                            placeholder="Nhập mô tả"
-                            rows="4"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2"
-                        />
+                        <div className="border border-gray-300 rounded-md">
+                            <Editor
+                                apiKey="2eggg290trdrelg0vl1f4y0l6z1wd1j43mzo63fr5brp3i6l"
+                                value={majorDescription}
+                                onEditorChange={(content) => setMajorDescription(content)}
+                                init={{
+                                    height: 300,
+                                    menubar: false,
+                                    language: 'vi',
+                                    plugins: [
+                                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                                    ],
+                                    toolbar: 'undo redo | blocks | ' +
+                                        'bold italic forecolor | alignleft aligncenter ' +
+                                        'alignright alignjustify | bullist numlist outdent indent | ' +
+                                        'removeformat | help',
+                                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                                }}
+                            />
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-2">

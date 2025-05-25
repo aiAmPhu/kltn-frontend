@@ -19,9 +19,10 @@ const InfoModal = ({ criteria, onClose }) => {
                     </p>
                     <div className="mt-4">
                         <p className="font-medium text-gray-700 mb-2">Mô tả:</p>
-                        <p className="bg-gray-50 p-3 rounded text-gray-600">
-                            {criteria.criteriaDescription || "Không có mô tả"}
-                        </p>
+                        <div 
+                            className="bg-gray-50 p-3 rounded text-gray-600 prose prose-sm max-w-none"
+                            dangerouslySetInnerHTML={{ __html: criteria.criteriaDescription || "Không có mô tả" }}
+                        />
                     </div>
                 </div>
                 <div className="mt-6 text-right">

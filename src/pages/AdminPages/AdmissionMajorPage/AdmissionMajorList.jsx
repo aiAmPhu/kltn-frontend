@@ -199,6 +199,9 @@ const AdmissionMajorList = ({ majors = [], setMajors }) => {
                                         Tổ hợp xét tuyển
                                     </th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Mô tả
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Trạng thái
                                     </th>
                                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -209,7 +212,7 @@ const AdmissionMajorList = ({ majors = [], setMajors }) => {
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan="5" className="px-6 py-4 text-center">
+                                        <td colSpan="6" className="px-6 py-4 text-center">
                                             <div className="flex justify-center items-center">
                                                 <svg className="animate-spin h-5 w-5 text-blue-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -221,7 +224,7 @@ const AdmissionMajorList = ({ majors = [], setMajors }) => {
                                     </tr>
                                 ) : currentItems.length === 0 ? (
                                     <tr>
-                                        <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                                        <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
                                             Không có ngành xét tuyển phù hợp
                                         </td>
                                     </tr>
@@ -249,6 +252,12 @@ const AdmissionMajorList = ({ majors = [], setMajors }) => {
                                                         "Không có tổ hợp"
                                                     )}
                                                 </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div 
+                                                    className="text-sm text-gray-500 prose prose-sm max-w-none max-h-20 overflow-y-auto"
+                                                    dangerouslySetInnerHTML={{ __html: major.majorDescription || "Không có mô tả" }}
+                                                />
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
