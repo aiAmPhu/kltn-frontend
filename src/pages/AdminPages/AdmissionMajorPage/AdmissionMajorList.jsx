@@ -189,22 +189,22 @@ const AdmissionMajorList = ({ majors = [], setMajors }) => {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[12%]">
                                         Mã ngành
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[25%]">
                                         Tên ngành
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[25%]">
                                         Tổ hợp xét tuyển
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">
                                         Mô tả
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[8%]">
                                         Trạng thái
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
                                         Thao tác
                                     </th>
                                 </tr>
@@ -235,15 +235,15 @@ const AdmissionMajorList = ({ majors = [], setMajors }) => {
                                                 <div className="text-sm font-medium text-gray-900">{major.majorId}</div>
                                                 <div className="text-sm text-gray-500">{major.majorCodeName}</div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{major.majorName}</div>
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm text-gray-900 break-words">{major.majorName}</div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="text-sm text-gray-500">
                                                     {major.majorCombination ? (
                                                         <div className="flex flex-wrap gap-1">
                                                             {major.majorCombination.map((combo, index) => (
-                                                                <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                                                                <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded break-words">
                                                                     {combo}
                                                                 </span>
                                                             ))}
@@ -255,7 +255,7 @@ const AdmissionMajorList = ({ majors = [], setMajors }) => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div 
-                                                    className="text-sm text-gray-500 prose prose-sm max-w-none max-h-20 overflow-y-auto"
+                                                    className="text-sm text-gray-500 prose prose-sm max-w-none line-clamp-2"
                                                     dangerouslySetInnerHTML={{ __html: major.majorDescription || "Không có mô tả" }}
                                                 />
                                             </td>
