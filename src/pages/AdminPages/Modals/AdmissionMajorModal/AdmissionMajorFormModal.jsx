@@ -104,7 +104,7 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
 
     return (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-center items-center px-4">
-            <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl">
+            <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 <h2 className="text-2xl font-bold text-blue-600 text-center mb-6">
                     {isEditing ? "Cập nhật" : "Thêm"} ngành xét tuyển
                 </h2>
@@ -177,7 +177,7 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
                             </button>
                         </div>
                         {majorCombination.length > 0 && (
-                            <div className="mt-2 space-y-2">
+                            <div className="mt-2 space-y-2 max-h-40 overflow-y-auto">
                                 {majorCombination.map((combo, index) => {
                                     const block = admissionBlocks.find(b => b.admissionBlockId === combo);
                                     return (
@@ -245,4 +245,4 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
     );
 };
 
-export default AdmissionMajorFormModal; 
+export default AdmissionMajorFormModal;
