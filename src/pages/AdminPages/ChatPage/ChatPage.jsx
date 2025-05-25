@@ -42,10 +42,23 @@ const ChatPage = () => {
         };
     }, []);
 
+    useEffect(() => {
+        if (selectedUser) {
+            fetchMessages();
+        }
+    }, [selectedUser]);
+
+    useEffect(() => {
+        if (selectedUser && socketRef.current) {
+            const roomId = `admin-${selectedUser.userId}`;
+            socketRef.current.emit('join_room', roomId);
+        }
+    }, [selectedUser]);
+
     const handleUserStatusChange = ({ userId, status }) => {
         setOnlineUsers(prev => ({
             ...prev,
-            [userId]: status === 'online'
+            [String(userId)]: status === 'online'
         }));
     };
 
@@ -111,7 +124,7 @@ const ChatPage = () => {
 
     const sendMessage = async (e) => {
         e.preventDefault();
-        
+
         if (!newMessage.trim() || !selectedUser || !selectedUser.userId || !user || !user.userId) {
             return;
         }
@@ -123,7 +136,7 @@ const ChatPage = () => {
                 receiverId: parseInt(selectedUser.userId, 10)
             };
 
-            const response = await axios.post(
+            await axios.post(
                 `${process.env.REACT_APP_API_BASE_URL}/chat/send`, 
                 messageData,
                 {
@@ -134,7 +147,7 @@ const ChatPage = () => {
                 }
             );
 
-            setMessages(prev => [...prev, response.data]);
+            // KHÔNG setMessages ở đây nữa!
             socketRef.current.emit('send_message', messageData);
             setNewMessage('');
             scrollToBottom();
@@ -220,6 +233,10 @@ const ChatPage = () => {
         }
     };
 
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages, selectedUser]);
+
     return (
         <div className="flex h-[calc(100vh-4rem)] bg-gray-100">
             {/* Users List */}
@@ -291,7 +308,7 @@ const ChatPage = () => {
                         </div>
 
                         {/* Messages */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                        <div className="flex-1 overflow-y-auto p-4 space-y-4 overflow-x-hidden">
                             {messages
                                 .filter(msg => {
                                     const roomId = `admin-${selectedUser.userId}`;
@@ -308,13 +325,13 @@ const ChatPage = () => {
                                     >
                                         <div className="relative group">
                                             <div
-                                                className={`max-w-[70%] rounded-lg p-3 ${
-                                                    message.senderId === parseInt(user.userId, 10)
-                                                        ? 'bg-blue-500 text-white'
-                                                        : 'bg-gray-200'
-                                                }`}
+                                                className={`max-w-[70%] min-w-[60px] rounded-lg p-3 break-all
+                                                    ${message.senderId === parseInt(user.userId, 10)
+                                                        ? 'bg-blue-500 text-white self-end'
+                                                        : 'bg-gray-200 self-start'
+                                                    }`}
                                             >
-                                                <p>{message.content}</p>
+                                                <p className="whitespace-pre-line">{message.content}</p>
                                                 <div className="flex items-center justify-between mt-1">
                                                     <p className="text-xs opacity-70">
                                                         {formatTimestamp(message.timestamp)}
@@ -407,4 +424,4 @@ const ChatPage = () => {
     );
 };
 
-export default ChatPage; 
+export default ChatPage;

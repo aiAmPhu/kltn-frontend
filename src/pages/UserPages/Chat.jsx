@@ -48,6 +48,10 @@ const Chat = ({ chatType, onClose }) => {
         };
     }, [user, chatType]);
 
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
+
     const fetchChatHistory = async (roomId) => {
         try {
             const response = await axios.get(
@@ -177,7 +181,7 @@ const Chat = ({ chatType, onClose }) => {
     return (
         <div className="flex flex-col h-full bg-gray-100">
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4">
                 {messages.map((message, index) => (
                     <div
                         key={message.id || index}
@@ -262,4 +266,4 @@ const Chat = ({ chatType, onClose }) => {
     );
 };
 
-export default Chat; 
+export default Chat;
