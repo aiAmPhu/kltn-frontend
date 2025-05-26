@@ -8,7 +8,7 @@ const HighSchoolTranscript = () => {
     const [grades, setGrades] = useState({});
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [message, setMessage] = useState({ type: '', text: '' });
+    const [message, setMessage] = useState({ type: "", text: "" });
     const [hasData, setHasData] = useState(false);
     const inputsRef = useRef([]);
 
@@ -50,9 +50,7 @@ const HighSchoolTranscript = () => {
             label: "Lớp 12",
             year: "grade12",
             color: "bg-red-100",
-            fields: [
-                { label: "Học kỳ 1", key: "score1" },
-            ],
+            fields: [{ label: "Học kỳ 1", key: "score1" }],
         },
     ];
 
@@ -86,8 +84,10 @@ const HighSchoolTranscript = () => {
                     });
                     setGrades(initialGrades);
                     setHasData(true);
+                    console.log("Có học bạ");
                 } else {
                     setHasData(false);
+                    console.log("Đéo có học bạ");
                 }
             } catch (error) {
                 console.error("Lỗi khi lấy học bạ:", error);
@@ -147,12 +147,12 @@ const HighSchoolTranscript = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
-            setMessage({ type: 'success', text: 'Lưu học bạ thành công!' });
+            setMessage({ type: "success", text: "Lưu học bạ thành công!" });
             setHasData(true);
             return true;
         } catch (error) {
             console.error("Error adding transcript:", error);
-            setMessage({ type: 'error', text: 'Lưu học bạ thất bại. Vui lòng thử lại.' });
+            setMessage({ type: "error", text: "Lưu học bạ thất bại. Vui lòng thử lại." });
             return false;
         } finally {
             setIsLoading(false);
@@ -188,11 +188,11 @@ const HighSchoolTranscript = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
-            setMessage({ type: 'success', text: 'Cập nhật học bạ thành công!' });
+            setMessage({ type: "success", text: "Cập nhật học bạ thành công!" });
             return true;
         } catch (error) {
             console.error("Error updating transcript:", error);
-            setMessage({ type: 'error', text: error.message || 'Cập nhật học bạ thất bại. Vui lòng thử lại.' });
+            setMessage({ type: "error", text: error.message || "Cập nhật học bạ thất bại. Vui lòng thử lại." });
             return false;
         } finally {
             setIsLoading(false);
@@ -213,11 +213,13 @@ const HighSchoolTranscript = () => {
             <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Học bạ THPT</h1>
 
             {message.text && (
-                <div className={`w-full max-w-4xl mx-auto mb-6 p-4 rounded-lg ${
-                    message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                }`}>
+                <div
+                    className={`w-full max-w-4xl mx-auto mb-6 p-4 rounded-lg ${
+                        message.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                    }`}
+                >
                     <div className="flex items-center gap-2">
-                        {message.type === 'success' ? <FaCheck /> : <FaTimes />}
+                        {message.type === "success" ? <FaCheck /> : <FaTimes />}
                         <span>{message.text}</span>
                     </div>
                 </div>
@@ -289,7 +291,7 @@ const HighSchoolTranscript = () => {
                     onClick={handleSubmit}
                     disabled={isLoading}
                 >
-                    {isLoading ? 'Đang xử lý...' : hasData ? 'Cập nhật' : 'Lưu'}
+                    {isLoading ? "Đang xử lý..." : hasData ? "Cập nhật" : "Lưu"}
                 </button>
             </div>
         </div>

@@ -70,6 +70,9 @@ const Login = () => {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="w-full outline-none"
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") handleLogin();
+                                    }}
                                 />
                             </div>
                             <div className="w-full flex items-center border border-gray-300 p-3 rounded-lg focus-within:ring focus-within:border-blue-500 bg-white">
@@ -80,6 +83,9 @@ const Login = () => {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="w-full outline-none"
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") handleLogin();
+                                    }}
                                 />
                             </div>
                             {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -92,7 +98,7 @@ const Login = () => {
                             </button>
 
                             {/* Forgot password */}
-                        <div className="w-full text-right mt-2">
+                            <div className="w-full text-right mt-2">
                                 <button
                                     className="text-sm text-blue-600 hover:underline"
                                     onClick={() => navigate("/forgot-password")}
@@ -121,7 +127,6 @@ const Login = () => {
                 </div>
             </div>
         </div>
-        
     );
 };
 
