@@ -21,8 +21,7 @@ const LearningProcess = () => {
     });
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [message, setMessage] = useState({ type: '', text: '' });
-    const [hasData, setHasData] = useState(false);
+    const [message, setMessage] = useState({ type: "", text: "" });
 
     const priorityGroupOptions = [
         { value: "OBJ001", label: "Ưu tiên khu vực miền núi" },
@@ -60,13 +59,9 @@ const LearningProcess = () => {
                         priorityGroup: priorityGroupId ?? "",
                         region: regionId ?? "",
                     });
-                    setHasData(true);
-                } else {
-                    setHasData(false);
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
-                setHasData(false);
             }
         };
         fetchData();
@@ -97,31 +92,6 @@ const LearningProcess = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const addLearningProcess = async () => {
-        try {
-            setIsLoading(true);
-            const response = await axios.post(
-                `${process.env.REACT_APP_API_BASE_URL}/learning/add`,
-                {
-                    userId,
-                    ...formData
-                },
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-            setMessage({ type: 'success', text: 'Lưu thông tin thành công!' });
-            setHasData(true);
-            return true;
-        } catch (error) {
-            console.error("Error adding learning process:", error);
-            setMessage({ type: 'error', text: 'Lưu thông tin thất bại. Vui lòng thử lại.' });
-            return false;
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const updateLearningProcess = async () => {
         try {
             setIsLoading(true);
@@ -132,11 +102,11 @@ const LearningProcess = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
-            setMessage({ type: 'success', text: 'Cập nhật thông tin thành công!' });
+            setMessage({ type: "success", text: "Cập nhật thông tin thành công!" });
             return true;
         } catch (error) {
             console.error("Error updating learning process:", error);
-            setMessage({ type: 'error', text: 'Cập nhật thông tin thất bại. Vui lòng thử lại.' });
+            setMessage({ type: "error", text: "Cập nhật thông tin thất bại. Vui lòng thử lại." });
             return false;
         } finally {
             setIsLoading(false);
@@ -146,14 +116,10 @@ const LearningProcess = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) {
-            setMessage({ type: 'error', text: 'Vui lòng kiểm tra lại thông tin!' });
+            setMessage({ type: "error", text: "Vui lòng kiểm tra lại thông tin!" });
             return;
         }
-        if (!hasData) {
-            await addLearningProcess();
-        } else {
-            await updateLearningProcess();
-        }
+        await updateLearningProcess();
     };
 
     const renderGradeInputs = (grade) => (
@@ -216,11 +182,13 @@ const LearningProcess = () => {
                 <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Quá Trình Học Tập Của Thí Sinh</h1>
 
                 {message.text && (
-                    <div className={`w-full max-w-4xl mx-auto mb-6 p-4 rounded-lg ${
-                        message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                    }`}>
+                    <div
+                        className={`w-full max-w-4xl mx-auto mb-6 p-4 rounded-lg ${
+                            message.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                        }`}
+                    >
                         <div className="flex items-center gap-2">
-                            {message.type === 'success' ? <FaCheck /> : <FaTimes />}
+                            {message.type === "success" ? <FaCheck /> : <FaTimes />}
                             <span>{message.text}</span>
                         </div>
                     </div>
@@ -277,7 +245,7 @@ const LearningProcess = () => {
                         disabled={isLoading}
                         className="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium hover:bg-blue-600 transition duration-200 disabled:opacity-50"
                     >
-                        {isLoading ? 'Đang xử lý...' : hasData ? 'Cập nhật' : 'Lưu'}
+                        {isLoading ? "Đang xử lý..." : "Cập nhật"}
                     </button>
                 </div>
             </section>

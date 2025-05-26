@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaUpload, FaCheck, FaTimes } from "react-icons/fa";
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const PhotoID = () => {
     const token = localStorage.getItem("token");
@@ -15,7 +15,6 @@ const PhotoID = () => {
     const [grade11Pic, setGrade11Pic] = useState(null);
     const [grade12Pic, setGrade12Pic] = useState(null);
     const [isLoading, setIsLoading] = useState({});
-    const [hasData, setHasData] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -31,13 +30,9 @@ const PhotoID = () => {
                     setGrade10Pic(response.data.data.grade10Pic);
                     setGrade11Pic(response.data.data.grade11Pic);
                     setGrade12Pic(response.data.data.grade12Pic);
-                    setHasData(true);
-                } else {
-                    setHasData(false);
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
-                setHasData(false);
             }
         };
         fetchData();
@@ -45,14 +40,14 @@ const PhotoID = () => {
 
     const handleUpload = async (fieldName, file, setFileUrl) => {
         if (!file) {
-            toast.error('Vui lòng chọn file để tải lên', {
+            toast.error("Vui lòng chọn file để tải lên", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
-                style: { marginTop: '60px' }
+                style: { marginTop: "60px" },
             });
             return;
         }
@@ -61,7 +56,7 @@ const PhotoID = () => {
         formData.append("image", file);
 
         try {
-            setIsLoading(prev => ({ ...prev, [fieldName]: true }));
+            setIsLoading((prev) => ({ ...prev, [fieldName]: true }));
             const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/upload/`, formData, {
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -73,7 +68,7 @@ const PhotoID = () => {
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
-                style: { marginTop: '60px' }
+                style: { marginTop: "60px" },
             });
             console.log(`${fieldName} uploaded successfully:`, res.data.imageUrl);
         } catch (err) {
@@ -85,63 +80,16 @@ const PhotoID = () => {
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
-                style: { marginTop: '60px' }
+                style: { marginTop: "60px" },
             });
         } finally {
-            setIsLoading(prev => ({ ...prev, [fieldName]: false }));
-        }
-    };
-
-    const addPhotoID = async () => {
-        try {
-            setIsLoading(prev => ({ ...prev, submit: true }));
-            const response = await axios.post(
-                `${process.env.REACT_APP_API_BASE_URL}/photo/add`,
-                {
-                    userId,
-                    personalPic,
-                    birthCertificate,
-                    frontCCCD,
-                    backCCCD,
-                    grade10Pic,
-                    grade11Pic,
-                    grade12Pic,
-                },
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-            toast.success('Lưu hồ sơ ảnh thành công!', {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                style: { marginTop: '60px' }
-            });
-            setHasData(true);
-            return true;
-        } catch (error) {
-            console.error("Error adding photo ID:", error);
-            toast.error('Lưu hồ sơ ảnh thất bại. Vui lòng thử lại.', {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                style: { marginTop: '60px' }
-            });
-            return false;
-        } finally {
-            setIsLoading(prev => ({ ...prev, submit: false }));
+            setIsLoading((prev) => ({ ...prev, [fieldName]: false }));
         }
     };
 
     const updatePhotoID = async () => {
         try {
-            setIsLoading(prev => ({ ...prev, submit: true }));
+            setIsLoading((prev) => ({ ...prev, submit: true }));
             const updateData = {
                 personalPic,
                 birthCertificate,
@@ -158,40 +106,36 @@ const PhotoID = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
-            toast.success('Cập nhật hồ sơ ảnh thành công!', {
+            toast.success("Cập nhật hồ sơ ảnh thành công!", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
-                style: { marginTop: '60px' }
+                style: { marginTop: "60px" },
             });
             return true;
         } catch (error) {
             console.error("Error updating photo ID:", error);
-            toast.error('Cập nhật hồ sơ ảnh thất bại. Vui lòng thử lại.', {
+            toast.error("Cập nhật hồ sơ ảnh thất bại. Vui lòng thử lại.", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
-                style: { marginTop: '60px' }
+                style: { marginTop: "60px" },
             });
             return false;
         } finally {
-            setIsLoading(prev => ({ ...prev, submit: false }));
+            setIsLoading((prev) => ({ ...prev, submit: false }));
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!hasData) {
-            await addPhotoID();
-        } else {
-            await updatePhotoID();
-        }
+        await updatePhotoID();
     };
 
     return (
@@ -201,12 +145,32 @@ const PhotoID = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl">
                 {[
                     { label: "Ảnh thẻ 3x4", file: personalPic, setFile: setPersonalPic, fieldName: "Ảnh thẻ 3x4" },
-                    { label: "Giấy khai sinh", file: birthCertificate, setFile: setBirthCertificate, fieldName: "Giấy khai sinh" },
+                    {
+                        label: "Giấy khai sinh",
+                        file: birthCertificate,
+                        setFile: setBirthCertificate,
+                        fieldName: "Giấy khai sinh",
+                    },
                     { label: "Mặt trước CCCD", file: frontCCCD, setFile: setFrontCCCD, fieldName: "Mặt trước CCCD" },
                     { label: "Mặt sau CCCD", file: backCCCD, setFile: setBackCCCD, fieldName: "Mặt sau CCCD" },
-                    { label: "Điểm học bạ lớp 10", file: grade10Pic, setFile: setGrade10Pic, fieldName: "Điểm học bạ lớp 10" },
-                    { label: "Điểm học bạ lớp 11", file: grade11Pic, setFile: setGrade11Pic, fieldName: "Điểm học bạ lớp 11" },
-                    { label: "Điểm học bạ lớp 12", file: grade12Pic, setFile: setGrade12Pic, fieldName: "Điểm học bạ lớp 12" },
+                    {
+                        label: "Điểm học bạ lớp 10",
+                        file: grade10Pic,
+                        setFile: setGrade10Pic,
+                        fieldName: "Điểm học bạ lớp 10",
+                    },
+                    {
+                        label: "Điểm học bạ lớp 11",
+                        file: grade11Pic,
+                        setFile: setGrade11Pic,
+                        fieldName: "Điểm học bạ lớp 11",
+                    },
+                    {
+                        label: "Điểm học bạ lớp 12",
+                        file: grade12Pic,
+                        setFile: setGrade12Pic,
+                        fieldName: "Điểm học bạ lớp 12",
+                    },
                 ].map(({ label, file, setFile, fieldName }, index) => (
                     <div key={index} className="p-4 bg-white shadow-md rounded-lg flex flex-col items-center gap-4">
                         <label className="font-semibold text-gray-700">{label}</label>
@@ -224,7 +188,7 @@ const PhotoID = () => {
                                 className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition flex items-center gap-2 disabled:opacity-50"
                             >
                                 <FaUpload />
-                                {isLoading[fieldName] ? 'Đang tải...' : 'Tải lên'}
+                                {isLoading[fieldName] ? "Đang tải..." : "Tải lên"}
                             </button>
                         </div>
                         {file && (
@@ -246,7 +210,7 @@ const PhotoID = () => {
                     disabled={isLoading.submit}
                     className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition flex items-center gap-2 disabled:opacity-50"
                 >
-                    {isLoading.submit ? 'Đang xử lý...' : hasData ? 'Cập nhật' : 'Lưu'}
+                    {isLoading.submit ? "Đang xử lý..." : "Cập nhật"}
                 </button>
             </div>
         </div>

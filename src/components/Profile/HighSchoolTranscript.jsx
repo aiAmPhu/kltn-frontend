@@ -9,7 +9,6 @@ const HighSchoolTranscript = () => {
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState({ type: "", text: "" });
-    const [hasData, setHasData] = useState(false);
     const inputsRef = useRef([]);
 
     const subjects = [
@@ -83,15 +82,9 @@ const HighSchoolTranscript = () => {
                         });
                     });
                     setGrades(initialGrades);
-                    setHasData(true);
-                    console.log("Có học bạ");
-                } else {
-                    setHasData(false);
-                    console.log("Đéo có học bạ");
                 }
             } catch (error) {
                 console.error("Lỗi khi lấy học bạ:", error);
-                setHasData(false);
             }
         };
         fetchTranscript();
@@ -121,44 +114,6 @@ const HighSchoolTranscript = () => {
         }
     };
 
-    const addTranscript = async () => {
-        try {
-            setIsLoading(true);
-            const scores = {};
-            subjects.forEach((subject, subjectIndex) => {
-                const subjectScores = [];
-                years.forEach((year, yearIndex) => {
-                    year.fields.forEach((field) => {
-                        const score = grades?.[subjectIndex]?.[yearIndex]?.[field.key];
-                        subjectScores.push({
-                            year: year.label,
-                            semester: field.label,
-                            score: parseFloat(score) || 0,
-                        });
-                    });
-                });
-                scores[subject] = subjectScores;
-            });
-
-            const response = await axios.post(
-                `${process.env.REACT_APP_API_BASE_URL}/transcripts/add`,
-                { userId, scores },
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-            setMessage({ type: "success", text: "Lưu học bạ thành công!" });
-            setHasData(true);
-            return true;
-        } catch (error) {
-            console.error("Error adding transcript:", error);
-            setMessage({ type: "error", text: "Lưu học bạ thất bại. Vui lòng thử lại." });
-            return false;
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const updateTranscript = async () => {
         try {
             setIsLoading(true);
@@ -181,7 +136,7 @@ const HighSchoolTranscript = () => {
                 scores[subject] = subjectScores;
             });
 
-            const response = await axios.put(
+            await axios.put(
                 `${process.env.REACT_APP_API_BASE_URL}/transcripts/update/${userId}`,
                 { scores },
                 {
@@ -201,11 +156,7 @@ const HighSchoolTranscript = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!hasData) {
-            await addTranscript();
-        } else {
-            await updateTranscript();
-        }
+        await updateTranscript();
     };
 
     return (
@@ -291,7 +242,7 @@ const HighSchoolTranscript = () => {
                     onClick={handleSubmit}
                     disabled={isLoading}
                 >
-                    {isLoading ? "Đang xử lý..." : hasData ? "Cập nhật" : "Lưu"}
+                    {isLoading ? "Đang xử lý..." : "Cập nhật"}
                 </button>
             </div>
         </div>

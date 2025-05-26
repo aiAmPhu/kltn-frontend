@@ -6,11 +6,9 @@ const AdmissionInformation = () => {
     const token = localStorage.getItem("token");
     const userId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
     const tokenEmail = token ? JSON.parse(atob(token.split(".")[1])).email : null;
-    const [user, setUser] = useState({});
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [message, setMessage] = useState({ type: '', text: '' });
-    const [hasData, setHasData] = useState(false);
+    const [message, setMessage] = useState({ type: "", text: "" });
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
@@ -39,7 +37,6 @@ const AdmissionInformation = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (res.data) {
-                    setUser(res.data);
                     setFormData({
                         firstName: res.data.firstName ?? "",
                         lastName: res.data.lastName ?? "",
@@ -60,13 +57,9 @@ const AdmissionInformation = () => {
                         address: res.data.address ?? "",
                         status: res.data.status ?? "",
                     });
-                    setHasData(true);
-                } else {
-                    setHasData(false);
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
-                setHasData(false);
             }
         };
         fetchData();
@@ -87,31 +80,6 @@ const AdmissionInformation = () => {
             } else {
                 e.target.blur();
             }
-        }
-    };
-
-    const addInformation = async () => {
-        try {
-            setIsLoading(true);
-            const response = await axios.post(
-                `${process.env.REACT_APP_API_BASE_URL}/adis/add`,
-                {
-                    userId,
-                    ...formData
-                },
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-            setMessage({ type: 'success', text: 'Lưu thông tin thành công!' });
-            setHasData(true);
-            return true;
-        } catch (error) {
-            console.error("Error adding information:", error);
-            setMessage({ type: 'error', text: 'Lưu thông tin thất bại. Vui lòng thử lại.' });
-            return false;
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -170,24 +138,20 @@ const AdmissionInformation = () => {
 
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) {
-            setMessage({ type: 'error', text: 'Vui lòng kiểm tra lại thông tin!' });
+            setMessage({ type: "error", text: "Vui lòng kiểm tra lại thông tin!" });
             return false;
         }
 
         try {
             setIsLoading(true);
-            const response = await axios.put(
-                `${process.env.REACT_APP_API_BASE_URL}/adis/update/${userId}`,
-                formData,
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-            setMessage({ type: 'success', text: 'Cập nhật thông tin thành công!' });
+            await axios.put(`${process.env.REACT_APP_API_BASE_URL}/adis/update/${userId}`, formData, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setMessage({ type: "success", text: "Cập nhật thông tin thành công!" });
             return true;
         } catch (error) {
             console.error("Error updating information:", error);
-            setMessage({ type: 'error', text: 'Cập nhật thông tin thất bại. Vui lòng thử lại.' });
+            setMessage({ type: "error", text: "Cập nhật thông tin thất bại. Vui lòng thử lại." });
             return false;
         } finally {
             setIsLoading(false);
@@ -196,11 +160,7 @@ const AdmissionInformation = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!hasData) {
-            await addInformation();
-        } else {
-            await updateInformation();
-        }
+        await updateInformation();
     };
 
     const formatDate = (date) => {
@@ -214,11 +174,13 @@ const AdmissionInformation = () => {
                 <h1 className="text-3xl font-bold text-center text-blue-600 flex-grow">Thông tin xét tuyển</h1>
 
                 {message.text && (
-                    <div className={`w-full max-w-4xl mx-auto mb-6 p-4 rounded-lg ${
-                        message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                    }`}>
+                    <div
+                        className={`w-full max-w-4xl mx-auto mb-6 p-4 rounded-lg ${
+                            message.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                        }`}
+                    >
                         <div className="flex items-center gap-2">
-                            {message.type === 'success' ? <FaCheck /> : <FaTimes />}
+                            {message.type === "success" ? <FaCheck /> : <FaTimes />}
                             <span>{message.text}</span>
                         </div>
                     </div>
@@ -475,7 +437,7 @@ const AdmissionInformation = () => {
                         disabled={isLoading}
                         className="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium hover:bg-blue-600 transition duration-200 disabled:opacity-50"
                     >
-                        {isLoading ? 'Đang xử lý...' : hasData ? 'Cập nhật' : 'Lưu'}
+                        {isLoading ? "Đang xử lý..." : "Cập nhật"}
                     </button>
                 </form>
             </section>
