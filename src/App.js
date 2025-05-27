@@ -43,6 +43,9 @@ import Information from "./pages/ReviewerPages/Information.jsx";
 import LearningProccess from "./pages/ReviewerPages/LearningProccess.jsx";
 import Transcript from "./pages/ReviewerPages/Transcript.jsx";
 import Photo from "./pages/ReviewerPages/Photo.jsx";
+import ForgotPasswordStep1 from "./pages/UserPages/ForgotPassword/ForgotPasswordStep1.jsx";
+import ForgotPasswordStep2 from "./pages/UserPages/ForgotPassword/ForgotPasswordStep2.jsx";
+import ForgotPasswordStep3 from "./pages/UserPages/ForgotPassword/ForgotPasswordStep3.jsx";
 
 function App() {
     return (
@@ -62,7 +65,9 @@ function App() {
                     <Route path="/block" element={<Block />} />
                     <Route path="/criteria" element={<Criteria />} />
                     <Route path="/chatbot" element={<Chatbot />} />
-                    
+                    <Route path="/forgot-password/step1" element={<ForgotPasswordStep1 />} />
+                    <Route path="/forgot-password/step2" element={<ForgotPasswordStep2 />} />
+                    <Route path="/forgot-password/step3" element={<ForgotPasswordStep3 />} />
                     {/* Protected User Routes */}
                     <Route
                         path="/wish"

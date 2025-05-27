@@ -101,7 +101,7 @@ const Login = () => {
                             <div className="w-full text-right mt-2">
                                 <button
                                     className="text-sm text-blue-600 hover:underline"
-                                    onClick={() => navigate("/forgot-password")}
+                                    onClick={() => navigate("/forgot-password/step1")}
                                 >
                                     Quên mật khẩu?
                                 </button>
