@@ -24,9 +24,7 @@ import ChangePassword from "./pages/UserPages/ChangePassword.jsx";
 import ReviewerPage from "./pages/ReviewerPages/ReviewerPage.jsx";
 import AdminPage from "./pages/AdminPages/AdminPage.jsx";
 import UserDetailPage from "./pages/ReviewerPages/UserDetailPage.jsx";
-import UserListPage from "./pages/AdminPages/UserPage/UserListPage.jsx";
-import AdmissionYearListPage from "./pages/AdminPages/AdmissionYearPage/AdmissionYearListPage.jsx";
-import AdmissionBlockListPage from "./pages/AdminPages/AdmissionBlockPage/AdmissionBlockListPage.jsx";
+import AdmissionYearList from "./pages/AdminPages/AdmissionYearPage/AdmissionYearList.jsx";
 import AdmissionCriteriaListPage from "./pages/AdminPages/AdmissionCriteriaPage/AdmissionCriteriaListPage.jsx";
 import AdmissionMajorListPage from "./pages/AdminPages/AdmissionMajorPage/AdmissionMajorListPage.jsx";
 import AdmissionRegionListPage from "./pages/AdminPages/AdmissionRegionPage/AdmissionRegionListPage.jsx";
@@ -46,6 +44,8 @@ import Photo from "./pages/ReviewerPages/Photo.jsx";
 import ForgotPasswordStep1 from "./pages/UserPages/ForgotPassword/ForgotPasswordStep1.jsx";
 import ForgotPasswordStep2 from "./pages/UserPages/ForgotPassword/ForgotPasswordStep2.jsx";
 import ForgotPasswordStep3 from "./pages/UserPages/ForgotPassword/ForgotPasswordStep3.jsx";
+import AdmissionBlockListPage from "./pages/AdminPages/AdmissionBlockPage/AdmissionBlockListPage.jsx";
+import UserListPage from "./pages/AdminPages/UserPage/UserListPage.jsx";
 
 function App() {
     return (
@@ -122,7 +122,7 @@ function App() {
                 >
                     <Route index element={<Navigate to="users" replace />} />
                     <Route path="users" element={<UserListPage />} />
-                    <Route path="admission-years" element={<AdmissionYearListPage />} />
+                    <Route path="admission-years" element={<AdmissionYearList />} />
                     <Route path="admission-blocks" element={<AdmissionBlockListPage />} />
                     <Route path="admission-majors" element={<AdmissionMajorListPage />} />
                     <Route path="admission-criteria" element={<AdmissionCriteriaListPage />} />

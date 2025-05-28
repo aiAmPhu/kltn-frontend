@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AdmissionBlockList from "./AdmissionBlockList";
 
@@ -10,14 +10,11 @@ const AdmissionBlockListPage = () => {
             try {
                 const token = localStorage.getItem("token");
 
-                const response = await axios.get(
-                    `${process.env.REACT_APP_API_BASE_URL}/adbs/getall`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    }
-                );
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adbs/getall`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
 
                 setAdmissionBlocks(response.data);
             } catch (error) {
@@ -35,4 +32,4 @@ const AdmissionBlockListPage = () => {
     );
 };
 
-export default AdmissionBlockListPage; 
+export default AdmissionBlockListPage;

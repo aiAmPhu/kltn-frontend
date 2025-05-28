@@ -139,15 +139,15 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
         try {
             const token = localStorage.getItem("token");
             const response = await axios.get(`${API_BASE_URL}/adbs/export`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
             });
 
             // Create a blob from the response data
-            const blob = new Blob([JSON.stringify(response.data, null, 2)], { type: 'application/json' });
+            const blob = new Blob([JSON.stringify(response.data, null, 2)], { type: "application/json" });
             const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
+            const link = document.createElement("a");
             link.href = url;
-            link.setAttribute('download', 'admission_blocks.json');
+            link.setAttribute("download", "admission_blocks.json");
             document.body.appendChild(link);
             link.click();
             link.remove();
@@ -167,16 +167,18 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                 try {
                     const adBlocks = JSON.parse(e.target.result);
                     const token = localStorage.getItem("token");
-                    
+
                     const response = await axios.post(
                         `${API_BASE_URL}/adbs/import`,
                         { adBlocks },
                         { headers: { Authorization: `Bearer ${token}` } }
                     );
 
-                    setImportSuccess(`Import thành công: ${response.data.results.success.length} khối, ${response.data.results.errors.length} lỗi`);
+                    setImportSuccess(
+                        `Import thành công: ${response.data.results.success.length} khối, ${response.data.results.errors.length} lỗi`
+                    );
                     setImportError("");
-                    
+
                     // Refresh the list
                     await loadAdmissionBlocks();
                 } catch (error) {
@@ -265,12 +267,7 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                         </button>
                         <label className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors flex items-center gap-2 cursor-pointer">
                             <FaFileImport /> Nhập
-                            <input
-                                type="file"
-                                accept=".json"
-                                onChange={handleImport}
-                                className="hidden"
-                            />
+                            <input type="file" accept=".json" onChange={handleImport} className="hidden" />
                         </label>
                         <button
                             onClick={handleAddBlock}

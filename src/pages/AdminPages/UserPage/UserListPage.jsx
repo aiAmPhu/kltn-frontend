@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import UserList from "./UserList";
 
@@ -11,14 +11,11 @@ const UserListPage = () => {
             try {
                 const token = localStorage.getItem("token");
 
-                const response = await axios.get(
-                    `${process.env.REACT_APP_API_BASE_URL}/users/getall`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    }
-                );
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/users/getall`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
 
                 setUsers(response.data); // sử dụng đúng setUsers trong component
             } catch (error) {

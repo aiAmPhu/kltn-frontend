@@ -340,7 +340,7 @@ const PermissionList = ({ users: usersProp = [], setUsers: setUsersProp }) => {
                                     </tr>
                                 ) : (
                                     currentUsers.map((user) => (
-                                        <tr key={user._id} className="hover:bg-gray-50">
+                                        <tr key={user.userId} className="hover:bg-gray-50">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm font-medium text-gray-900">{user.name}</div>
                                             </td>
