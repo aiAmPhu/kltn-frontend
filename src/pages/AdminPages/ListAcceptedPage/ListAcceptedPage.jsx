@@ -15,13 +15,9 @@ const ListAcceptedPage = () => {
         setError(null);
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.get(
-                `${process.env.REACT_APP_API_BASE_URL}/wish/getAccepted`,
-                {
-                    headers: token ? { Authorization: `Bearer ${token}` } : {},
-                }
-            );
-            console.log("API Response:", response.data); // Debug log
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/wish/getAccepted`, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+            });
             if (response.data && Array.isArray(response.data)) {
                 setWishes(response.data);
             } else if (response.data && response.data.data && Array.isArray(response.data.data)) {
@@ -100,9 +96,25 @@ const ListAcceptedPage = () => {
         return (
             <div className="flex justify-center items-center h-64">
                 <div className="flex flex-col items-center">
-                    <svg className="animate-spin h-8 w-8 text-blue-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                        className="animate-spin h-8 w-8 text-blue-500 mb-2"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                        ></circle>
+                        <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                     </svg>
                     <span className="text-gray-700 text-lg">Đang tải dữ liệu...</span>
                 </div>
@@ -114,9 +126,7 @@ const ListAcceptedPage = () => {
     if (error) {
         return (
             <div className="flex justify-center items-center h-64">
-                <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded">
-                    {error}
-                </div>
+                <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded">{error}</div>
             </div>
         );
     }
@@ -138,12 +148,30 @@ const ListAcceptedPage = () => {
                     <button
                         onClick={handleFilter}
                         disabled={filtering}
-                        className={`inline-flex items-center gap-2 px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition ${filtering ? "opacity-60 cursor-not-allowed" : ""}`}
+                        className={`inline-flex items-center gap-2 px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition ${
+                            filtering ? "opacity-60 cursor-not-allowed" : ""
+                        }`}
                     >
                         {filtering && (
-                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            <svg
+                                className="animate-spin h-5 w-5 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                ></circle>
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
                             </svg>
                         )}
                         {filtering ? "Đang lọc..." : "Lọc danh sách trúng tuyển"}
@@ -152,7 +180,13 @@ const ListAcceptedPage = () => {
                         onClick={exportToCSV}
                         className="inline-flex items-center gap-2 px-5 py-2 bg-green-500 text-white font-semibold rounded-lg shadow hover:bg-green-600 transition"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
                         Xuất file CSV
@@ -169,13 +203,27 @@ const ListAcceptedPage = () => {
                     <thead className="bg-gray-100">
                         <tr>
                             <th className="px-4 py-3 border-b text-xs font-semibold text-gray-600 uppercase">#</th>
-                            <th className="px-4 py-3 border-b text-xs font-semibold text-gray-600 uppercase">Mã Nguyện Vọng</th>
-                            <th className="px-4 py-3 border-b text-xs font-semibold text-gray-600 uppercase">Độ Ưu Tiên</th>
-                            <th className="px-4 py-3 border-b text-xs font-semibold text-gray-600 uppercase">Diện Xét Tuyển</th>
-                            <th className="px-4 py-3 border-b text-xs font-semibold text-gray-600 uppercase">Khối Xét Tuyển</th>
-                            <th className="px-4 py-3 border-b text-xs font-semibold text-gray-600 uppercase">Ngành Xét Tuyển</th>
-                            <th className="px-4 py-3 border-b text-xs font-semibold text-gray-600 uppercase">Điểm Xét Tuyển</th>
-                            <th className="px-4 py-3 border-b text-xs font-semibold text-gray-600 uppercase">Trạng Thái</th>
+                            <th className="px-4 py-3 border-b text-xs font-semibold text-gray-600 uppercase">
+                                Mã Nguyện Vọng
+                            </th>
+                            <th className="px-4 py-3 border-b text-xs font-semibold text-gray-600 uppercase">
+                                Độ Ưu Tiên
+                            </th>
+                            <th className="px-4 py-3 border-b text-xs font-semibold text-gray-600 uppercase">
+                                Diện Xét Tuyển
+                            </th>
+                            <th className="px-4 py-3 border-b text-xs font-semibold text-gray-600 uppercase">
+                                Khối Xét Tuyển
+                            </th>
+                            <th className="px-4 py-3 border-b text-xs font-semibold text-gray-600 uppercase">
+                                Ngành Xét Tuyển
+                            </th>
+                            <th className="px-4 py-3 border-b text-xs font-semibold text-gray-600 uppercase">
+                                Điểm Xét Tuyển
+                            </th>
+                            <th className="px-4 py-3 border-b text-xs font-semibold text-gray-600 uppercase">
+                                Trạng Thái
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
