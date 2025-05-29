@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaCheck, FaTimes } from "react-icons/fa";
+import {
+    FaCheck,
+    FaTimes,
+    FaSchool,
+    FaMapMarkerAlt,
+    FaCity,
+    FaCalendarAlt,
+    FaFlag
+} from "react-icons/fa";
 
 const LearningProcess = () => {
     const token = localStorage.getItem("token");
@@ -127,7 +135,9 @@ const LearningProcess = () => {
             <h2 className="text-xl font-semibold mb-4 text-blue-600">Lớp {grade}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                    <label className="block font-medium mb-1 text-gray-700">Tỉnh/Thành phố</label>
+                    <label className="block font-medium mb-1 text-gray-700 flex items-center gap-2">
+                        <FaCity className="text-blue-500" /> Tỉnh/Thành phố
+                    </label>
                     <input
                         type="text"
                         value={formData[`grade${grade}_province`] || ""}
@@ -141,7 +151,9 @@ const LearningProcess = () => {
                 </div>
 
                 <div>
-                    <label className="block font-medium mb-1 text-gray-700">Huyện/Quận</label>
+                    <label className="block font-medium mb-1 text-gray-700 flex items-center gap-2">
+                        <FaMapMarkerAlt className="text-blue-500" /> Huyện/Quận
+                    </label>
                     <input
                         type="text"
                         value={formData[`grade${grade}_district`] || ""}
@@ -155,7 +167,9 @@ const LearningProcess = () => {
                 </div>
 
                 <div>
-                    <label className="block font-medium mb-1 text-gray-700">Trường THPT</label>
+                    <label className="block font-medium mb-1 text-gray-700 flex items-center gap-2">
+                        <FaSchool className="text-blue-500" /> Trường THPT
+                    </label>
                     <input
                         type="text"
                         value={formData[`grade${grade}_school`] || ""}
@@ -200,7 +214,9 @@ const LearningProcess = () => {
                     ))}
 
                     <div className="mb-6">
-                        <label className="block font-medium mb-1 text-gray-700">Đối Tượng Ưu Tiên</label>
+                        <label className="block font-medium mb-1 text-gray-700 flex items-center gap-2">
+                            <FaFlag className="text-blue-500" /> Đối Tượng Ưu Tiên
+                        </label>
                         <select
                             value={formData.priorityGroup}
                             onChange={(e) => setFormData({ ...formData, priorityGroup: e.target.value })}
@@ -213,7 +229,9 @@ const LearningProcess = () => {
                         {errors.priorityGroup && <p className="text-red-500 text-sm">{errors.priorityGroup}</p>}
                     </div>
                     <div className="mb-6">
-                        <label className="block font-medium mb-1 text-gray-700">Khu vực ưu tiên</label>
+                        <label className="block font-medium mb-1 text-gray-700 flex items-center gap-2">
+                            <FaMapMarkerAlt className="text-blue-500" /> Khu vực ưu tiên
+                        </label>
                         <select
                             value={formData.region}
                             onChange={(e) => setFormData({ ...formData, region: e.target.value })}
@@ -229,7 +247,9 @@ const LearningProcess = () => {
                         {errors.region && <p className="text-red-500 text-sm">{errors.region}</p>}
                     </div>
                     <div className="mb-6">
-                        <label className="block font-medium mb-1 text-gray-700">Năm tốt ngiệp</label>
+                        <label className="block font-medium mb-1 text-gray-700 flex items-center gap-2">
+                            <FaCalendarAlt className="text-blue-500" /> Năm tốt nghiệp
+                        </label>
                         <input
                             type="number"
                             value={formData.graduationYear}

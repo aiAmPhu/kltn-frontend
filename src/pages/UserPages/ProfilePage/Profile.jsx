@@ -138,7 +138,7 @@ function ProfilePage() {
                                 }`}
                             >
                                         <span className="text-lg">{item.icon}</span>
-                                        <span className="font-medium">{item.label}</span>
+                                        <span className="font-medium break-words whitespace-normal">{item.label}</span>
                                     </button>
                             </li>
                             ))}
@@ -190,7 +190,7 @@ function ProfilePage() {
                                     Thông tin cá nhân
                                 </h3>
 
-                                <div className="grid md:grid-cols-2 gap-8">
+                                <div className="grid grid-cols-[0.5fr_2fr] gap-8">
                                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                                         <div className="flex flex-col items-center">
                                             {idPhoto ? (
@@ -217,7 +217,7 @@ function ProfilePage() {
                                                 <FaUser className="text-blue-600" />
                                                 <div>
                                                     <p className="text-sm text-gray-500">Họ và tên</p>
-                                                    <p className="font-medium">
+                                                    <p className="font-medium break-words whitespace-normal">
                                                 {user.fullName === "null null" ? "Chưa cập nhật" : user.fullName}
                                         </p>
                                                 </div>
@@ -226,7 +226,7 @@ function ProfilePage() {
                                                 <FaCalendarAlt className="text-blue-600" />
                                                 <div>
                                                     <p className="text-sm text-gray-500">Ngày sinh</p>
-                                                    <p className="font-medium">
+                                                    <p className="font-medium break-words whitespace-normal">
                                                 {user.birthDate === "null"
                                                     ? "Chưa cập nhật"
                                                     : dayjs(user.birthDate).isValid()
@@ -239,28 +239,28 @@ function ProfilePage() {
                                                 <FaEnvelope className="text-blue-600" />
                                                 <div>
                                                     <p className="text-sm text-gray-500">Email</p>
-                                                    <p className="font-medium">{user?.email || "Chưa cập nhật"}</p>
+                                                    <p className="font-medium break-words whitespace-normal">{user?.email || "Chưa cập nhật"}</p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                                                 <FaVenusMars className="text-blue-600" />
                                                 <div>
                                                     <p className="text-sm text-gray-500">Giới tính</p>
-                                                    <p className="font-medium">{user?.gender || "Chưa cập nhật"}</p>
+                                                    <p className="font-medium break-words whitespace-normal">{user?.gender || "Chưa cập nhật"}</p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                                                 <FaPhone className="text-blue-600" />
                                                 <div>
                                                     <p className="text-sm text-gray-500">Số điện thoại</p>
-                                                    <p className="font-medium">{user?.phoneNumber || "Chưa cập nhật"}</p>
+                                                    <p className="font-medium break-words whitespace-normal">{user?.phoneNumber || "Chưa cập nhật"}</p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                                                 <FaAddressCard className="text-blue-600" />
                                                 <div>
                                                     <p className="text-sm text-gray-500">CCCD</p>
-                                                    <p className="font-medium">{user?.idNumber || "Chưa cập nhật"}</p>
+                                                    <p className="font-medium break-words whitespace-normal">{user?.idNumber || "Chưa cập nhật"}</p>
                                                 </div>
                                             </div>
                                         </div>

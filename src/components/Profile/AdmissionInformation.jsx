@@ -1,6 +1,19 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { FaCheck, FaTimes } from "react-icons/fa";
+import { 
+    FaCheck, 
+    FaTimes, 
+    FaUser, 
+    FaCalendarAlt, 
+    FaVenusMars, 
+    FaMapMarkerAlt, 
+    FaPhone, 
+    FaEnvelope, 
+    FaIdCard, 
+    FaBuilding,
+    FaHome,
+    FaRoad
+} from "react-icons/fa";
 
 const AdmissionInformation = () => {
     const token = localStorage.getItem("token");
@@ -171,7 +184,7 @@ const AdmissionInformation = () => {
     return (
         <div className="flex-1 p-6">
             <section className="mb-8">
-                <h1 className="text-3xl font-bold text-center text-blue-600 flex-grow">Thông tin xét tuyển</h1>
+                <h1 className="text-3xl font-bold text-center text-blue-600 flex-grow mb-6">Thông tin xét tuyển</h1>
 
                 {message.text && (
                     <div
@@ -189,7 +202,10 @@ const AdmissionInformation = () => {
                 <form className="bg-white shadow-md rounded-lg p-6 space-y-6" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">Họ và Họ đệm</label>
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaUser className="text-blue-500" />
+                                Họ và Họ đệm
+                            </label>
                             <input
                                 type="text"
                                 name="firstName"
@@ -202,7 +218,10 @@ const AdmissionInformation = () => {
                             {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">Tên</label>
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaUser className="text-blue-500" />
+                                Tên
+                            </label>
                             <input
                                 type="text"
                                 name="lastName"
@@ -215,7 +234,10 @@ const AdmissionInformation = () => {
                             {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">Ngày sinh</label>
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaCalendarAlt className="text-blue-500" />
+                                Ngày sinh
+                            </label>
                             <input
                                 type="date"
                                 name="birthDate"
@@ -227,7 +249,10 @@ const AdmissionInformation = () => {
                             {errors.birthDate && <p className="text-red-500 text-sm">{errors.birthDate}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">Giới tính</label>
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaVenusMars className="text-blue-500" />
+                                Giới tính
+                            </label>
                             <select
                                 name="gender"
                                 value={formData.gender}
@@ -240,7 +265,10 @@ const AdmissionInformation = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">Nơi sinh</label>
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaMapMarkerAlt className="text-blue-500" />
+                                Nơi sinh
+                            </label>
                             <input
                                 type="text"
                                 name="birthPlace"
@@ -253,7 +281,10 @@ const AdmissionInformation = () => {
                             {errors.birthPlace && <p className="text-red-500 text-sm">{errors.birthPlace}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">Số điện thoại</label>
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaPhone className="text-blue-500" />
+                                Số điện thoại
+                            </label>
                             <input
                                 type="text"
                                 name="phone"
@@ -270,21 +301,25 @@ const AdmissionInformation = () => {
                     {/* Additional form fields */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">Email</label>
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaEnvelope className="text-blue-500" />
+                                Email
+                            </label>
                             <input
                                 type="email"
                                 name="email"
                                 value={formData.email}
-                                //onChange={handleInputChange}
                                 onKeyDown={handleKeyDown}
                                 className="border border-gray-300 rounded-lg w-full p-2 bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                //placeholder="Nhập email"
                                 disabled
                             />
                             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">Email phụ huynh</label>
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaEnvelope className="text-green-500" />
+                                Email phụ huynh
+                            </label>
                             <input
                                 type="email"
                                 name="parentEmail"
@@ -300,7 +335,10 @@ const AdmissionInformation = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">CMND/CCCD</label>
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaIdCard className="text-blue-500" />
+                                CMND/CCCD
+                            </label>
                             <input
                                 type="text"
                                 name="idNumber"
@@ -314,7 +352,10 @@ const AdmissionInformation = () => {
                         </div>
 
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">Ngày cấp CMND/CCCD</label>
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaCalendarAlt className="text-blue-500" />
+                                Ngày cấp CMND/CCCD
+                            </label>
                             <input
                                 type="date"
                                 name="idIssueDate"
@@ -326,16 +367,17 @@ const AdmissionInformation = () => {
                             {errors.idIssueDate && <p className="text-red-500 text-sm">{errors.idIssueDate}</p>}
                         </div>
 
-                        <div>
-                            <label className="block text-gray-700 font-medium mb-2">Nơi cấp CMND/CCCD</label>
+                        <div className="md:col-span-2">
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaBuilding className="text-blue-500" />
+                                Nơi cấp CMND/CCCD
+                            </label>
                             <select
-                                type="text"
                                 name="idIssuePlace"
                                 value={formData.idIssuePlace}
                                 onChange={handleInputChange}
                                 onKeyDown={handleKeyDown}
-                                className="border border-gray-300 rounded-lg  p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                //placeholder="Nhập nơi cấp"
+                                className="border border-gray-300 rounded-lg w-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="" disabled>
                                     Nhập nơi cấp
@@ -343,11 +385,16 @@ const AdmissionInformation = () => {
                                 <option>CỤC TRƯỞNG CỤC CẢNH SÁT QUẢN LÝ HÀNH CHÍNH VỀ TRẬT TỰ XÃ HỘI</option>
                                 <option>BỘ CÔNG AN</option>
                             </select>
+                            {errors.idIssuePlace && <p className="text-red-500 text-sm">{errors.idIssuePlace}</p>}
                         </div>
                     </div>
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">Tỉnh (Thành phố)</label>
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaMapMarkerAlt className="text-red-500" />
+                                Tỉnh (Thành phố)
+                            </label>
                             <input
                                 type="text"
                                 name="province"
@@ -360,7 +407,10 @@ const AdmissionInformation = () => {
                             {errors.province && <p className="text-red-500 text-sm">{errors.province}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">Huyện (Quận)</label>
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaMapMarkerAlt className="text-orange-500" />
+                                Huyện (Quận)
+                            </label>
                             <input
                                 type="text"
                                 name="district"
@@ -373,7 +423,10 @@ const AdmissionInformation = () => {
                             {errors.district && <p className="text-red-500 text-sm">{errors.district}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">Xã (Phường)</label>
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaMapMarkerAlt className="text-green-500" />
+                                Xã (Phường)
+                            </label>
                             <input
                                 type="text"
                                 name="commune"
@@ -389,7 +442,10 @@ const AdmissionInformation = () => {
 
                     {/* Địa chỉ báo tin */}
                     <div>
-                        <label className="block text-gray-700 font-medium mb-2">Địa chỉ báo tin</label>
+                        <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <FaHome className="text-purple-500" />
+                            Địa chỉ báo tin
+                        </label>
                         <input
                             type="text"
                             name="address"
@@ -405,7 +461,10 @@ const AdmissionInformation = () => {
                     {/* Số nhà và Tên đường (thôn, xóm, ấp) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">Số nhà</label>
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaHome className="text-blue-500" />
+                                Số nhà
+                            </label>
                             <input
                                 type="text"
                                 name="houseNumber"
@@ -418,7 +477,10 @@ const AdmissionInformation = () => {
                             {errors.houseNumber && <p className="text-red-500 text-sm">{errors.houseNumber}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2">Tên đường (thôn, xóm, ấp)</label>
+                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                <FaRoad className="text-gray-500" />
+                                Tên đường (thôn, xóm, ấp)
+                            </label>
                             <input
                                 type="text"
                                 name="streetName"
@@ -435,9 +497,19 @@ const AdmissionInformation = () => {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium hover:bg-blue-600 transition duration-200 disabled:opacity-50"
+                        className="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium hover:bg-blue-600 transition duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
-                        {isLoading ? "Đang xử lý..." : "Cập nhật"}
+                        {isLoading ? (
+                            <>
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                Đang xử lý...
+                            </>
+                        ) : (
+                            <>
+                                <FaCheck />
+                                Cập nhật
+                            </>
+                        )}
                     </button>
                 </form>
             </section>
