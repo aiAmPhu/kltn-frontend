@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
-import { FaPaperPlane, FaUser, FaSearch, FaEllipsisH, FaTrash, FaSmile } from 'react-icons/fa';
+import { FaPaperPlane, FaUser, FaSearch, FaEllipsisH, FaTrash, FaSmile, FaCheck, FaCheckDouble, FaPhone, FaVideo, FaInfoCircle } from 'react-icons/fa';
 import { useAuth } from '../../../contexts/AuthContext';
 import EmojiPicker from 'emoji-picker-react';
 
@@ -19,6 +19,10 @@ const ChatPage = () => {
     const socketRef = useRef();
     const messagesEndRef = useRef(null);
     const searchTimeoutRef = useRef(null);
+    const [unreadCounts, setUnreadCounts] = useState({});
+    const [activeUsers, setActiveUsers] = useState(new Set());
+    const [userLastMessageTime, setUserLastMessageTime] = useState({});
+    const [messageStatuses, setMessageStatuses] = useState({});
 
     useEffect(() => {
         socketRef.current = io(process.env.REACT_APP_API_BASE_URL.replace('/api', ''), {
@@ -36,6 +40,9 @@ const ChatPage = () => {
         socketRef.current.on('message_status', handleMessageStatus);
         socketRef.current.on('message_reaction', handleMessageReaction);
         socketRef.current.on('message_deleted', handleMessageDeleted);
+        socketRef.current.on('new_message_notification', handleNewMessageNotification);
+
+        socketRef.current.emit('join_room', `admin_${user.userId}`);
 
         return () => {
             socketRef.current.disconnect();
@@ -62,10 +69,22 @@ const ChatPage = () => {
         }));
     };
 
-    const handleMessageStatus = ({ messageId, status }) => {
+    const handleMessageStatus = ({ messageId, status, userId }) => {
         setMessages(prev => prev.map(msg => 
             msg.id === messageId ? { ...msg, status } : msg
         ));
+        
+        setMessageStatuses(prev => ({
+            ...prev,
+            [userId]: status
+        }));
+
+        if (status === 'read') {
+            setUnreadCounts(prev => ({
+                ...prev,
+                [userId]: 0
+            }));
+        }
     };
 
     const handleMessageReaction = ({ messageId, reaction, userId }) => {
@@ -82,12 +101,46 @@ const ChatPage = () => {
         setMessages(prev => prev.filter(msg => msg.id !== messageId));
     };
 
+    const handleNewMessageNotification = ({ roomId, senderId, unreadCount, content }) => {
+        setUnreadCounts(prev => ({
+            ...prev,
+            [senderId]: unreadCount
+        }));
+        setUserLastMessageTime(prev => ({
+            ...prev,
+            [senderId]: new Date().getTime()
+        }));
+        setMessageStatuses(prev => ({
+            ...prev,
+            [senderId]: 'sent'
+        }));
+
+        if (selectedUser && senderId === parseInt(selectedUser.userId, 10)) {
+            socketRef.current.emit('mark_as_read', {
+                roomId: `admin-${selectedUser.userId}`,
+                messageId: null
+            });
+        }
+    };
+
     const fetchMessages = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/chat/admin/all-messages`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
             });
             setMessages(response.data);
+            
+            const lastMessageTimes = {};
+            const statuses = {};
+            response.data.forEach(message => {
+                const time = new Date(message.timestamp).getTime();
+                if (!lastMessageTimes[message.senderId] || time > lastMessageTimes[message.senderId]) {
+                    lastMessageTimes[message.senderId] = time;
+                    statuses[message.senderId] = message.status;
+                }
+            });
+            setUserLastMessageTime(lastMessageTimes);
+            setMessageStatuses(statuses);
         } catch (error) {
             console.error('Error fetching messages:', error);
         }
@@ -111,7 +164,37 @@ const ChatPage = () => {
     };
 
     const handleNewMessage = (message) => {
-        setMessages(prev => [...prev, message]);
+        setMessages(prev => {
+            const exists = prev.some(msg => msg.id === message.id);
+            if (exists) return prev;
+            return [...prev, message];
+        });
+
+        setUserLastMessageTime(prev => ({
+            ...prev,
+            [message.senderId]: new Date(message.timestamp).getTime()
+        }));
+
+        // Only update unread count for received messages
+        if (message.senderId !== parseInt(user.userId, 10)) {
+            setUnreadCounts(prev => ({
+                ...prev,
+                [message.senderId]: (prev[message.senderId] || 0) + 1
+            }));
+        }
+
+        setMessageStatuses(prev => ({
+            ...prev,
+            [message.senderId]: 'sent'
+        }));
+
+        if (selectedUser && message.senderId === parseInt(selectedUser.userId, 10)) {
+            socketRef.current.emit('mark_as_read', {
+                roomId: `admin-${selectedUser.userId}`,
+                messageId: message.id
+            });
+        }
+
         scrollToBottom();
     };
 
@@ -147,7 +230,6 @@ const ChatPage = () => {
                 }
             );
 
-            // KHÔNG setMessages ở đây nữa!
             socketRef.current.emit('send_message', messageData);
             setNewMessage('');
             scrollToBottom();
@@ -237,47 +319,117 @@ const ChatPage = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, selectedUser]);
 
+    const sortedUsers = [...users].sort((a, b) => {
+        const timeA = userLastMessageTime[a.userId] || 0;
+        const timeB = userLastMessageTime[b.userId] || 0;
+        return timeB - timeA;
+    });
+
+    const getMessageStatusIcon = (status) => {
+        switch (status) {
+            case 'read':
+                return <FaCheckDouble className="text-blue-500" />;
+            case 'delivered':
+                return <FaCheckDouble className="text-gray-400" />;
+            case 'sent':
+                return <FaCheck className="text-gray-400" />;
+            default:
+                return null;
+        }
+    };
+
+    const handleUserSelect = (user) => {
+        setSelectedUser(user);
+        // Reset unread count for selected user
+        setUnreadCounts(prev => ({
+            ...prev,
+            [user.userId]: 0
+        }));
+        // Mark messages as read
+        socketRef.current.emit('mark_as_read', {
+            roomId: `admin-${user.userId}`,
+            messageId: null
+        });
+    };
+
     return (
-        <div className="flex h-[calc(100vh-4rem)] bg-gray-100">
-            {/* Users List */}
-            <div className="w-1/4 bg-white border-r">
-                <div className="p-4 border-b">
-                    <h2 className="text-xl font-semibold mb-4">Users</h2>
+        <div className="flex h-[calc(100vh-4rem)] bg-white">
+            {/* Users List - Left Sidebar */}
+            <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+                {/* Header */}
+                <div className="p-4 border-b border-gray-200">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-semibold text-gray-800">Chats</h2>
+                        <div className="flex space-x-2">
+                            <button className="p-2 hover:bg-gray-100 rounded-full">
+                                <FaVideo className="text-gray-600" />
+                            </button>
+                            <button className="p-2 hover:bg-gray-100 rounded-full">
+                                <FaPhone className="text-gray-600" />
+                            </button>
+                        </div>
+                    </div>
                     <div className="relative">
                         <input
                             type="text"
-                            placeholder="Search users..."
-                            className="w-full p-2 border rounded-lg focus:outline-none focus:border-blue-500"
+                            placeholder="Search Messenger"
+                            className="w-full p-2 pl-10 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
-                        <FaSearch className="absolute right-3 top-3 text-gray-400" />
+                        <FaSearch className="absolute left-3 top-3 text-gray-400" />
                     </div>
                 </div>
-                <div className="overflow-y-auto h-[calc(100%-8rem)]">
-                    {users
+
+                {/* Users List */}
+                <div className="flex-1 overflow-y-auto">
+                    {sortedUsers
                         .filter(user => 
                             user.name.toLowerCase().includes(searchQuery.toLowerCase())
                         )
                         .map(user => (
                             <div
                                 key={user.userId}
-                                onClick={() => setSelectedUser(user)}
-                                className={`p-4 cursor-pointer hover:bg-gray-50 ${
-                                    selectedUser?.userId === user.userId ? 'bg-blue-50' : ''
+                                onClick={() => handleUserSelect(user)}
+                                className={`p-3 cursor-pointer hover:bg-gray-100 transition-colors ${
+                                    selectedUser?.userId === user.userId ? 'bg-gray-100' : ''
                                 }`}
                             >
                                 <div className="flex items-center space-x-3">
                                     <div className="relative">
-                                        <FaUser className="text-gray-400" />
+                                        <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                                            <FaUser className="text-gray-400 text-xl" />
+                                        </div>
                                         {onlineUsers[user.userId] && (
                                             <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
                                         )}
                                     </div>
-                                    <div>
-                                        <p className="font-medium">{user.name}</p>
-                                        {typingUsers[user.userId] && (
-                                            <p className="text-sm text-gray-500">typing...</p>
-                                        )}
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between">
+                                            <p className="font-semibold text-gray-800 truncate">{user.name}</p>
+                                            {userLastMessageTime[user.userId] && (
+                                                <span className="text-xs text-gray-500">
+                                                    {new Date(userLastMessageTime[user.userId]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center space-x-1">
+                                                {typingUsers[user.userId] ? (
+                                                    <p className="text-sm text-blue-500">typing...</p>
+                                                ) : (
+                                                    messageStatuses[user.userId] && (
+                                                        <div className="flex items-center space-x-1">
+                                                            {getMessageStatusIcon(messageStatuses[user.userId])}
+                                                        </div>
+                                                    )
+                                                )}
+                                            </div>
+                                            {unreadCounts[user.userId] > 0 && (
+                                                <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[20px] text-center">
+                                                    {unreadCounts[user.userId]}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -286,54 +438,71 @@ const ChatPage = () => {
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col bg-gray-50">
                 {selectedUser ? (
                     <>
                         {/* Chat Header */}
-                        <div className="p-4 border-b bg-white flex justify-between items-center">
+                        <div className="p-4 border-b border-gray-200 bg-white flex justify-between items-center">
                             <div className="flex items-center space-x-3">
                                 <div className="relative">
-                                    <FaUser className="text-gray-400" />
+                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <FaUser className="text-gray-400" />
+                                    </div>
                                     {onlineUsers[selectedUser.userId] && (
                                         <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
                                     )}
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-semibold">{selectedUser.name}</h2>
+                                    <h2 className="text-lg font-semibold text-gray-800">{selectedUser.name}</h2>
                                     <p className="text-sm text-gray-500">
-                                        {onlineUsers[selectedUser.userId] ? 'Online' : 'Offline'}
+                                        {onlineUsers[selectedUser.userId] ? 'Active now' : 'Offline'}
                                     </p>
                                 </div>
+                            </div>
+                            <div className="flex space-x-2">
+                                <button className="p-2 hover:bg-gray-100 rounded-full">
+                                    <FaPhone className="text-gray-600" />
+                                </button>
+                                <button className="p-2 hover:bg-gray-100 rounded-full">
+                                    <FaVideo className="text-gray-600" />
+                                </button>
+                                <button className="p-2 hover:bg-gray-100 rounded-full">
+                                    <FaInfoCircle className="text-gray-600" />
+                                </button>
                             </div>
                         </div>
 
                         {/* Messages */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4 overflow-x-hidden">
+                        <div className="flex-1 overflow-y-auto p-4 space-y-4">
                             {messages
                                 .filter(msg => {
                                     const roomId = `admin-${selectedUser.userId}`;
                                     return msg.roomId === roomId || 
                                            (msg.senderId === parseInt(selectedUser.userId, 10) && 
-                                            msg.receiverId === parseInt(user.userId, 10));
+                                            msg.receiverId === parseInt(user.userId, 10)) ||
+                                           (msg.senderId === parseInt(user.userId, 10) && 
+                                            msg.receiverId === parseInt(selectedUser.userId, 10));
                                 })
                                 .map((message, index) => (
                                     <div
                                         key={index}
-                                        className={`flex ${
+                                        className={`flex w-full ${
                                             message.senderId === parseInt(user.userId, 10) ? 'justify-end' : 'justify-start'
                                         }`}
                                     >
-                                        <div className="relative group">
+                                        <div className="relative group" style={{ maxWidth: '70%' }}>
                                             <div
-                                                className={`max-w-[70%] min-w-[60px] rounded-lg p-3 break-all
-                                                    ${message.senderId === parseInt(user.userId, 10)
-                                                        ? 'bg-blue-500 text-white self-end'
-                                                        : 'bg-gray-200 self-start'
-                                                    }`}
+                                                className={`rounded-2xl p-3 ${
+                                                    message.senderId === parseInt(user.userId, 10)
+                                                        ? 'bg-blue-500 text-white'
+                                                        : 'bg-white shadow-sm'
+                                                }`}
                                             >
-                                                <p className="whitespace-pre-line">{message.content}</p>
-                                                <div className="flex items-center justify-between mt-1">
-                                                    <p className="text-xs opacity-70">
+                                                <div style={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
+                                                    {message.content}
+                                                </div>
+                                                <div className="flex items-center justify-end mt-1">
+                                                    <p className={`text-xs ${message.senderId === parseInt(user.userId, 10) ? 'text-blue-100' : 'text-gray-500'}`}>
                                                         {formatTimestamp(message.timestamp)}
                                                     </p>
                                                     {message.senderId === parseInt(user.userId, 10) && (
@@ -343,15 +512,6 @@ const ChatPage = () => {
                                                         </span>
                                                     )}
                                                 </div>
-                                                {message.reactions && Object.keys(message.reactions).length > 0 && (
-                                                    <div className="flex flex-wrap gap-1 mt-1">
-                                                        {Object.entries(message.reactions).map(([userId, reaction]) => (
-                                                            <span key={userId} className="text-sm">
-                                                                {reaction}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                )}
                                             </div>
                                             {message.senderId === parseInt(user.userId, 10) && (
                                                 <button
@@ -379,14 +539,14 @@ const ChatPage = () => {
                         </div>
 
                         {/* Message Input */}
-                        <form onSubmit={sendMessage} className="p-4 border-t bg-white">
-                            <div className="flex space-x-2">
+                        <form onSubmit={sendMessage} className="p-4 border-t border-gray-200 bg-white">
+                            <div className="flex items-center space-x-2">
                                 <button
                                     type="button"
-                                    className="text-gray-500 hover:text-gray-700"
+                                    className="p-2 text-gray-500 hover:bg-gray-100 rounded-full"
                                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                                 >
-                                    <FaSmile />
+                                    <FaSmile className="text-xl" />
                                 </button>
                                 {showEmojiPicker && (
                                     <div className="absolute bottom-20 left-4">
@@ -402,21 +562,21 @@ const ChatPage = () => {
                                     type="text"
                                     value={newMessage}
                                     onChange={(e) => setNewMessage(e.target.value)}
-                                    placeholder="Type a message..."
-                                    className="flex-1 p-2 border rounded-lg focus:outline-none focus:border-blue-500"
+                                    placeholder="Aa"
+                                    className="flex-1 p-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                                 <button
                                     type="submit"
-                                    className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600"
+                                    className="p-2 text-blue-500 hover:bg-gray-100 rounded-full"
                                 >
-                                    <FaPaperPlane />
+                                    <FaPaperPlane className="text-xl" />
                                 </button>
                             </div>
                         </form>
                     </>
                 ) : (
-                    <div className="flex-1 flex items-center justify-center text-gray-500">
-                        Select a user to start chatting
+                    <div className="flex-1 flex items-center justify-center">
+                        <p className="text-gray-500">Select a user to start a conversation</p>
                     </div>
                 )}
             </div>
