@@ -17,15 +17,9 @@ import {
     FaPhone,
     FaAddressCard,
     FaUser,
-    FaBook,
     FaClipboardList,
     FaIdBadge,
     FaHistory,
-    FaChartLine,
-    FaUniversity,
-    FaSchool,
-    FaAward,
-    FaCertificate,
 } from "react-icons/fa";
 import Header from "../../../components/Header";
 import AdmissionInformation from "../../../components/Profile/AdmissionInformation";
@@ -50,7 +44,7 @@ function ProfilePage() {
                     }),
                     axios.get(`${process.env.REACT_APP_API_BASE_URL}/photo/getPhoto/${userId}`, {
                         headers: { Authorization: `Bearer ${token}` },
-                    })
+                    }),
                 ]);
                 setUser(userRes.data.data);
                 if (photoRes.data.data) {
@@ -128,19 +122,19 @@ function ProfilePage() {
                     <nav>
                         <ul className="space-y-2">
                             {menuItems.map((item) => (
-                                <li key={item.id || 'status'}>
+                                <li key={item.id || "status"}>
                                     <button
                                         onClick={() => handleClick(item.id)}
                                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                                             activeSection === item.id
-                                        ? "bg-blue-600 text-white shadow-md"
+                                                ? "bg-blue-600 text-white shadow-md"
                                                 : "hover:bg-blue-50 text-gray-700"
-                                }`}
-                            >
+                                        }`}
+                                    >
                                         <span className="text-lg">{item.icon}</span>
                                         <span className="font-medium break-words whitespace-normal">{item.label}</span>
                                     </button>
-                            </li>
+                                </li>
                             ))}
                         </ul>
                     </nav>
@@ -157,8 +151,8 @@ function ProfilePage() {
                             <div className="flex items-center justify-between">
                                 <h2 className="text-3xl font-bold text-gray-800">
                                     <FaClipboardList className="inline-block mr-3 text-blue-600" />
-                                Trạng thái Hồ Sơ
-                            </h2>
+                                    Trạng thái Hồ Sơ
+                                </h2>
                                 <div className="flex items-center gap-2">
                                     <FaHistory className="text-gray-400" />
                                     <span className="text-sm text-gray-500">
@@ -195,9 +189,9 @@ function ProfilePage() {
                                         <div className="flex flex-col items-center">
                                             {idPhoto ? (
                                                 <div className="w-32 h-40 bg-gray-100 rounded-lg mb-4 overflow-hidden">
-                                                    <img 
-                                                        src={idPhoto} 
-                                                        alt="Ảnh thẻ" 
+                                                    <img
+                                                        src={idPhoto}
+                                                        alt="Ảnh thẻ"
                                                         className="w-full h-full object-cover"
                                                     />
                                                 </div>
@@ -218,8 +212,10 @@ function ProfilePage() {
                                                 <div>
                                                     <p className="text-sm text-gray-500">Họ và tên</p>
                                                     <p className="font-medium break-words whitespace-normal">
-                                                {user.fullName === "null null" ? "Chưa cập nhật" : user.fullName}
-                                        </p>
+                                                        {user.fullName === "null null"
+                                                            ? "Chưa cập nhật"
+                                                            : user.fullName}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
@@ -227,11 +223,11 @@ function ProfilePage() {
                                                 <div>
                                                     <p className="text-sm text-gray-500">Ngày sinh</p>
                                                     <p className="font-medium break-words whitespace-normal">
-                                                {user.birthDate === "null"
-                                                    ? "Chưa cập nhật"
-                                                    : dayjs(user.birthDate).isValid()
-                                                    ? dayjs(user.birthDate).format("DD/MM/YYYY")
-                                                    : "Chưa cập nhật"}
+                                                        {user.birthDate === "null"
+                                                            ? "Chưa cập nhật"
+                                                            : dayjs(user.birthDate).isValid()
+                                                            ? dayjs(user.birthDate).format("DD/MM/YYYY")
+                                                            : "Chưa cập nhật"}
                                                     </p>
                                                 </div>
                                             </div>
@@ -239,28 +235,36 @@ function ProfilePage() {
                                                 <FaEnvelope className="text-blue-600" />
                                                 <div>
                                                     <p className="text-sm text-gray-500">Email</p>
-                                                    <p className="font-medium break-words whitespace-normal">{user?.email || "Chưa cập nhật"}</p>
+                                                    <p className="font-medium break-words whitespace-normal">
+                                                        {user?.email || "Chưa cập nhật"}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                                                 <FaVenusMars className="text-blue-600" />
                                                 <div>
                                                     <p className="text-sm text-gray-500">Giới tính</p>
-                                                    <p className="font-medium break-words whitespace-normal">{user?.gender || "Chưa cập nhật"}</p>
+                                                    <p className="font-medium break-words whitespace-normal">
+                                                        {user?.gender || "Chưa cập nhật"}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                                                 <FaPhone className="text-blue-600" />
                                                 <div>
                                                     <p className="text-sm text-gray-500">Số điện thoại</p>
-                                                    <p className="font-medium break-words whitespace-normal">{user?.phoneNumber || "Chưa cập nhật"}</p>
+                                                    <p className="font-medium break-words whitespace-normal">
+                                                        {user?.phoneNumber || "Chưa cập nhật"}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                                                 <FaAddressCard className="text-blue-600" />
                                                 <div>
                                                     <p className="text-sm text-gray-500">CCCD</p>
-                                                    <p className="font-medium break-words whitespace-normal">{user?.idNumber || "Chưa cập nhật"}</p>
+                                                    <p className="font-medium break-words whitespace-normal">
+                                                        {user?.idNumber || "Chưa cập nhật"}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
