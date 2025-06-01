@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {
-    FaCheck,
-    FaTimes,
-    FaSchool,
-    FaMapMarkerAlt,
-    FaCity,
-    FaCalendarAlt,
-    FaFlag
-} from "react-icons/fa";
+import { FaCheck, FaTimes, FaSchool, FaMapMarkerAlt, FaCity, FaCalendarAlt, FaFlag } from "react-icons/fa";
 
 const LearningProcess = () => {
     const token = localStorage.getItem("token");
@@ -38,8 +30,10 @@ const LearningProcess = () => {
 
     const regionOptions = [
         { value: "R001", label: "Miền Bắc" },
-        { value: "R002", label: "Miền Trung" },
-        { value: "R003", label: "Miền Nam" },
+        { value: "R002", label: "Khu vực 1" },
+        { value: "R003", label: "Khu vực 2" },
+        { value: "R004", label: "Khu vực 2-NT" },
+        { value: "R005", label: "Khu vực 3" },
     ];
 
     useEffect(() => {
@@ -103,13 +97,9 @@ const LearningProcess = () => {
     const updateLearningProcess = async () => {
         try {
             setIsLoading(true);
-            const response = await axios.put(
-                `${process.env.REACT_APP_API_BASE_URL}/learning/update/${userId}`,
-                formData,
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
+            await axios.put(`${process.env.REACT_APP_API_BASE_URL}/learning/update/${userId}`, formData, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
             setMessage({ type: "success", text: "Cập nhật thông tin thành công!" });
             return true;
         } catch (error) {
@@ -135,7 +125,7 @@ const LearningProcess = () => {
             <h2 className="text-xl font-semibold mb-4 text-blue-600">Lớp {grade}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                    <label className="block font-medium mb-1 text-gray-700 flex items-center gap-2">
+                    <label className="font-medium mb-1 text-gray-700 flex items-center gap-2">
                         <FaCity className="text-blue-500" /> Tỉnh/Thành phố
                     </label>
                     <input
@@ -151,7 +141,7 @@ const LearningProcess = () => {
                 </div>
 
                 <div>
-                    <label className="block font-medium mb-1 text-gray-700 flex items-center gap-2">
+                    <label className="font-medium mb-1 text-gray-700 flex items-center gap-2">
                         <FaMapMarkerAlt className="text-blue-500" /> Huyện/Quận
                     </label>
                     <input
@@ -167,7 +157,7 @@ const LearningProcess = () => {
                 </div>
 
                 <div>
-                    <label className="block font-medium mb-1 text-gray-700 flex items-center gap-2">
+                    <label className="font-medium mb-1 text-gray-700 flex items-center gap-2">
                         <FaSchool className="text-blue-500" /> Trường THPT
                     </label>
                     <input
@@ -214,7 +204,7 @@ const LearningProcess = () => {
                     ))}
 
                     <div className="mb-6">
-                        <label className="block font-medium mb-1 text-gray-700 flex items-center gap-2">
+                        <label className="font-medium mb-1 text-gray-700 flex items-center gap-2">
                             <FaFlag className="text-blue-500" /> Đối Tượng Ưu Tiên
                         </label>
                         <select
@@ -223,13 +213,18 @@ const LearningProcess = () => {
                             className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         >
                             <option value="">Chọn đối tượng ưu tiên</option>
-                            <option value="OBJ001">Nhóm 1</option>
-                            <option value="OBJ002">Nhóm 2</option>
+                            {/* <option value="OBJ001">Nhóm 1</option>
+                            <option value="OBJ002">Nhóm 2</option> */}
+                            {priorityGroupOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
                         </select>
                         {errors.priorityGroup && <p className="text-red-500 text-sm">{errors.priorityGroup}</p>}
                     </div>
                     <div className="mb-6">
-                        <label className="block font-medium mb-1 text-gray-700 flex items-center gap-2">
+                        <label className="font-medium mb-1 text-gray-700 flex items-center gap-2">
                             <FaMapMarkerAlt className="text-blue-500" /> Khu vực ưu tiên
                         </label>
                         <select
@@ -238,16 +233,21 @@ const LearningProcess = () => {
                             className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         >
                             <option value="">Chọn khu vực ưu tiên</option>
-                            <option value="R001">Khu vực 1</option>
+                            {/* <option value="R001">Khu vực 1</option>
                             <option value="R002">Khu vực 2</option>
                             <option value="R003">Khu vực 3</option>
                             <option value="R004">Khu vực 4</option>
-                            <option value="R005">Khu vực 5</option>
+                            <option value="R005">Khu vực 5</option> */}
+                            {regionOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
                         </select>
                         {errors.region && <p className="text-red-500 text-sm">{errors.region}</p>}
                     </div>
                     <div className="mb-6">
-                        <label className="block font-medium mb-1 text-gray-700 flex items-center gap-2">
+                        <label className="font-medium mb-1 text-gray-700 flex items-center gap-2">
                             <FaCalendarAlt className="text-blue-500" /> Năm tốt nghiệp
                         </label>
                         <input
