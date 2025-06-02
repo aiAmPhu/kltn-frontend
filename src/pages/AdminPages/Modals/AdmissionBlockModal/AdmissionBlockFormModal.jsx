@@ -42,21 +42,15 @@ const AdmissionBlockFormModal = ({ admissionBlockToEdit, setAdmissionBlocks, onC
 
         try {
             if (isEditing && admissionBlockToEdit) {
-                await axios.put(
-                    `${API_BASE_URL}/adbs/update/${admissionBlockId}`,
-                    newAdmissionBlock,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
+                await axios.put(`${API_BASE_URL}/adbs/update/${admissionBlockId}`, newAdmissionBlock, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                alert("Cập nhật khối xét tuyển thành công!");
             } else {
-                await axios.post(
-                    `${API_BASE_URL}/adbs/add`,
-                    newAdmissionBlock,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
+                await axios.post(`${API_BASE_URL}/adbs/add`, newAdmissionBlock, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                alert("Thêm khối xét tuyển thành công!");
             }
 
             const response = await axios.get(`${API_BASE_URL}/adbs/getall`, {
@@ -76,11 +70,7 @@ const AdmissionBlockFormModal = ({ admissionBlockToEdit, setAdmissionBlocks, onC
                     {isEditing ? "Cập nhật" : "Thêm"} khối xét tuyển
                 </h2>
 
-                {error && (
-                    <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">
-                        {error}
-                    </div>
-                )}
+                {error && <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
@@ -166,4 +156,4 @@ const AdmissionBlockFormModal = ({ admissionBlockToEdit, setAdmissionBlocks, onC
     );
 };
 
-export default AdmissionBlockFormModal; 
+export default AdmissionBlockFormModal;

@@ -52,6 +52,7 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 await loadAdmissionBlocks();
+                alert("Xóa khối xét tuyển thành công!");
                 setError("");
             } catch (error) {
                 setError(error.response?.data?.message || "Lỗi khi xóa khối xét tuyển");
