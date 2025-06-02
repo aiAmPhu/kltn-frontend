@@ -1,17 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import {
-    FaEye,
-    FaEyeSlash,
-    FaUpload,
-    FaCheck,
-    FaTimes,
-    FaUserPlus,
-    FaKey,
-    FaEnvelope,
-    FaUserTag,
-    FaPaperPlane,
-} from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaCheck, FaTimes, FaUserPlus } from "react-icons/fa";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;

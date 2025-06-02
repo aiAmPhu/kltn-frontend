@@ -5,7 +5,15 @@ import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-const AdmissionQuantityFormModal = ({ quantityId, quantityToEdit, setQuantities, onClose, isEditing, majors, criteria }) => {
+const AdmissionQuantityFormModal = ({
+    quantityId,
+    quantityToEdit,
+    setQuantities,
+    onClose,
+    isEditing,
+    majors,
+    criteria,
+}) => {
     const [majorId, setMajorId] = useState("");
     const [criteriaId, setCriteriaId] = useState("");
     const [quantity, setQuantity] = useState("");
@@ -28,7 +36,7 @@ const AdmissionQuantityFormModal = ({ quantityId, quantityToEdit, setQuantities,
         const quantityData = {
             majorId,
             criteriaId,
-            quantity: parseInt(quantity)
+            quantity: parseInt(quantity),
         };
 
         try {
@@ -38,16 +46,18 @@ const AdmissionQuantityFormModal = ({ quantityId, quantityToEdit, setQuantities,
                     oldCriteriaId: quantityToEdit.criteriaId,
                     newMajorId: majorId,
                     newCriteriaId: criteriaId,
-                    quantity: parseInt(quantity)
+                    quantity: parseInt(quantity),
                 };
-                
+
                 await axios.put(`${API_BASE_URL}/adqs/update`, updateData, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
+                alert("Cập nhật chỉ tiêu thành công!");
             } else {
                 await axios.post(`${API_BASE_URL}/adqs/add`, quantityData, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
+                alert("Thêm chỉ tiêu thành công!");
             }
 
             const response = await axios.get(`${API_BASE_URL}/adqs/getall`, {
@@ -72,11 +82,7 @@ const AdmissionQuantityFormModal = ({ quantityId, quantityToEdit, setQuantities,
                     {isEditing ? "Cập nhật" : "Thêm"} chỉ tiêu
                 </h2>
 
-                {error && (
-                    <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">
-                        {error}
-                    </div>
-                )}
+                {error && <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="relative">

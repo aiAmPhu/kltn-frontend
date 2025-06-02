@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { ChevronDownIcon, ChevronUpIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import AdmissionQuantityFormModal from "../Modals/AdmissionQuantityModal/AdmissionQuantityFormModal";
 import InfoModal from "../Modals/AdmissionQuantityModal/InfoModal";
 import { toast } from "react-toastify";
@@ -78,11 +78,11 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                         criteriaId: quantity.criteriaId
                     }
                 });
-                
+
                 const response = await axios.get(`${API_BASE_URL}/adqs/getall`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                
+
                 setQuantities(response.data);
                 setError("");
                 toast.success("Xóa chỉ tiêu thành công!");
@@ -132,15 +132,15 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
         const delta = 1;
         let range = [];
         range.push(1);
-        
+
         let start = Math.max(2, currentPage - delta);
         let end = Math.min(totalPages - 1, currentPage + delta);
-        
+
         if (start > 2) range.push("...");
         for (let i = start; i <= end; i++) range.push(i);
         if (end < totalPages - 1) range.push("...");
         if (totalPages > 1) range.push(totalPages);
-        
+
         return range;
     };
 
@@ -291,9 +291,9 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                 <div className="flex flex-col md:flex-row justify-between items-center mt-4">
                     <div className="flex items-center mb-4 md:mb-0">
                         <span className="text-sm text-gray-700 mr-4">
-                            Hiển thị 
-                            <select 
-                                value={itemsPerPage} 
+                            Hiển thị
+                            <select
+                                value={itemsPerPage}
                                 onChange={(e) => setItemsPerPage(Number(e.target.value))}
                                 className="mx-1 p-1 border border-gray-300 rounded-md"
                             >
@@ -321,7 +321,7 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                             >
                                 <ChevronLeftIcon className="h-5 w-5" />
                             </button>
-                            
+
                             {getPageRange().map((page, index) => (
                                 page === "..." ? (
                                     <span key={`ellipsis-${index}`} className="px-2 py-1">...</span>
@@ -339,7 +339,7 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                                     </button>
                                 )
                             ))}
-                            
+
                             <button
                                 onClick={() => paginate(currentPage + 1)}
                                 disabled={currentPage === totalPages}
@@ -373,4 +373,4 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
     );
 };
 
-export default AdmissionQuantityList; 
+export default AdmissionQuantityList;

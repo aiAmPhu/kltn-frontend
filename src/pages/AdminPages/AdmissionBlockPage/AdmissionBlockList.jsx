@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import InfoModal from "../Modals/AdmissionBlockModal/InfoModal";
 import AdmissionBlockFormModal from "../Modals/AdmissionBlockModal/AdmissionBlockFormModal";
-import { ChevronDownIcon, ChevronUpIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { FaFileExport, FaFileImport } from "react-icons/fa";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import InfoPermissionModal from "../Modals/PermissionModal/InfoPermissionModal";
 import PermissionFormModal from "../Modals/PermissionModal/PermissionFormModal";
-import { ChevronDownIcon, ChevronUpIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -121,6 +121,7 @@ const PermissionList = ({ users: usersProp = [], setUsers: setUsersProp }) => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 await loadUsers();
+                alert("Xóa quyền thành công!");
                 setError("");
             } catch (error) {
                 setError(error.response?.data?.message || "Lỗi khi xóa quyền");
@@ -135,12 +136,6 @@ const PermissionList = ({ users: usersProp = [], setUsers: setUsersProp }) => {
     const handleEdit = (user) => {
         setUserToEdit(user);
         setIsEditing(true);
-        setIsModalOpen(true);
-    };
-
-    const handleAddPermission = () => {
-        setUserToEdit(null);
-        setIsEditing(false);
         setIsModalOpen(true);
     };
 
