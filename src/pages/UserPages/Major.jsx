@@ -47,8 +47,7 @@ function Majors() {
     };
 
     const filteredMajors = majors.filter((major) =>
-        removeDiacritics(major.majorName).includes(removeDiacritics(searchTerm)) ||
-        removeDiacritics(major.majorCodeName).includes(removeDiacritics(searchTerm))
+        removeDiacritics(major.majorName).includes(removeDiacritics(searchTerm))
     );
 
     const totalPages = Math.ceil(filteredMajors.length / itemsPerPage);
@@ -90,9 +89,7 @@ function Majors() {
                                 className="w-full sm:w-1/3 h-48 object-cover"
                             />
                             <div className="p-6 flex-1">
-                                <h2 className="text-xl font-semibold text-blue-700 mb-2">
-                                    {major.majorName} ({major.majorCodeName})
-                                </h2>
+                                <h2 className="text-xl font-semibold text-blue-700 mb-2">{major.majorName}</h2>
                                 <p
                                     className="text-gray-700 text-sm line-clamp-3 mb-4"
                                     dangerouslySetInnerHTML={{
@@ -125,12 +122,7 @@ function Majors() {
                     </button>
 
                     {Array.from({ length: totalPages }, (_, i) => i + 1)
-                        .filter(
-                            (page) =>
-                                page === 1 ||
-                                page === totalPages ||
-                                Math.abs(page - currentPage) <= 2
-                        )
+                        .filter((page) => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 2)
                         .map((page, index, array) => {
                             const isDots = index > 0 && page - array[index - 1] > 1;
                             return (
@@ -139,9 +131,7 @@ function Majors() {
                                     <button
                                         onClick={() => setCurrentPage(page)}
                                         className={`px-4 py-2 border rounded ${
-                                            currentPage === page
-                                                ? "bg-blue-600 text-white"
-                                                : "hover:bg-gray-100"
+                                            currentPage === page ? "bg-blue-600 text-white" : "hover:bg-gray-100"
                                         }`}
                                     >
                                         {page}

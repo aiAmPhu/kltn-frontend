@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import {
     FaUsers,
-    FaFileAlt,
-    FaCog,
     FaSignOutAlt,
     FaGraduationCap,
     FaListAlt,
@@ -113,7 +111,7 @@ const AdminPage = () => {
             <div
                 className={`${
                     sidebarOpen ? "w-64" : "w-16"
-                } bg-[#00548f] text-white flex flex-col transition-all duration-300 ease-in-out border-r border-blue-900/30`}
+                } bg-[#00548f] text-white flex flex-col transition-all duration-300 ease-in-out border-r border-blue-950`}
             >
                 {/* Logo */}
                 <div className="flex flex-col items-center py-4">

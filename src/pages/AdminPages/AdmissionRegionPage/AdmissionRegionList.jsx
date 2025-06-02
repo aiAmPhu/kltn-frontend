@@ -13,12 +13,12 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [error, setError] = useState("");
-    
+
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [regionsPerPage, setRegionsPerPage] = useState(5);
     const [isLoading, setIsLoading] = useState(true);
-    
+
     // Load regions from API
     const loadRegions = async () => {
         setIsLoading(true);
@@ -56,6 +56,7 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 await loadRegions();
+                alert("Xóa đối tượng ưu tiên thành công!");
                 setError("");
             } catch (error) {
                 setError(error.response?.data?.message || "Lỗi khi xóa đối tượng ưu tiên");
@@ -87,48 +88,48 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
     };
-    
+
     const handleRegionsPerPageChange = (e) => {
         setRegionsPerPage(Number(e.target.value));
         setCurrentPage(1);
     };
-    
+
     // Pagination logic
     const indexOfLastRegion = currentPage * regionsPerPage;
     const indexOfFirstRegion = indexOfLastRegion - regionsPerPage;
     const currentRegions = filteredRegions.slice(indexOfFirstRegion, indexOfLastRegion);
     const totalPages = Math.ceil(filteredRegions.length / regionsPerPage);
-    
+
     const paginate = (pageNumber) => {
         if (pageNumber > 0 && pageNumber <= totalPages) {
             setCurrentPage(pageNumber);
         }
     };
-    
+
     const getPageRange = () => {
         const delta = 1;
         let range = [];
         range.push(1);
-        
+
         let start = Math.max(2, currentPage - delta);
         let end = Math.min(totalPages - 1, currentPage + delta);
-        
+
         if (start > 2) {
             range.push("...");
         }
-        
+
         for (let i = start; i <= end; i++) {
             range.push(i);
         }
-        
+
         if (end < totalPages - 1) {
             range.push("...");
         }
-        
+
         if (totalPages > 1) {
             range.push(totalPages);
         }
-        
+
         return range;
     };
 
@@ -138,7 +139,7 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
                 <div className="mb-6">
                    <h1 className="text-3xl font-bold text-blue-600 text-center">Quản lý đối tượng ưu tiên</h1>
                 </div>
-                
+
                 {error && (
                     <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
                         <div className="flex items-center">
@@ -153,7 +154,7 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
                         </div>
                     </div>
                 )}
-                
+
                 <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
                     <div className="flex flex-wrap items-center gap-4 flex-grow">
                         <div className="relative flex-grow max-w-md">
@@ -271,13 +272,13 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
                         </table>
                     </div>
                 </div>
-                
+
                 <div className="flex flex-col md:flex-row justify-between items-center mt-4">
                     <div className="flex items-center mb-4 md:mb-0">
                         <span className="text-sm text-gray-700 mr-4">
-                            Hiển thị 
-                            <select 
-                                value={regionsPerPage} 
+                            Hiển thị
+                            <select
+                                value={regionsPerPage}
                                 onChange={handleRegionsPerPageChange}
                                 className="mx-1 p-1 border border-gray-300 rounded-md"
                             >
@@ -291,7 +292,7 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
                             Tổng: <span className="font-medium">{filteredRegions.length}</span> đối tượng
                         </span>
                     </div>
-                    
+
                     {totalPages > 1 && (
                         <div className="flex items-center justify-center space-x-1">
                             <button
@@ -305,7 +306,7 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
                             >
                                 <ChevronLeftIcon className="h-5 w-5" />
                             </button>
-                            
+
                             {getPageRange().map((page, index) => (
                                 page === "..." ? (
                                     <span key={`ellipsis-${index}`} className="px-2 py-1">...</span>
@@ -323,7 +324,7 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
                                     </button>
                                 )
                             ))}
-                            
+
                             <button
                                 onClick={() => paginate(currentPage + 1)}
                                 disabled={currentPage === totalPages}
@@ -355,4 +356,4 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
     );
 };
 
-export default AdmissionRegionList; 
+export default AdmissionRegionList;

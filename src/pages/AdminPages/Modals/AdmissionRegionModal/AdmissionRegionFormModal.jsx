@@ -37,10 +37,12 @@ const AdmissionRegionFormModal = ({ regionId, regionToEdit, setRegions, onClose,
                 await axios.put(`${API_BASE_URL}/adrs/update/${regionId}`, newRegion, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
+                alert("Cập nhật khu vực ưu tiên thành công!");
             } else {
                 await axios.post(`${API_BASE_URL}/adrs/add`, newRegion, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
+                alert("Thêm khu vực ưu tiên thành công!");
             }
 
             const response = await axios.get(`${API_BASE_URL}/adrs/getall`, {
@@ -60,11 +62,7 @@ const AdmissionRegionFormModal = ({ regionId, regionToEdit, setRegions, onClose,
                     {isEditing ? "Cập nhật" : "Thêm"} đối tượng ưu tiên
                 </h2>
 
-                {error && (
-                    <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">
-                        {error}
-                    </div>
-                )}
+                {error && <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
