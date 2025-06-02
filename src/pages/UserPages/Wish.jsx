@@ -21,32 +21,27 @@ function WishRegistration() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [criteriaRes, blockRes, majorRes, wishRes] = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/adcs/getAll`),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/adbs/getall`),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getAll`),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/wish/getAll/${userId}`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }),
-                ]);
-                setCriteriaList(criteriaRes.data);
-                setBlockList(blockRes.data);
-                setMajorList(majorRes.data);
-                setUserWishes(wishRes.data.wishes);
-
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/wish/form-data`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                console.log("Dữ liệu nguyện vọng:", response.data.data);
+                const { criteria, majors, blocks, userWishes } = response.data.data;
+                // console.log("Criteria:", criteria);
+                // console.log("Majors:", majors);
+                // console.log("Blocks:", blocks);
+                // console.log("User Wishes:", fo);
+                setCriteriaList(criteria);
+                setBlockList(blocks);
+                setMajorList(majors);
+                setUserWishes(userWishes);
                 // Fetch accepted wishes if user is admin
-                if (userRole === 'admin') {
+                if (userRole === "admin") {
                     try {
-                        const acceptedRes = await axios.get(
-                            `${process.env.REACT_APP_API_BASE_URL}/wish/getAccepted`,
-                            {
-                                headers: {
-                                    Authorization: `Bearer ${token}`,
-                                },
-                            }
-                        );
+                        const acceptedRes = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/wish/getAccepted`, {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        });
                         setAcceptedWishes(acceptedRes.data);
                     } catch (error) {
                         console.error("Lỗi khi tải danh sách nguyện vọng đã chấp nhận:", error);
@@ -106,7 +101,7 @@ function WishRegistration() {
                 ĐĂNG KÝ NGUYỆN VỌNG XÉT TUYỂN
             </h1>
 
-            {userRole === 'admin' && acceptedWishes.length > 0 && (
+            {userRole === "admin" && acceptedWishes.length > 0 && (
                 <div className="mb-8 bg-green-50 p-4 rounded-lg">
                     <h2 className="text-lg font-semibold text-green-800 mb-2">Nguyện vọng đã được chấp nhận</h2>
                     <div className="overflow-x-auto">
