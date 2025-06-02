@@ -19,10 +19,9 @@ const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing 
         const fetchAdmissionMajors = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const response = await axios.get(
-                    `${API_BASE_URL}/adms/getall`,
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
+                const response = await axios.get(`${API_BASE_URL}/adms/getall`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
                 setAdmissionMajors(response.data?.data || response.data || []);
             } catch (error) {
                 setError("Không thể tải danh sách ngành học");
@@ -61,11 +60,11 @@ const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing 
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             // Refresh user list
-            const response = await axios.get(
-                `${API_BASE_URL}/users/getall`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            const response = await axios.get(`${API_BASE_URL}/users/getall`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
             setUsers(response.data?.data || response.data || []);
+            alert("Cập nhật phân quyền thành công!");
             onClose();
         } catch (err) {
             if (err.response?.data?.message) {
@@ -80,9 +79,7 @@ const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing 
 
     const handleMajorChange = (majorId) => {
         setSelectedMajors((prev) =>
-            prev.includes(majorId)
-                ? prev.filter((id) => id !== majorId)
-                : [...prev, majorId]
+            prev.includes(majorId) ? prev.filter((id) => id !== majorId) : [...prev, majorId]
         );
     };
 
@@ -94,9 +91,7 @@ const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing 
                     Cập nhật phân quyền
                 </h2>
                 {error && (
-                    <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm text-center">
-                        {error}
-                    </div>
+                    <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm text-center">{error}</div>
                 )}
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="flex gap-4">
@@ -126,7 +121,10 @@ const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing 
                                 </div>
                             )}
                             {admissionMajors.map((major) => (
-                                <label key={major._id || major.majorId} className="flex items-center gap-2 px-2 py-1 rounded hover:bg-blue-50 cursor-pointer">
+                                <label
+                                    key={major._id || major.majorId}
+                                    className="flex items-center gap-2 px-2 py-1 rounded hover:bg-blue-50 cursor-pointer"
+                                >
                                     <input
                                         type="checkbox"
                                         value={major.majorId}
@@ -143,7 +141,9 @@ const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing 
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-2 ${isLoading ? "opacity-60 cursor-not-allowed" : ""}`}
+                            className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-2 ${
+                                isLoading ? "opacity-60 cursor-not-allowed" : ""
+                            }`}
                         >
                             <FaCheck />
                             {isLoading ? "Đang lưu..." : "Cập nhật"}
