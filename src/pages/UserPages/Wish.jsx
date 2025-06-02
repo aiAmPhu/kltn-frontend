@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 function WishRegistration() {
     const [criteriaList, setCriteriaList] = useState([]);
@@ -70,10 +71,10 @@ function WishRegistration() {
                     },
                 }
             );
-            alert("Lưu nguyện vọng thành công!");
+            toast.success("Lưu nguyện vọng thành công!");
             setUserWishes((prev) => [...prev, res.data]);
         } catch (err) {
-            alert("Lỗi khi lưu nguyện vọng!");
+            toast.error(err.response?.data?.message);
             console.error(err);
         }
     };

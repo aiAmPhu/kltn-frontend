@@ -5,6 +5,7 @@ import Banner from "./Banner.jsx";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Chat from "../pages/UserPages/Chat.jsx";
+import { toast } from "react-toastify";
 
 function HomePage() {
     const [majors, setMajors] = useState([]);
@@ -44,10 +45,10 @@ function HomePage() {
 
     const handleChatClick = (type) => {
         if (!user) {
-            alert('Vui lòng đăng nhập để sử dụng tính năng chat');
+            toast.error("Vui lòng đăng nhập để sử dụng tính năng chat");
             return;
         }
-        
+
         setChatType(type);
         setShowChat(true);
         setShowChatMenu(false);
@@ -67,7 +68,7 @@ function HomePage() {
                             <GraduationCap className="w-8 h-8 ml-2 text-blue-700" />
                         </h2>
                     </div>
-                    
+
                     {loading ? (
                         <div className="text-center p-8">
                             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-700 mx-auto mb-2"></div>
@@ -116,14 +117,16 @@ function HomePage() {
                     >
                         <MessageCircle className="w-6 h-6" />
                         <span className="hidden md:inline">Chat</span>
-                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showChatMenu ? 'rotate-180' : ''}`} />
+                        <ChevronDown
+                            className={`w-4 h-4 transition-transform duration-200 ${showChatMenu ? "rotate-180" : ""}`}
+                        />
                     </button>
 
                     {/* Chat Menu Dropdown */}
                     {showChatMenu && (
                         <div className="absolute bottom-full right-0 mb-2 w-48 bg-white rounded-lg shadow-xl py-2 border border-gray-200">
                             <button
-                                onClick={() => handleChatClick('admin')}
+                                onClick={() => handleChatClick("admin")}
                                 className="w-full px-4 py-2 text-left hover:bg-purple-50 flex items-center space-x-2 transition-colors duration-200"
                             >
                                 <MessageCircle className="w-4 h-4 text-purple-500" />
@@ -131,7 +134,7 @@ function HomePage() {
                             </button>
                             <div className="h-px bg-gray-200 my-1"></div>
                             <button
-                                onClick={() => handleChatClick('reviewer')}
+                                onClick={() => handleChatClick("reviewer")}
                                 className="w-full px-4 py-2 text-left hover:bg-purple-50 flex items-center space-x-2 transition-colors duration-200"
                             >
                                 <MessageCircle className="w-4 h-4 text-purple-500" />
@@ -147,7 +150,7 @@ function HomePage() {
                 <div className="fixed bottom-24 right-6 w-96 h-[600px] bg-white rounded-lg shadow-xl z-50 flex flex-col">
                     <div className="p-4 border-b bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-t-lg flex justify-between items-center">
                         <h2 className="text-lg font-semibold">
-                            {chatType === 'admin' ? 'Chat với Admin' : 'Chat với Reviewer'}
+                            {chatType === "admin" ? "Chat với Admin" : "Chat với Reviewer"}
                         </h2>
                         <button
                             onClick={() => setShowChat(false)}

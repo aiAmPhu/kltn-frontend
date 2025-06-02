@@ -1,6 +1,17 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { FaEye, FaEyeSlash, FaUpload, FaCheck, FaTimes, FaUserPlus, FaKey, FaEnvelope, FaUserTag, FaPaperPlane } from "react-icons/fa";
+import {
+    FaEye,
+    FaEyeSlash,
+    FaUpload,
+    FaCheck,
+    FaTimes,
+    FaUserPlus,
+    FaKey,
+    FaEnvelope,
+    FaUserTag,
+    FaPaperPlane,
+} from "react-icons/fa";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -13,10 +24,6 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing }) => 
     const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState("admin");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [image, setImage] = useState(null);
-    const [pic, setPic] = useState("");
-    const [otp, setOtp] = useState("");
-    const [isOtpSent, setIsOtpSent] = useState(false);
 
     useEffect(() => {
         if (userToEdit) {
@@ -24,14 +31,11 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing }) => 
             setEmail(userToEdit.email);
             setPassword("");
             setRole(userToEdit.role);
-            setPic(userToEdit.pic || "");
         } else {
             setName("");
             setEmail("");
             setPassword("");
             setRole("admin");
-            setPic("");
-            setIsOtpSent(false);
         }
     }, [userToEdit]);
 
@@ -39,46 +43,14 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing }) => 
         setIsDropdownOpen(!isDropdownOpen);
     };
 
-    const handleSendOTP = async () => {
-        try {
-            await axios.post(`${API_BASE_URL}/users/sendOTP`, { email });
-            setIsOtpSent(true);
-            setError("");
-        } catch (error) {
-            setError(error.response?.data?.message || "Gửi OTP thất bại");
-        }
-    };
-
-    const handleVerifyOTP = async () => {
-        try {
-            await axios.post(`${API_BASE_URL}/users/verifyOTP`, { email, otp });
-            setError("");
-            return true;
-        } catch (error) {
-            setError(error.response?.data?.message || "Xác thực OTP thất bại");
-            return false;
-        }
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem("token");
-
-        if (!isEditing && !isOtpSent) {
-            setError("Vui lòng gửi và xác thực OTP trước khi thêm người dùng");
-            return;
-        }
-
-        if (!isEditing && isOtpSent) {
-            const isOtpValid = await handleVerifyOTP();
-            if (!isOtpValid) return;
-        }
 
         const newUser = {
             name,
             email,
             role,
-            pic: pic || "https://res.cloudinary.com/dlum0st9k/image/upload/v1731705123/pngwing.com_1_x0zbek.png",
         };
 
         if (password) {
@@ -90,10 +62,12 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing }) => 
                 await axios.put(`${API_BASE_URL}/users/update/${userId}`, newUser, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
+                alert("Cập nhật người dùng thành công!");
             } else {
                 await axios.post(`${API_BASE_URL}/users/add`, newUser, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
+                alert("Thêm người dùng thành công!");
             }
 
             const response = await axios.get(`${API_BASE_URL}/users/getall`, {
@@ -106,25 +80,6 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing }) => 
         }
     };
 
-    const handleUpload = async () => {
-        if (!image) return;
-        const formData = new FormData();
-        formData.append("image", image);
-
-        try {
-            const res = await axios.post(`${API_BASE_URL}/upload`, formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
-            setPic(res.data.imageUrl);
-        } catch (err) {
-            setError("Tải ảnh thất bại");
-        }
-    };
-
-    const handleImageChange = (e) => {
-        setImage(e.target.files[0]);
-    };
-
     return (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-center items-center px-4">
             <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl">
@@ -132,11 +87,7 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing }) => 
                     {isEditing ? "Cập nhật" : "Thêm"} người dùng
                 </h2>
 
-                {error && (
-                    <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">
-                        {error}
-                    </div>
-                )}
+                {error && <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input
@@ -158,7 +109,7 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing }) => 
                             disabled={isEditing}
                             className="flex-1 border border-gray-300 rounded-md px-3 py-2"
                         />
-                        {!isEditing && (
+                        {/* {!isEditing && (
                             <button
                                 type="button"
                                 onClick={handleSendOTP}
@@ -166,19 +117,8 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing }) => 
                             >
                                 <FaPaperPlane /> Gửi OTP
                             </button>
-                        )}
+                        )} */}
                     </div>
-
-                    {!isEditing && isOtpSent && (
-                        <input
-                            type="text"
-                            value={otp}
-                            onChange={(e) => setOtp(e.target.value)}
-                            placeholder="Nhập OTP"
-                            required
-                            className="w-full border border-gray-300 rounded-md px-3 py-2"
-                        />
-                    )}
 
                     <div className="relative">
                         <input
@@ -219,7 +159,7 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing }) => 
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    {/* <div className="flex items-center gap-4">
                         <input type="file" onChange={handleImageChange} accept="image/*" />
                         <button
                             type="button"
@@ -234,7 +174,7 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing }) => 
                         <div className="text-center mt-4">
                             <img src={pic} className="rounded-lg mx-auto w-40 h-40 object-cover shadow" alt="Avatar preview" />
                         </div>
-                    )}
+                    )} */}
 
                     <div className="flex justify-between mt-6">
                         <button
