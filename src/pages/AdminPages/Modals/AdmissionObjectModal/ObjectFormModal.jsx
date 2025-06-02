@@ -9,7 +9,7 @@ const ObjectFormModal = ({ objectId, objectToEdit, setObjects, onClose, isEditin
         objectId: "",
         objectName: "",
         objectScored: "",
-        objectDescription: ""
+        objectDescription: "",
     });
     const [error, setError] = useState("");
 
@@ -19,7 +19,7 @@ const ObjectFormModal = ({ objectId, objectToEdit, setObjects, onClose, isEditin
                 objectId: objectToEdit.objectId,
                 objectName: objectToEdit.objectName,
                 objectScored: objectToEdit.objectScored,
-                objectDescription: objectToEdit.objectDescription
+                objectDescription: objectToEdit.objectDescription,
             });
         }
     }, [objectToEdit]);
@@ -33,10 +33,12 @@ const ObjectFormModal = ({ objectId, objectToEdit, setObjects, onClose, isEditin
                 await axios.put(`${API_BASE_URL}/ados/update/${objectId}`, objectData, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
+                alert("Cập nhật đối tượng ưu tiên thành công!");
             } else {
                 await axios.post(`${API_BASE_URL}/ados/add`, objectData, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
+                alert("Thêm đối tượng ưu tiên thành công!");
             }
 
             const response = await axios.get(`${API_BASE_URL}/ados/getall`, {
@@ -51,9 +53,9 @@ const ObjectFormModal = ({ objectId, objectToEdit, setObjects, onClose, isEditin
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setObjectData(prev => ({
+        setObjectData((prev) => ({
             ...prev,
-            [name]: name === 'objectScored' ? parseFloat(value) || value : value
+            [name]: name === "objectScored" ? parseFloat(value) || value : value,
         }));
     };
 
@@ -64,17 +66,11 @@ const ObjectFormModal = ({ objectId, objectToEdit, setObjects, onClose, isEditin
                     {isEditing ? "Cập nhật" : "Thêm"} đối tượng ưu tiên
                 </h2>
 
-                {error && (
-                    <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">
-                        {error}
-                    </div>
-                )}
+                {error && <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Mã đối tượng
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Mã đối tượng</label>
                         <input
                             type="text"
                             name="objectId"
@@ -88,9 +84,7 @@ const ObjectFormModal = ({ objectId, objectToEdit, setObjects, onClose, isEditin
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Tên đối tượng
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Tên đối tượng</label>
                         <input
                             type="text"
                             name="objectName"
@@ -103,9 +97,7 @@ const ObjectFormModal = ({ objectId, objectToEdit, setObjects, onClose, isEditin
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Điểm ưu tiên
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Điểm ưu tiên</label>
                         <input
                             type="number"
                             name="objectScored"
@@ -121,9 +113,7 @@ const ObjectFormModal = ({ objectId, objectToEdit, setObjects, onClose, isEditin
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Mô tả
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
                         <textarea
                             name="objectDescription"
                             value={objectData.objectDescription}
@@ -157,4 +147,4 @@ const ObjectFormModal = ({ objectId, objectToEdit, setObjects, onClose, isEditin
     );
 };
 
-export default ObjectFormModal; 
+export default ObjectFormModal;

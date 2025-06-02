@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { 
-    FaCheck, 
-    FaTimes, 
-    FaUser, 
-    FaCalendarAlt, 
-    FaVenusMars, 
-    FaMapMarkerAlt, 
-    FaPhone, 
-    FaEnvelope, 
-    FaIdCard, 
+import {
+    FaCheck,
+    FaTimes,
+    FaUser,
+    FaCalendarAlt,
+    FaVenusMars,
+    FaMapMarkerAlt,
+    FaPhone,
+    FaEnvelope,
+    FaIdCard,
     FaBuilding,
     FaHome,
-    FaRoad
+    FaRoad,
 } from "react-icons/fa";
 
 const AdmissionInformation = () => {
@@ -202,7 +202,7 @@ const AdmissionInformation = () => {
                 <form className="bg-white shadow-md rounded-lg p-6 space-y-6" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaUser className="text-blue-500" />
                                 Họ và Họ đệm
                             </label>
@@ -218,7 +218,7 @@ const AdmissionInformation = () => {
                             {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaUser className="text-blue-500" />
                                 Tên
                             </label>
@@ -234,7 +234,7 @@ const AdmissionInformation = () => {
                             {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaCalendarAlt className="text-blue-500" />
                                 Ngày sinh
                             </label>
@@ -249,7 +249,7 @@ const AdmissionInformation = () => {
                             {errors.birthDate && <p className="text-red-500 text-sm">{errors.birthDate}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaVenusMars className="text-blue-500" />
                                 Giới tính
                             </label>
@@ -265,7 +265,7 @@ const AdmissionInformation = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaMapMarkerAlt className="text-blue-500" />
                                 Nơi sinh
                             </label>
@@ -281,7 +281,7 @@ const AdmissionInformation = () => {
                             {errors.birthPlace && <p className="text-red-500 text-sm">{errors.birthPlace}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaPhone className="text-blue-500" />
                                 Số điện thoại
                             </label>
@@ -301,7 +301,7 @@ const AdmissionInformation = () => {
                     {/* Additional form fields */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaEnvelope className="text-blue-500" />
                                 Email
                             </label>
@@ -316,7 +316,7 @@ const AdmissionInformation = () => {
                             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaEnvelope className="text-green-500" />
                                 Email phụ huynh
                             </label>
@@ -335,7 +335,7 @@ const AdmissionInformation = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaIdCard className="text-blue-500" />
                                 CMND/CCCD
                             </label>
@@ -352,7 +352,7 @@ const AdmissionInformation = () => {
                         </div>
 
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaCalendarAlt className="text-blue-500" />
                                 Ngày cấp CMND/CCCD
                             </label>
@@ -368,7 +368,7 @@ const AdmissionInformation = () => {
                         </div>
 
                         <div className="md:col-span-2">
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaBuilding className="text-blue-500" />
                                 Nơi cấp CMND/CCCD
                             </label>
@@ -388,10 +388,10 @@ const AdmissionInformation = () => {
                             {errors.idIssuePlace && <p className="text-red-500 text-sm">{errors.idIssuePlace}</p>}
                         </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaMapMarkerAlt className="text-red-500" />
                                 Tỉnh (Thành phố)
                             </label>
@@ -407,7 +407,7 @@ const AdmissionInformation = () => {
                             {errors.province && <p className="text-red-500 text-sm">{errors.province}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaMapMarkerAlt className="text-orange-500" />
                                 Huyện (Quận)
                             </label>
@@ -423,7 +423,7 @@ const AdmissionInformation = () => {
                             {errors.district && <p className="text-red-500 text-sm">{errors.district}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaMapMarkerAlt className="text-green-500" />
                                 Xã (Phường)
                             </label>
@@ -442,7 +442,7 @@ const AdmissionInformation = () => {
 
                     {/* Địa chỉ báo tin */}
                     <div>
-                        <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                        <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                             <FaHome className="text-purple-500" />
                             Địa chỉ báo tin
                         </label>
@@ -461,7 +461,7 @@ const AdmissionInformation = () => {
                     {/* Số nhà và Tên đường (thôn, xóm, ấp) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaHome className="text-blue-500" />
                                 Số nhà
                             </label>
@@ -477,7 +477,7 @@ const AdmissionInformation = () => {
                             {errors.houseNumber && <p className="text-red-500 text-sm">{errors.houseNumber}</p>}
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                            <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
                                 <FaRoad className="text-gray-500" />
                                 Tên đường (thôn, xóm, ấp)
                             </label>
