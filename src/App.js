@@ -122,7 +122,7 @@ function App() {
                 >
                     <Route index element={<Navigate to="users" replace />} />
                     <Route path="users" element={<UserListPage />} />
-                    {/* <Route path="admission-years" element={<AdmissionYearList />} /> */}
+                    <Route path="admission-years" element={<AdmissionYearList />} />
                     <Route path="admission-blocks" element={<AdmissionBlockListPage />} />
                     <Route path="admission-majors" element={<AdmissionMajorListPage />} />
                     <Route path="admission-criteria" element={<AdmissionCriteriaListPage />} />

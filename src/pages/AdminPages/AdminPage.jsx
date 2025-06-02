@@ -26,11 +26,11 @@ const menuItems = [
         icon: <FaUsers className="text-lg" />,
         label: "Quản lý người dùng",
     },
-    // {
-    //   to: "/admin/admission-years",
-    //   icon: <FaCalendarAlt className="text-lg" />,
-    //   label: "Quản lý năm tuyển sinh",
-    // },
+    {
+        to: "/admin/admission-years",
+        icon: <FaCalendarAlt className="text-lg" />,
+        label: "Quản lý năm tuyển sinh",
+    },
     {
         to: "/admin/admission-blocks",
         icon: <FaGraduationCap className="text-lg" />,
