@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaCheck, FaTimes, FaPlus } from "react-icons/fa";
-import { Editor } from '@tinymce/tinymce-react';
+import { Editor } from "@tinymce/tinymce-react";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -35,21 +35,15 @@ const AdmissionCriteriaFormModal = ({ criteriaToEdit, setCriterias, onClose, isE
 
         try {
             if (isEditing && criteriaToEdit) {
-                await axios.put(
-                    `${API_BASE_URL}/adcs/update/${criteriaId}`,
-                    newCriteria,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
+                await axios.put(`${API_BASE_URL}/adcs/update/${criteriaId}`, newCriteria, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                alert("Cập nhật thành công!");
             } else {
-                await axios.post(
-                    `${API_BASE_URL}/adcs/add`,
-                    newCriteria,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
+                await axios.post(`${API_BASE_URL}/adcs/add`, newCriteria, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                alert("Thêm diện xét tuyển thành công!");
             }
 
             const response = await axios.get(`${API_BASE_URL}/adcs/getall`, {
@@ -69,11 +63,7 @@ const AdmissionCriteriaFormModal = ({ criteriaToEdit, setCriterias, onClose, isE
                     {isEditing ? "Cập nhật" : "Thêm"} diện xét tuyển
                 </h2>
 
-                {error && (
-                    <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">
-                        {error}
-                    </div>
-                )}
+                {error && <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
@@ -111,17 +101,33 @@ const AdmissionCriteriaFormModal = ({ criteriaToEdit, setCriterias, onClose, isE
                                 init={{
                                     height: 300,
                                     menubar: false,
-                                    language: 'vi',
+                                    language: "vi",
                                     plugins: [
-                                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                                        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                                        "advlist",
+                                        "autolink",
+                                        "lists",
+                                        "link",
+                                        "image",
+                                        "charmap",
+                                        "preview",
+                                        "anchor",
+                                        "searchreplace",
+                                        "visualblocks",
+                                        "code",
+                                        "fullscreen",
+                                        "insertdatetime",
+                                        "media",
+                                        "table",
+                                        "code",
+                                        "help",
+                                        "wordcount",
                                     ],
-                                    toolbar: 'undo redo | blocks | ' +
-                                        'bold italic forecolor | alignleft aligncenter ' +
-                                        'alignright alignjustify | bullist numlist outdent indent | ' +
-                                        'removeformat | help',
-                                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                                    toolbar:
+                                        "undo redo | blocks | " +
+                                        "bold italic forecolor | alignleft aligncenter " +
+                                        "alignright alignjustify | bullist numlist outdent indent | " +
+                                        "removeformat | help",
+                                    content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
                                 }}
                             />
                         </div>
@@ -149,4 +155,4 @@ const AdmissionCriteriaFormModal = ({ criteriaToEdit, setCriterias, onClose, isE
     );
 };
 
-export default AdmissionCriteriaFormModal; 
+export default AdmissionCriteriaFormModal;

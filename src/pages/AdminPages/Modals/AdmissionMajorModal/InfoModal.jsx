@@ -1,5 +1,5 @@
 import React from "react";
-import { FaTimes, FaIdCard, FaInfoCircle, FaList, FaToggleOn } from "react-icons/fa";
+import { FaTimes, FaIdCard, FaInfoCircle, FaList } from "react-icons/fa";
 
 const InfoModal = ({ major, onClose }) => {
     if (!major) return null;
@@ -41,9 +41,12 @@ const InfoModal = ({ major, onClose }) => {
                     </div>
                     <div className="mt-4">
                         <p className="font-medium text-gray-700 mb-2">Mô tả:</p>
-                        <p className="bg-gray-50 p-3 rounded text-gray-600">
-                            {major.majorDescription || "Không có mô tả"}
-                        </p>
+                        <div
+                            className="bg-gray-50 p-3 rounded text-gray-600 prose prose-sm max-w-none"
+                            dangerouslySetInnerHTML={{
+                                __html: major.majorDescription || "Không có mô tả",
+                            }}
+                        />
                     </div>
                 </div>
                 <div className="mt-6 text-right">
