@@ -10,15 +10,15 @@ const InfoModal = ({ major, onClose }) => {
                 <h2 className="text-2xl font-bold text-blue-600 text-center mb-6">Chi tiết ngành xét tuyển</h2>
                 <div className="space-y-3 text-sm">
                     <p className="flex items-center gap-2">
-                        <FaIdCard className="text-blue-500" /> 
+                        <FaIdCard className="text-blue-500" />
                         <span className="font-medium text-gray-700">Mã ngành:</span> {major.majorId}
                     </p>
                     <p className="flex items-center gap-2">
-                        <FaIdCard className="text-blue-500" /> 
+                        <FaIdCard className="text-blue-500" />
                         <span className="font-medium text-gray-700">Mã ngành:</span> {major.majorCodeName}
                     </p>
                     <p className="flex items-center gap-2">
-                        <FaInfoCircle className="text-blue-500" /> 
+                        <FaInfoCircle className="text-blue-500" />
                         <span className="font-medium text-gray-700">Tên ngành:</span> {major.majorName}
                     </p>
                     <div className="mt-4">
@@ -29,7 +29,9 @@ const InfoModal = ({ major, onClose }) => {
                             {major.majorCombination ? (
                                 <ul className="list-disc list-inside space-y-1">
                                     {major.majorCombination.map((combo, index) => (
-                                        <li key={index} className="text-gray-600">{combo}</li>
+                                        <li key={index} className="text-gray-600">
+                                            {combo}
+                                        </li>
                                     ))}
                                 </ul>
                             ) : (
@@ -43,15 +45,6 @@ const InfoModal = ({ major, onClose }) => {
                             {major.majorDescription || "Không có mô tả"}
                         </p>
                     </div>
-                    <p className="flex items-center gap-2">
-                        <FaToggleOn className="text-blue-500" /> 
-                        <span className="font-medium text-gray-700">Trạng thái:</span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            major.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
-                            {major.isActive ? 'Đang hoạt động' : 'Đã ẩn'}
-                        </span>
-                    </p>
                 </div>
                 <div className="mt-6 text-right">
                     <button
@@ -66,4 +59,4 @@ const InfoModal = ({ major, onClose }) => {
     );
 };
 
-export default InfoModal; 
+export default InfoModal;

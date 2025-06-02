@@ -1,17 +1,15 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaCheck, FaTimes, FaPlus } from "react-icons/fa";
-import { Editor } from '@tinymce/tinymce-react';
+import { Editor } from "@tinymce/tinymce-react";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing }) => {
     const [majorId, setMajorId] = useState("");
-    const [majorCodeName, setMajorCodeName] = useState("");
     const [majorName, setMajorName] = useState("");
     const [majorCombination, setMajorCombination] = useState([]);
     const [majorDescription, setMajorDescription] = useState("");
-    const [isActive, setIsActive] = useState(true);
     const [error, setError] = useState("");
     const [admissionBlocks, setAdmissionBlocks] = useState([]);
     const [selectedBlock, setSelectedBlock] = useState("");
@@ -35,18 +33,14 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
     useEffect(() => {
         if (majorToEdit) {
             setMajorId(majorToEdit.majorId);
-            setMajorCodeName(majorToEdit.majorCodeName);
             setMajorName(majorToEdit.majorName);
             setMajorCombination(majorToEdit.majorCombination || []);
             setMajorDescription(majorToEdit.majorDescription || "");
-            setIsActive(majorToEdit.isActive);
         } else {
             setMajorId("");
-            setMajorCodeName("");
             setMajorName("");
             setMajorCombination([]);
             setMajorDescription("");
-            setIsActive(true);
         }
     }, [majorToEdit]);
 
@@ -67,30 +61,22 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
 
         const newMajor = {
             majorId,
-            majorCodeName,
             majorName,
             majorCombination,
             majorDescription,
-            isActive,
         };
 
         try {
             if (isEditing && majorToEdit) {
-                await axios.put(
-                    `${API_BASE_URL}/adms/update/${majorId}`,
-                    newMajor,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
+                await axios.put(`${API_BASE_URL}/adms/update/${majorId}`, newMajor, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                alert("Cập nhật ngành thành công!");
             } else {
-                await axios.post(
-                    `${API_BASE_URL}/adms/add`,
-                    newMajor,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
+                await axios.post(`${API_BASE_URL}/adms/add`, newMajor, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                alert("Thêm ngành thành công!");
             }
 
             const response = await axios.get(`${API_BASE_URL}/adms/getall`, {
@@ -110,11 +96,7 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
                     {isEditing ? "Cập nhật" : "Thêm"} ngành xét tuyển
                 </h2>
 
-                {error && (
-                    <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">
-                        {error}
-                    </div>
-                )}
+                {error && <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
@@ -126,18 +108,6 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
                             placeholder="Nhập mã ngành"
                             required
                             disabled={isEditing}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Mã ngành</label>
-                        <input
-                            type="text"
-                            value={majorCodeName}
-                            onChange={(e) => setMajorCodeName(e.target.value)}
-                            placeholder="Nhập mã ngành"
-                            required
                             className="w-full border border-gray-300 rounded-md px-3 py-2"
                         />
                     </div>
@@ -165,7 +135,8 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
                                 <option value="">Chọn khối xét tuyển</option>
                                 {admissionBlocks.map((block) => (
                                     <option key={block.admissionBlockId} value={block.admissionBlockId}>
-                                        {block.admissionBlockName} ({block.admissionBlockSubject1}, {block.admissionBlockSubject2}, {block.admissionBlockSubject3})
+                                        {block.admissionBlockName} ({block.admissionBlockSubject1},{" "}
+                                        {block.admissionBlockSubject2}, {block.admissionBlockSubject3})
                                     </option>
                                 ))}
                             </select>
@@ -180,11 +151,13 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
                         {majorCombination.length > 0 && (
                             <div className="mt-2 space-y-2 max-h-40 overflow-y-auto">
                                 {majorCombination.map((combo, index) => {
-                                    const block = admissionBlocks.find(b => b.admissionBlockId === combo);
+                                    const block = admissionBlocks.find((b) => b.admissionBlockId === combo);
                                     return (
                                         <div key={index} className="flex items-center gap-2">
                                             <span className="flex-1 bg-gray-50 p-2 rounded">
-                                                {block ? `${block.admissionBlockName} (${block.admissionBlockSubject1}, ${block.admissionBlockSubject2}, ${block.admissionBlockSubject3})` : combo}
+                                                {block
+                                                    ? `${block.admissionBlockName} (${block.admissionBlockSubject1}, ${block.admissionBlockSubject2}, ${block.admissionBlockSubject3})`
+                                                    : combo}
                                             </span>
                                             <button
                                                 type="button"
@@ -210,35 +183,37 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
                                 init={{
                                     height: 300,
                                     menubar: false,
-                                    language: 'vi',
+                                    language: "vi",
                                     plugins: [
-                                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                                        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                                        "advlist",
+                                        "autolink",
+                                        "lists",
+                                        "link",
+                                        "image",
+                                        "charmap",
+                                        "preview",
+                                        "anchor",
+                                        "searchreplace",
+                                        "visualblocks",
+                                        "code",
+                                        "fullscreen",
+                                        "insertdatetime",
+                                        "media",
+                                        "table",
+                                        "code",
+                                        "help",
+                                        "wordcount",
                                     ],
-                                    toolbar: 'undo redo | blocks | ' +
-                                        'bold italic forecolor | alignleft aligncenter ' +
-                                        'alignright alignjustify | bullist numlist outdent indent | ' +
-                                        'removeformat | help',
-                                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                                    toolbar:
+                                        "undo redo | blocks | " +
+                                        "bold italic forecolor | alignleft aligncenter " +
+                                        "alignright alignjustify | bullist numlist outdent indent | " +
+                                        "removeformat | help",
+                                    content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
                                 }}
                             />
                         </div>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            id="isActive"
-                            checked={isActive}
-                            onChange={(e) => setIsActive(e.target.checked)}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
-                            Đang hoạt động
-                        </label>
-                    </div>
-
                     <div className="flex justify-between mt-6">
                         <button
                             type="submit"

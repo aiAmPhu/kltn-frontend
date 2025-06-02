@@ -50,6 +50,7 @@ const AdmissionMajorList = ({ majors = [], setMajors }) => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 await loadAdmissionMajors();
+                alert(`Đã xóa ngành ${major.majorName} thành công`);
                 setError("");
             } catch (error) {
                 setError(error.response?.data?.message || "Lỗi khi xóa ngành xét tuyển");
@@ -233,9 +234,6 @@ const AdmissionMajorList = ({ majors = [], setMajors }) => {
                                     >
                                         Mô tả
                                     </th>
-                                    {/* <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[8%]">
-                                        Trạng thái
-                                    </th> */}
                                     <th
                                         scope="col"
                                         className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]"
@@ -317,17 +315,6 @@ const AdmissionMajorList = ({ majors = [], setMajors }) => {
                                                     }}
                                                 />
                                             </td>
-                                            {/* <td className="px-6 py-4 whitespace-nowrap">
-                                                <span
-                                                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                                        major.isActive
-                                                            ? "bg-green-100 text-green-800"
-                                                            : "bg-red-100 text-red-800"
-                                                    }`}
-                                                >
-                                                    {major.isActive ? "Đang hoạt động" : "Đã ẩn"}
-                                                </span>
-                                            </td> */}
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <div className="flex justify-end space-x-2">
                                                     <button
