@@ -91,7 +91,7 @@ const Footer = () => {
             {/* Bottom Bar */}
             <div className="bg-blue-600 text-white text-sm flex flex-col md:flex-row justify-between items-center px-6 py-4">
                 <p className="text-center">
-                    © 2017 SOFTWARE TECHNOLOGY CENTER - HCMUTE. All rights reserved.
+                    ©2025 - NGUYỄN DUY SƠN - PHẠM LÊ THIÊN PHÚ
                 </p>
                 <p className="mt-2 md:mt-0 text-center">
                     HOTLINE: (028) 3722 5724
