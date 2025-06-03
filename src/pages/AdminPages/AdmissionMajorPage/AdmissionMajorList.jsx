@@ -92,8 +92,7 @@ const AdmissionMajorList = ({ majors = [], setMajors }) => {
     const filteredMajors = majors.filter(
         (major) =>
             major.majorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            major.majorId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            major.majorCodeName.toLowerCase().includes(searchQuery.toLowerCase())
+            major.majorId.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     // Pagination logic
@@ -282,7 +281,6 @@ const AdmissionMajorList = ({ majors = [], setMajors }) => {
                                         <tr key={major.majorId} className="hover:bg-gray-50">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm font-medium text-gray-900">{major.majorId}</div>
-                                                <div className="text-sm text-gray-500">{major.majorCodeName}</div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="text-sm text-gray-900 break-words">

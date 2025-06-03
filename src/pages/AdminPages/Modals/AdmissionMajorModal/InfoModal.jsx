@@ -14,10 +14,6 @@ const InfoModal = ({ major, onClose }) => {
                         <span className="font-medium text-gray-700">Mã ngành:</span> {major.majorId}
                     </p>
                     <p className="flex items-center gap-2">
-                        <FaIdCard className="text-blue-500" />
-                        <span className="font-medium text-gray-700">Mã ngành:</span> {major.majorCodeName}
-                    </p>
-                    <p className="flex items-center gap-2">
                         <FaInfoCircle className="text-blue-500" />
                         <span className="font-medium text-gray-700">Tên ngành:</span> {major.majorName}
                     </p>

@@ -154,7 +154,7 @@ function WishRegistration() {
                         <option value="">-- Chọn ngành --</option>
                         {majorList.map((m) => (
                             <option key={m.majorId} value={m.majorId}>
-                                {m.majorCodeName} - {m.majorName}
+                                {m.majorName}
                             </option>
                         ))}
                     </select>

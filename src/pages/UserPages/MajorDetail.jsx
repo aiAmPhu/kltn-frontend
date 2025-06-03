@@ -35,23 +35,25 @@ function MajorDetail() {
             <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-8">
                 <div className="relative mb-8">
                     <span
-                        className={`self-end px-4 py-1 rounded-full text-sm font-semibold text-white ${isActive ? "bg-green-500" : "bg-gray-500"}`}
+                        className={`self-end px-4 py-1 rounded-full text-sm font-semibold text-white ${
+                            isActive ? "bg-green-500" : "bg-gray-500"
+                        }`}
                     >
                         {isActive ? "Đang xét tuyển" : "Không xét tuyển"}
                     </span>
-                    
-                    <h1 className="text-4xl font-bold text-red-600 mt-2 text-center">
-                        {major.majorName}
-                    </h1>
+
+                    <h1 className="text-4xl font-bold text-red-600 mt-2 text-center">{major.majorName}</h1>
                 </div>
 
                 {/* Mã ngành & tổ hợp môn */}
                 <div className="mb-8">
-                    <p className="font-semibold text-blue-600 text-xl">Mã ngành: {major.majorCodeName}</p>
                     <p className="font-semibold text-blue-600 text-xl mt-4 mb-2">Tổ hợp môn:</p>
                     <div className="flex flex-wrap gap-3">
                         {major.majorCombination.map((comb, idx) => (
-                            <span key={idx} className="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm font-medium">
+                            <span
+                                key={idx}
+                                className="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm font-medium"
+                            >
                                 {comb}
                             </span>
                         ))}
@@ -61,7 +63,12 @@ function MajorDetail() {
                 {/* Mô tả ngành học */}
                 <div className="mb-10">
                     <h2 className="text-blue-600 font-semibold text-xl mb-3">MÔ TẢ NGÀNH HỌC</h2>
-                    <p className="text-gray-700 text-base" dangerouslySetInnerHTML={{ __html: major?.majorDescription || "Chưa có mô tả cho ngành này..." }} />
+                    <p
+                        className="text-gray-700 text-base"
+                        dangerouslySetInnerHTML={{
+                            __html: major?.majorDescription || "Chưa có mô tả cho ngành này...",
+                        }}
+                    />
                 </div>
 
                 <div className="text-center">
