@@ -15,10 +15,16 @@ import {
     FaAngleDoubleLeft,
     FaAngleDoubleRight,
     FaComments,
+    FaChartPie,
 } from "react-icons/fa";
 import logo from "../../assets/logo_hcmute.png";
 
 const menuItems = [
+    {
+        to: "/admin/statistics",
+        icon: <FaChartPie className="text-lg" />,
+        label: "Thống kê hằng năm",
+    },
     {
         to: "/admin/users",
         icon: <FaUsers className="text-lg" />,

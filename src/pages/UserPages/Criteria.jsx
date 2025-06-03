@@ -50,7 +50,14 @@ function Criteria() {
                                 <td className="px-4 py-3 border-b">{item.criteriaId}</td>
                                 <td className="px-4 py-3 border-b font-medium text-blue-700">{item.criteriaName}</td>
                                 <td className="px-4 py-3 border-b text-gray-700 whitespace-pre-line text-sm">
-                                    {item.criteriaDescription || (
+                                    {item.criteriaDescription ? (
+                                        <div
+                                            className="prose prose-sm max-w-none"
+                                            dangerouslySetInnerHTML={{
+                                                __html: item.criteriaDescription,
+                                            }}
+                                        />
+                                    ) : (
                                         <span className="italic text-gray-400">Chưa có mô tả.</span>
                                     )}
                                 </td>

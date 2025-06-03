@@ -46,7 +46,7 @@ import ForgotPasswordStep2 from "./pages/UserPages/ForgotPassword/ForgotPassword
 import ForgotPasswordStep3 from "./pages/UserPages/ForgotPassword/ForgotPasswordStep3.jsx";
 import AdmissionBlockListPage from "./pages/AdminPages/AdmissionBlockPage/AdmissionBlockListPage.jsx";
 import UserListPage from "./pages/AdminPages/UserPage/UserListPage.jsx";
-
+import StatisticsPage from "./pages/AdminPages/StatisticsPage/Statistic.jsx";
 function App() {
     return (
         <>
@@ -120,7 +120,8 @@ function App() {
                         </ProtectedRoute>
                     }
                 >
-                    <Route index element={<Navigate to="users" replace />} />
+                    <Route index element={<Navigate to="statistics" replace />} />
+                    <Route path="statistics" element={<StatisticsPage />} />
                     <Route path="users" element={<UserListPage />} />
                     <Route path="admission-years" element={<AdmissionYearList />} />
                     <Route path="admission-blocks" element={<AdmissionBlockListPage />} />
