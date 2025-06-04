@@ -36,6 +36,7 @@ import FilterPage from "./pages/AdminPages/FilterPage/FilterPage.jsx";
 import ChatPage from "./pages/AdminPages/ChatPage/ChatPage.jsx";
 import UserChat from "./pages/UserPages/Chat.jsx";
 import ReviewerChat from "./pages/ReviewerPages/Chat.jsx";
+import GoogleCallback from "./pages/GoogleCallback.jsx";
 // Import các component con của UserDetailPage
 import Information from "./pages/ReviewerPages/Information.jsx";
 import LearningProccess from "./pages/ReviewerPages/LearningProccess.jsx";
@@ -47,6 +48,7 @@ import ForgotPasswordStep3 from "./pages/UserPages/ForgotPassword/ForgotPassword
 import AdmissionBlockListPage from "./pages/AdminPages/AdmissionBlockPage/AdmissionBlockListPage.jsx";
 import UserListPage from "./pages/AdminPages/UserPage/UserListPage.jsx";
 import StatisticsPage from "./pages/AdminPages/StatisticsPage/Statistic.jsx";
+
 function App() {
     return (
         <>
@@ -60,6 +62,7 @@ function App() {
                     <Route path="/register/step2" element={<RegisterStep2 />} />
                     <Route path="/register/step3" element={<RegisterStep3 />} />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/auth/google/callback" element={<GoogleCallback />} />
                     <Route path="/major" element={<Majors />} />
                     <Route path="/majors/:id" element={<MajorDetail />} />
                     <Route path="/block" element={<Block />} />
