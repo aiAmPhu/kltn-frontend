@@ -97,31 +97,33 @@ function WishRegistration() {
     };
 
     return (
-        <div className="max-w-3xl mx-auto py-10 px-4 mt-12">
+        <div className="max-w-7xl mx-auto py-10 px-4 mt-12">
             <h1 className="text-3xl font-bold mb-8 text-blue-700 border-l-8 border-blue-500 pl-4 bg-blue-50 py-2">
                 ĐĂNG KÝ NGUYỆN VỌNG XÉT TUYỂN
             </h1>
 
             {userRole === "admin" && acceptedWishes.length > 0 && (
-                <div className="mb-8 bg-green-50 p-4 rounded-lg">
-                    <h2 className="text-lg font-semibold text-green-800 mb-2">Nguyện vọng đã được chấp nhận</h2>
-                    <div className="overflow-x-auto">
+                <div className="mb-8 bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-xl shadow-sm border border-green-200">
+                    <h2 className="text-xl font-bold text-green-800 mb-4">
+                        Nguyện vọng đã được chấp nhận
+                    </h2>
+                    <div className="overflow-x-auto rounded-lg border border-green-200">
                         <table className="min-w-full bg-white">
                             <thead>
                                 <tr className="bg-green-100">
-                                    <th className="px-4 py-2 text-left">Người dùng</th>
-                                    <th className="px-4 py-2 text-left">Ngành</th>
-                                    <th className="px-4 py-2 text-left">Diện xét tuyển</th>
-                                    <th className="px-4 py-2 text-left">Khối xét tuyển</th>
+                                    <th className="px-6 py-3 text-left text-sm font-semibold text-green-800">Người dùng</th>
+                                    <th className="px-6 py-3 text-left text-sm font-semibold text-green-800">Ngành</th>
+                                    <th className="px-6 py-3 text-left text-sm font-semibold text-green-800">Diện xét tuyển</th>
+                                    <th className="px-6 py-3 text-left text-sm font-semibold text-green-800">Khối xét tuyển</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="divide-y divide-green-100">
                                 {acceptedWishes.map((wish, index) => (
-                                    <tr key={index} className="border-b hover:bg-green-50">
-                                        <td className="px-4 py-2">{wish.userName}</td>
-                                        <td className="px-4 py-2">{wish.majorId}</td>
-                                        <td className="px-4 py-2">{wish.criteriaId}</td>
-                                        <td className="px-4 py-2">{wish.admissionBlockId}</td>
+                                    <tr key={index} className="hover:bg-green-50 transition-colors">
+                                        <td className="px-6 py-4 text-sm text-gray-700">{wish.userName}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-700">{wish.majorId}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-700">{wish.criteriaId}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-700">{wish.admissionBlockId}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -130,76 +132,99 @@ function WishRegistration() {
                 </div>
             )}
 
-            {userWishes.length > 0 && (
-                <div className="mb-8">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-2">Nguyện vọng đã đăng ký</h2>
-                    <ul className="list-disc pl-5 text-sm text-gray-700">
-                        {userWishes.map((wish, index) => (
-                            <li key={index}>
-                                Nguyện vọng {index + 1}: {wish.majorId} - {wish.criteriaId} - {wish.admissionBlockId}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-
-            <div className="space-y-5">
-                <div>
-                    <label className="block font-medium mb-1">Chọn ngành</label>
-                    <select
-                        value={selected.majorId}
-                        onChange={handleMajorChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                    >
-                        <option value="">-- Chọn ngành --</option>
-                        {majorList.map((m) => (
-                            <option key={m.majorId} value={m.majorId}>
-                                {m.majorName}
-                            </option>
-                        ))}
-                    </select>
+            <div className="grid grid-cols-2 gap-8">
+                {/* Left side - Registered Wishes */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h2 className="text-xl font-bold text-gray-800 mb-4">
+                        Nguyện vọng đã đăng ký
+                    </h2>
+                    <div className="space-y-3">
+                        {userWishes.length > 0 ? (
+                            userWishes.map((wish, index) => (
+                                <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <span className="w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full font-semibold mr-3">
+                                        {index + 1}
+                                    </span>
+                                    <div className="flex-1">
+                                        <p className="text-sm text-gray-700">
+                                            Ngành: <span className="font-medium">{wish.majorId}</span> | 
+                                            Diện: <span className="font-medium">{wish.criteriaId}</span> | 
+                                            Khối: <span className="font-medium">{wish.admissionBlockId}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-gray-500 text-center py-4">Chưa có nguyện vọng nào được đăng ký</p>
+                        )}
+                    </div>
                 </div>
 
-                <div>
-                    <label className="block font-medium mb-1">Chọn diện xét tuyển</label>
-                    <select
-                        value={selected.criteriaId}
-                        onChange={(e) => setSelected({ ...selected, criteriaId: e.target.value })}
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                    >
-                        <option value="">-- Chọn diện --</option>
-                        {criteriaList.map((c) => (
-                            <option key={c.criteriaId} value={c.criteriaId}>
-                                {c.criteriaName}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                {/* Right side - New Wish Registration */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-6">
+                    <h2 className="text-xl font-bold text-gray-800 mb-4">
+                        Đăng ký nguyện vọng mới
+                    </h2>
+                    
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Chọn ngành</label>
+                            <select
+                                value={selected.majorId}
+                                onChange={handleMajorChange}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            >
+                                <option value="">-- Chọn ngành --</option>
+                                {majorList.map((m) => (
+                                    <option key={m.majorId} value={m.majorId}>
+                                        {m.majorName}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
-                <div>
-                    <label className="block font-medium mb-1">Chọn khối xét tuyển</label>
-                    <select
-                        value={selected.admissionBlockId}
-                        onChange={(e) => setSelected({ ...selected, admissionBlockId: e.target.value })}
-                        disabled={!selected.majorId} // disable nếu chưa chọn ngành
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                    >
-                        <option value="">-- Chọn khối --</option>
-                        {availableBlocks.map((b) => (
-                            <option key={b.admissionBlockId} value={b.admissionBlockId}>
-                                {b.admissionBlockId} - {b.admissionBlockName}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Chọn diện xét tuyển</label>
+                            <select
+                                value={selected.criteriaId}
+                                onChange={(e) => setSelected({ ...selected, criteriaId: e.target.value })}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            >
+                                <option value="">-- Chọn diện --</option>
+                                {criteriaList.map((c) => (
+                                    <option key={c.criteriaId} value={c.criteriaId}>
+                                        {c.criteriaName}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
-                <button
-                    onClick={handleSave}
-                    disabled={!selected.criteriaId || !selected.admissionBlockId || !selected.majorId}
-                    className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
-                >
-                    Lưu nguyện vọng
-                </button>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Chọn khối xét tuyển</label>
+                            <select
+                                value={selected.admissionBlockId}
+                                onChange={(e) => setSelected({ ...selected, admissionBlockId: e.target.value })}
+                                disabled={!selected.majorId}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            >
+                                <option value="">-- Chọn khối --</option>
+                                {availableBlocks.map((b) => (
+                                    <option key={b.admissionBlockId} value={b.admissionBlockId}>
+                                        {b.admissionBlockId} - {b.admissionBlockName}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <button
+                            onClick={handleSave}
+                            disabled={!selected.criteriaId || !selected.admissionBlockId || !selected.majorId}
+                            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200"
+                        >
+                            Lưu nguyện vọng
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );

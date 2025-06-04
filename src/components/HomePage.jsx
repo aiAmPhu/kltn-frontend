@@ -43,15 +43,13 @@ function HomePage() {
         fetchMajors();
     }, []);
 
-    const handleChatClick = (type) => {
+    const handleChatClick = () => {
         if (!user) {
             toast.error("Vui lòng đăng nhập để sử dụng tính năng chat");
             return;
         }
 
-        setChatType(type);
-        setShowChat(true);
-        setShowChatMenu(false);
+        setShowChat(prev => !prev);
     };
 
     return (
@@ -61,7 +59,7 @@ function HomePage() {
             <div className="max-w-6xl mx-auto px-4 py-6">
                 {/* Đại học chính quy */}
                 <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6 mb-6 shadow-md">
-                    <div className="flex justify-between items-center mb-6">
+                    <div className="flex justify-center items-center mb-6">
                         <h2 className="text-2xl font-bold text-blue-800 flex items-center">
                             <GraduationCap className="w-8 h-8 mr-2 text-blue-700" />
                             ĐẠI HỌC CHÍNH QUY
@@ -110,57 +108,34 @@ function HomePage() {
 
             {/* Floating Chat Button */}
             <div className="fixed bottom-6 right-6 z-50">
-                <div className="relative">
-                    <button
-                        onClick={() => setShowChatMenu(!showChatMenu)}
-                        className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
-                    >
-                        <MessageCircle className="w-6 h-6" />
-                        <span className="hidden md:inline">Chat</span>
-                        <ChevronDown
-                            className={`w-4 h-4 transition-transform duration-200 ${showChatMenu ? "rotate-180" : ""}`}
-                        />
-                    </button>
-
-                    {/* Chat Menu Dropdown */}
-                    {showChatMenu && (
-                        <div className="absolute bottom-full right-0 mb-2 w-48 bg-white rounded-lg shadow-xl py-2 border border-gray-200">
-                            <button
-                                onClick={() => handleChatClick("admin")}
-                                className="w-full px-4 py-2 text-left hover:bg-purple-50 flex items-center space-x-2 transition-colors duration-200"
-                            >
-                                <MessageCircle className="w-4 h-4 text-purple-500" />
-                                <span className="text-gray-700">Chat với Admin</span>
-                            </button>
-                            <div className="h-px bg-gray-200 my-1"></div>
-                            <button
-                                onClick={() => handleChatClick("reviewer")}
-                                className="w-full px-4 py-2 text-left hover:bg-purple-50 flex items-center space-x-2 transition-colors duration-200"
-                            >
-                                <MessageCircle className="w-4 h-4 text-purple-500" />
-                                <span className="text-gray-700">Chat với Reviewer</span>
-                            </button>
-                        </div>
-                    )}
-                </div>
+                <button
+                    onClick={handleChatClick}
+                    className={`bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2 hover:scale-105 ${
+                        showChat ? 'ring-2 ring-blue-300 ring-offset-2' : ''
+                    }`}
+                >
+                    <MessageCircle className="w-6 h-6" />
+                    <span className="hidden md:inline font-medium">Chat</span>
+                </button>
             </div>
 
             {/* Chat Popup */}
             {showChat && (
-                <div className="fixed bottom-24 right-6 w-96 h-[600px] bg-white rounded-lg shadow-xl z-50 flex flex-col">
-                    <div className="p-4 border-b bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-t-lg flex justify-between items-center">
-                        <h2 className="text-lg font-semibold">
-                            {chatType === "admin" ? "Chat với Admin" : "Chat với Reviewer"}
-                        </h2>
+                <div className="fixed bottom-24 right-6 w-96 h-[600px] bg-white rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden border border-gray-100">
+                    <div className="p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white flex justify-between items-center">
+                        <div className="flex items-center space-x-2">
+                            <MessageCircle className="w-5 h-5" />
+                            <h2 className="text-lg font-semibold">Chat</h2>
+                        </div>
                         <button
                             onClick={() => setShowChat(false)}
-                            className="text-white hover:text-gray-200 transition-colors"
+                            className="text-white hover:text-gray-200 transition-colors p-1 hover:bg-blue-600 rounded-full"
                         >
                             <X className="w-5 h-5" />
                         </button>
                     </div>
-                    <div className="flex-1 overflow-hidden">
-                        <Chat chatType={chatType} onClose={() => setShowChat(false)} />
+                    <div className="flex-1 overflow-hidden bg-gray-50">
+                        <Chat chatType="admin" onClose={() => setShowChat(false)} />
                     </div>
                 </div>
             )}
