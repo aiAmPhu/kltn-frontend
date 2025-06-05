@@ -3,7 +3,7 @@ import axios from "axios";
 import InfoPermissionModal from "../Modals/PermissionModal/InfoPermissionModal";
 import PermissionFormModal from "../Modals/PermissionModal/PermissionFormModal";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-
+import { toast } from "react-toastify";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const PermissionList = ({ users: usersProp = [], setUsers: setUsersProp }) => {
@@ -121,7 +121,7 @@ const PermissionList = ({ users: usersProp = [], setUsers: setUsersProp }) => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 await loadUsers();
-                alert("Xóa quyền thành công!");
+                toast.success("Xóa quyền thành công!");
                 setError("");
             } catch (error) {
                 setError(error.response?.data?.message || "Lỗi khi xóa quyền");

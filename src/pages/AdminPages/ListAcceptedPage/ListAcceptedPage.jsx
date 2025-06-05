@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Papa from "papaparse";
 import * as XLSX from "xlsx";
+import { toast } from "react-toastify";
 
 const ListAcceptedPage = () => {
     const [wishes, setWishes] = useState([]);
@@ -65,30 +65,6 @@ const ListAcceptedPage = () => {
             setLoading(false);
         }
     };
-    // Hàm gọi API lấy danh sách trúng tuyển
-    // const fetchAcceptedWishes = async () => {
-    //     setLoading(true);
-    //     setError(null);
-    //     try {
-    //         const token = localStorage.getItem("token");
-    //         const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/wish/getAccepted`, {
-    //             headers: token ? { Authorization: `Bearer ${token}` } : {},
-    //         });
-    //         if (response.data && Array.isArray(response.data)) {
-    //             setWishes(response.data);
-    //         } else if (response.data && response.data.data && Array.isArray(response.data.data)) {
-    //             setWishes(response.data.data);
-    //         } else {
-    //             console.error("Unexpected data structure:", response.data);
-    //             setError("Dữ liệu không đúng định dạng");
-    //         }
-    //         setLoading(false);
-    //     } catch (err) {
-    //         console.error("Error fetching data:", err.response || err); // Debug log
-    //         setError(err.response?.data?.message || "Lỗi khi tải dữ liệu");
-    //         setLoading(false);
-    //     }
-    // };
 
     // Gọi API lấy danh sách trúng tuyển khi load trang hoặc sau khi lọc
     useEffect(() => {
@@ -121,7 +97,7 @@ const ListAcceptedPage = () => {
     // Export to Excel
     const exportToExcel = () => {
         if (!wishes.length) {
-            alert("Không có dữ liệu để xuất!");
+            toast.error("Không có dữ liệu để xuất!");
             return;
         }
 

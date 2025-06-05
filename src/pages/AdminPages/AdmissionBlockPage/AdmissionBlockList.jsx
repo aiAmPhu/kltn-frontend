@@ -4,7 +4,7 @@ import InfoModal from "../Modals/AdmissionBlockModal/InfoModal";
 import AdmissionBlockFormModal from "../Modals/AdmissionBlockModal/AdmissionBlockFormModal";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { FaFileExport, FaFileImport } from "react-icons/fa";
-
+import { toast } from "react-toastify";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
@@ -52,7 +52,7 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 await loadAdmissionBlocks();
-                alert("Xóa khối xét tuyển thành công!");
+                toast.success("Xóa khối xét tuyển thành công!");
                 setError("");
             } catch (error) {
                 setError(error.response?.data?.message || "Lỗi khi xóa khối xét tuyển");

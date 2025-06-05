@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaCheck, FaTimes, FaListUl } from "react-icons/fa";
-
+import { toast } from "react-toastify";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing }) => {
@@ -64,7 +64,7 @@ const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing 
                 headers: { Authorization: `Bearer ${token}` },
             });
             setUsers(response.data?.data || response.data || []);
-            alert("Cập nhật phân quyền thành công!");
+            toast.success("Cập nhật phân quyền thành công!");
             onClose();
         } catch (err) {
             if (err.response?.data?.message) {

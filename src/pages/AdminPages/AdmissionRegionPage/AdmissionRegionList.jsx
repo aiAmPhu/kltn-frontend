@@ -3,6 +3,7 @@ import axios from "axios";
 import AdmissionRegionInfoModal from "../Modals/AdmissionRegionModal/AdmissionRegionInfoModal";
 import AdmissionRegionFormModal from "../Modals/AdmissionRegionModal/AdmissionRegionFormModal";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { toast } from "react-toastify";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -57,7 +58,7 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 await loadRegions();
-                alert("Xóa đối tượng ưu tiên thành công!");
+                toast.success("Xóa đối tượng ưu tiên thành công!");
                 setError("");
             } catch (error) {
                 setError(error.response?.data?.message || "Lỗi khi xóa đối tượng ưu tiên");

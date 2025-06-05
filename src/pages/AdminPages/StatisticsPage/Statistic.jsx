@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -12,7 +13,7 @@ import {
     PointElement,
     LineElement,
 } from "chart.js";
-import { Bar, Pie, Line } from "react-chartjs-2";
+import { Bar, Pie } from "react-chartjs-2";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement);
 
@@ -48,7 +49,7 @@ const StatisticsPage = () => {
 
     const handleCompareSnapshots = async () => {
         if (selectedSnapshots.length < 2) {
-            alert("Vui lòng chọn ít nhất 2 snapshots để so sánh");
+            toast.warning("Vui lòng chọn ít nhất 2 snapshots để so sánh");
             return;
         }
 

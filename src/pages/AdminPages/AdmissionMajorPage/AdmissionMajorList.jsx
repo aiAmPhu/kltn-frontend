@@ -3,7 +3,7 @@ import axios from "axios";
 import InfoModal from "../Modals/AdmissionMajorModal/InfoModal";
 import AdmissionMajorFormModal from "../Modals/AdmissionMajorModal/AdmissionMajorFormModal";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-
+import { toast } from "react-toastify";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const AdmissionMajorList = ({ majors = [], setMajors }) => {
@@ -50,7 +50,7 @@ const AdmissionMajorList = ({ majors = [], setMajors }) => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 await loadAdmissionMajors();
-                alert(`Đã xóa ngành ${major.majorName} thành công`);
+                toast.success(`Đã xóa ngành ${major.majorName} thành công`);
                 setError("");
             } catch (error) {
                 setError(error.response?.data?.message || "Lỗi khi xóa ngành xét tuyển");

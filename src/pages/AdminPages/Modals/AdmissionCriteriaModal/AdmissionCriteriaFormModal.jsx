@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaCheck, FaTimes, FaPlus } from "react-icons/fa";
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { toast } from "react-toastify";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const AdmissionCriteriaFormModal = ({ criteriaToEdit, setCriterias, onClose, isEditing }) => {
@@ -39,12 +39,12 @@ const AdmissionCriteriaFormModal = ({ criteriaToEdit, setCriterias, onClose, isE
                 await axios.put(`${API_BASE_URL}/adcs/update/${criteriaId}`, newCriteria, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                alert("Cập nhật thành công!");
+                toast.success("Cập nhật thành công!");
             } else {
                 await axios.post(`${API_BASE_URL}/adcs/add`, newCriteria, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                alert("Thêm diện xét tuyển thành công!");
+                toast.success("Thêm diện xét tuyển thành công!");
             }
 
             const response = await axios.get(`${API_BASE_URL}/adcs/getall`, {
@@ -104,24 +104,24 @@ const AdmissionCriteriaFormModal = ({ criteriaToEdit, setCriterias, onClose, isE
                                 }}
                                 config={{
                                     toolbar: [
-                                        'heading',
-                                        '|',
-                                        'bold',
-                                        'italic',
-                                        'link',
-                                        'bulletedList',
-                                        'numberedList',
-                                        '|',
-                                        'outdent',
-                                        'indent',
-                                        '|',
-                                        'blockQuote',
-                                        'insertTable',
-                                        'undo',
-                                        'redo'
+                                        "heading",
+                                        "|",
+                                        "bold",
+                                        "italic",
+                                        "link",
+                                        "bulletedList",
+                                        "numberedList",
+                                        "|",
+                                        "outdent",
+                                        "indent",
+                                        "|",
+                                        "blockQuote",
+                                        "insertTable",
+                                        "undo",
+                                        "redo",
                                     ],
-                                    language: 'vi',
-                                    height: '300px'
+                                    language: "vi",
+                                    height: "300px",
                                 }}
                             />
                         </div>
