@@ -4,6 +4,7 @@ import { FaCheck, FaTimes, FaPlus } from "react-icons/fa";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { toast } from "react-toastify";
+
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing }) => {
