@@ -6,18 +6,40 @@ const TinyMCEEditor = () => {
     <Editor
       apiKey='yn584rby174ogaewa0zij7yf1dwb178jk9dcq541j27ydmwk'
       init={{
+        height: 500,
+        menubar: true,
         plugins: [
-          'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
-          'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown','importword', 'exportword', 'exportpdf'
+          'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+          'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+          'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount',
+          'emoticons', 'codesample', 'visualblocks', 'pagebreak', 'nonbreaking',
+          'toc', 'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+          'preview', 'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+          'insertdatetime', 'media', 'table', 'help', 'wordcount'
         ],
-        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
-        tinycomments_mode: 'embedded',
-        tinycomments_author: 'Author name',
-        mergetags_list: [
-          { value: 'First.Name', title: 'First Name' },
-          { value: 'Email', title: 'Email' },
-        ],
-        ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+        toolbar: 'undo redo | formatselect | ' +
+          'bold italic backcolor | alignleft aligncenter ' +
+          'alignright alignjustify | bullist numlist outdent indent | ' +
+          'removeformat | help | image media | code | fullscreen',
+        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+        branding: false,
+        promotion: false,
+        valid_elements: '*[*]',
+        extended_valid_elements: '*[*]',
+        valid_children: '*[*]',
+        allow_conditional_comments: true,
+        allow_html_in_named_anchor: true,
+        allow_unsafe_link_target: true,
+        convert_urls: false,
+        relative_urls: false,
+        remove_script_host: false,
+        document_base_url: 'https://kltn-frontend-five.vercel.app/',
+        images_upload_url: 'https://kltn-frontend-five.vercel.app/upload',
+        images_upload_handler: (blobInfo, success, failure) => {
+          // Xử lý upload ảnh ở đây
+          console.log('Upload image:', blobInfo);
+          success('https://kltn-frontend-five.vercel.app/images/example.jpg');
+        }
       }}
       initialValue="Welcome to TinyMCE!"
     />
