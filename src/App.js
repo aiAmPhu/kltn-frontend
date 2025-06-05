@@ -37,6 +37,7 @@ import ChatPage from "./pages/AdminPages/ChatPage/ChatPage.jsx";
 import UserChat from "./pages/UserPages/Chat.jsx";
 import ReviewerChat from "./pages/ReviewerPages/Chat.jsx";
 import GoogleCallback from "./pages/GoogleCallback.jsx";
+import TinyMCEEditor from "./components/TinyMCEEditor.jsx";
 // Import các component con của UserDetailPage
 import Information from "./pages/ReviewerPages/Information.jsx";
 import LearningProccess from "./pages/ReviewerPages/LearningProccess.jsx";
@@ -68,6 +69,7 @@ function App() {
                     <Route path="/block" element={<Block />} />
                     <Route path="/criteria" element={<Criteria />} />
                     <Route path="/chatbot" element={<Chatbot />} />
+                    <Route path="/editor" element={<TinyMCEEditor />} />
                     <Route path="/forgot-password/step1" element={<ForgotPasswordStep1 />} />
                     <Route path="/forgot-password/step2" element={<ForgotPasswordStep2 />} />
                     <Route path="/forgot-password/step3" element={<ForgotPasswordStep3 />} />
