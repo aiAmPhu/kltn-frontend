@@ -6,7 +6,8 @@ const TinyMCEEditor = () => {
     <Editor
       apiKey='yn584rby174ogaewa0zij7yf1dwb178jk9dcq541j27ydmwk'
       init={{
-        height: 500,
+        
+        height: 500, 
         menubar: true,
         plugins: [
           'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
