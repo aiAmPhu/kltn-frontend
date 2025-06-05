@@ -26,49 +26,24 @@ const menuItems = [
         label: "Thống kê hằng năm",
     },
     {
-        to: "/admin/users",
-        icon: <FaUsers className="text-lg" />,
-        label: "Quản lý người dùng",
-    },
-    {
         to: "/admin/admission-years",
         icon: <FaCalendarAlt className="text-lg" />,
         label: "Quản lý năm tuyển sinh",
     },
     {
-        to: "/admin/admission-blocks",
-        icon: <FaGraduationCap className="text-lg" />,
-        label: "Quản lý khối xét tuyển",
-    },
-    {
-        to: "/admin/admission-majors",
-        icon: <FaUniversity className="text-lg" />,
-        label: "Quản lý ngành xét tuyển",
-    },
-    {
-        to: "/admin/admission-criteria",
-        icon: <FaListAlt className="text-lg" />,
-        label: "Quản lý diện xét tuyển",
-    },
-    {
-        to: "/admin/admission-regions",
-        icon: <FaMapMarkerAlt className="text-lg" />,
-        label: "Quản lý khu vực ưu tiên",
-    },
-    {
-        to: "/admin/admission-objects",
-        icon: <FaUserTag className="text-lg" />,
-        label: "Quản lý đối tượng ưu tiên",
-    },
-    {
-        to: "/admin/admission-quantities",
-        icon: <FaChartBar className="text-lg" />,
-        label: "Quản lý chỉ tiêu",
+        to: "/admin/users",
+        icon: <FaUsers className="text-lg" />,
+        label: "Quản lý người dùng",
     },
     {
         to: "/admin/permissions",
         icon: <FaUserTag className="text-lg" />,
         label: "Quản lý quyền",
+    },    
+    {
+        to: "/admin/admission-quantities",
+        icon: <FaChartBar className="text-lg" />,
+        label: "Quản lý chỉ tiêu",
     },
     {
         to: "/admin/filter",
@@ -84,6 +59,31 @@ const menuItems = [
         to: "/admin/chat",
         icon: <FaComments className="text-lg" />,
         label: "Chat với người dùng",
+    },
+    {
+        to: "/admin/admission-majors",
+        icon: <FaUniversity className="text-lg" />,
+        label: "Quản lý ngành xét tuyển",
+    },
+    {
+        to: "/admin/admission-criteria",
+        icon: <FaListAlt className="text-lg" />,
+        label: "Quản lý diện xét tuyển",
+    },
+    {
+        to: "/admin/admission-blocks",
+        icon: <FaGraduationCap className="text-lg" />,
+        label: "Quản lý khối xét tuyển",
+    },  
+    {
+        to: "/admin/admission-regions",
+        icon: <FaMapMarkerAlt className="text-lg" />,
+        label: "Quản lý khu vực ưu tiên",
+    },
+    {
+        to: "/admin/admission-objects",
+        icon: <FaUserTag className="text-lg" />,
+        label: "Quản lý đối tượng ưu tiên",
     },
 ];
 
