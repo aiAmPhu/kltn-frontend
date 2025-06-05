@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaCheck, FaTimes, FaPlus } from "react-icons/fa";
-import { Editor } from "@tinymce/tinymce-react";
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -176,40 +177,33 @@ const AdmissionMajorFormModal = ({ majorToEdit, setMajors, onClose, isEditing })
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
                         <div className="border border-gray-300 rounded-md">
-                            <Editor
-                                apiKey="2eggg290trdrelg0vl1f4y0l6z1wd1j43mzo63fr5brp3i6l"
-                                value={majorDescription}
-                                onEditorChange={(content) => setMajorDescription(content)}
-                                init={{
-                                    height: 300,
-                                    menubar: false,
-                                    language: "vi",
-                                    plugins: [
-                                        "advlist",
-                                        "autolink",
-                                        "lists",
-                                        "link",
-                                        "image",
-                                        "charmap",
-                                        "preview",
-                                        "anchor",
-                                        "searchreplace",
-                                        "visualblocks",
-                                        "code",
-                                        "fullscreen",
-                                        "insertdatetime",
-                                        "media",
-                                        "table",
-                                        "code",
-                                        "help",
-                                        "wordcount",
+                            <CKEditor
+                                editor={ClassicEditor}
+                                data={majorDescription}
+                                onChange={(event, editor) => {
+                                    const data = editor.getData();
+                                    setMajorDescription(data);
+                                }}
+                                config={{
+                                    toolbar: [
+                                        'heading',
+                                        '|',
+                                        'bold',
+                                        'italic',
+                                        'link',
+                                        'bulletedList',
+                                        'numberedList',
+                                        '|',
+                                        'outdent',
+                                        'indent',
+                                        '|',
+                                        'blockQuote',
+                                        'insertTable',
+                                        'undo',
+                                        'redo'
                                     ],
-                                    toolbar:
-                                        "undo redo | blocks | " +
-                                        "bold italic forecolor | alignleft aligncenter " +
-                                        "alignright alignjustify | bullist numlist outdent indent | " +
-                                        "removeformat | help",
-                                    content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                                    language: 'vi',
+                                    height: '300px'
                                 }}
                             />
                         </div>
