@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaCheck, FaTimes, FaPlus } from "react-icons/fa";
-
+import { toast } from "react-toastify";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const AdmissionBlockFormModal = ({ admissionBlockToEdit, setAdmissionBlocks, onClose, isEditing }) => {
@@ -45,12 +45,12 @@ const AdmissionBlockFormModal = ({ admissionBlockToEdit, setAdmissionBlocks, onC
                 await axios.put(`${API_BASE_URL}/adbs/update/${admissionBlockId}`, newAdmissionBlock, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                alert("Cập nhật khối xét tuyển thành công!");
+                toast.success("Cập nhật khối xét tuyển thành công!");
             } else {
                 await axios.post(`${API_BASE_URL}/adbs/add`, newAdmissionBlock, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                alert("Thêm khối xét tuyển thành công!");
+                toast.success("Thêm khối xét tuyển thành công!");
             }
 
             const response = await axios.get(`${API_BASE_URL}/adbs/getall`, {

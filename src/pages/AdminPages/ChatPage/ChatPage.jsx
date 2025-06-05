@@ -1,19 +1,32 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { io } from 'socket.io-client';
-import axios from 'axios';
-import { FaPaperPlane, FaUser, FaSearch, FaEllipsisH, FaTrash, FaSmile, FaCheck, FaCheckDouble, FaPhone, FaVideo, FaInfoCircle } from 'react-icons/fa';
-import { useAuth } from '../../../contexts/AuthContext';
-import EmojiPicker from 'emoji-picker-react';
+import React, { useState, useEffect, useRef } from "react";
+import { io } from "socket.io-client";
+import axios from "axios";
+import {
+    FaPaperPlane,
+    FaUser,
+    FaSearch,
+    FaEllipsisH,
+    FaTrash,
+    FaSmile,
+    FaCheck,
+    FaCheckDouble,
+    FaPhone,
+    FaVideo,
+    FaInfoCircle,
+} from "react-icons/fa";
+import { useAuth } from "../../../contexts/AuthContext";
+import EmojiPicker from "emoji-picker-react";
+import { toast } from "react-toastify";
 
 const ChatPage = () => {
     const { user } = useAuth();
     const [messages, setMessages] = useState([]);
-    const [newMessage, setNewMessage] = useState('');
+    const [newMessage, setNewMessage] = useState("");
     const [selectedUser, setSelectedUser] = useState(null);
     const [users, setUsers] = useState([]);
     const [typingUsers, setTypingUsers] = useState({});
     const [onlineUsers, setOnlineUsers] = useState({});
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState("");
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [showMessageOptions, setShowMessageOptions] = useState(null);
     const socketRef = useRef();
@@ -25,24 +38,24 @@ const ChatPage = () => {
     const [messageStatuses, setMessageStatuses] = useState({});
 
     useEffect(() => {
-        socketRef.current = io(process.env.REACT_APP_API_BASE_URL.replace('/api', ''), {
+        socketRef.current = io(process.env.REACT_APP_API_BASE_URL.replace("/api", ""), {
             auth: {
-                token: localStorage.getItem('token')
-            }
+                token: localStorage.getItem("token"),
+            },
         });
 
         fetchMessages();
         fetchUsers();
 
-        socketRef.current.on('receive_message', handleNewMessage);
-        socketRef.current.on('user_typing', handleUserTyping);
-        socketRef.current.on('user_status_change', handleUserStatusChange);
-        socketRef.current.on('message_status', handleMessageStatus);
-        socketRef.current.on('message_reaction', handleMessageReaction);
-        socketRef.current.on('message_deleted', handleMessageDeleted);
-        socketRef.current.on('new_message_notification', handleNewMessageNotification);
+        socketRef.current.on("receive_message", handleNewMessage);
+        socketRef.current.on("user_typing", handleUserTyping);
+        socketRef.current.on("user_status_change", handleUserStatusChange);
+        socketRef.current.on("message_status", handleMessageStatus);
+        socketRef.current.on("message_reaction", handleMessageReaction);
+        socketRef.current.on("message_deleted", handleMessageDeleted);
+        socketRef.current.on("new_message_notification", handleNewMessageNotification);
 
-        socketRef.current.emit('join_room', `admin_${user.userId}`);
+        socketRef.current.emit("join_room", `admin_${user.userId}`);
 
         return () => {
             socketRef.current.disconnect();
@@ -58,67 +71,67 @@ const ChatPage = () => {
     useEffect(() => {
         if (selectedUser && socketRef.current) {
             const roomId = `admin-${selectedUser.userId}`;
-            socketRef.current.emit('join_room', roomId);
+            socketRef.current.emit("join_room", roomId);
         }
     }, [selectedUser]);
 
     const handleUserStatusChange = ({ userId, status }) => {
-        setOnlineUsers(prev => ({
+        setOnlineUsers((prev) => ({
             ...prev,
-            [String(userId)]: status === 'online'
+            [String(userId)]: status === "online",
         }));
     };
 
     const handleMessageStatus = ({ messageId, status, userId }) => {
-        setMessages(prev => prev.map(msg => 
-            msg.id === messageId ? { ...msg, status } : msg
-        ));
-        
-        setMessageStatuses(prev => ({
+        setMessages((prev) => prev.map((msg) => (msg.id === messageId ? { ...msg, status } : msg)));
+
+        setMessageStatuses((prev) => ({
             ...prev,
-            [userId]: status
+            [userId]: status,
         }));
 
-        if (status === 'read') {
-            setUnreadCounts(prev => ({
+        if (status === "read") {
+            setUnreadCounts((prev) => ({
                 ...prev,
-                [userId]: 0
+                [userId]: 0,
             }));
         }
     };
 
     const handleMessageReaction = ({ messageId, reaction, userId }) => {
-        setMessages(prev => prev.map(msg => {
-            if (msg.id === messageId) {
-                const reactions = { ...msg.reactions, [userId]: reaction };
-                return { ...msg, reactions };
-            }
-            return msg;
-        }));
+        setMessages((prev) =>
+            prev.map((msg) => {
+                if (msg.id === messageId) {
+                    const reactions = { ...msg.reactions, [userId]: reaction };
+                    return { ...msg, reactions };
+                }
+                return msg;
+            })
+        );
     };
 
     const handleMessageDeleted = ({ messageId }) => {
-        setMessages(prev => prev.filter(msg => msg.id !== messageId));
+        setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
     };
 
     const handleNewMessageNotification = ({ roomId, senderId, unreadCount, content }) => {
-        setUnreadCounts(prev => ({
+        setUnreadCounts((prev) => ({
             ...prev,
-            [senderId]: unreadCount
+            [senderId]: unreadCount,
         }));
-        setUserLastMessageTime(prev => ({
+        setUserLastMessageTime((prev) => ({
             ...prev,
-            [senderId]: new Date().getTime()
+            [senderId]: new Date().getTime(),
         }));
-        setMessageStatuses(prev => ({
+        setMessageStatuses((prev) => ({
             ...prev,
-            [senderId]: 'sent'
+            [senderId]: "sent",
         }));
 
         if (selectedUser && senderId === parseInt(selectedUser.userId, 10)) {
-            socketRef.current.emit('mark_as_read', {
+            socketRef.current.emit("mark_as_read", {
                 roomId: `admin-${selectedUser.userId}`,
-                messageId: null
+                messageId: null,
             });
         }
     };
@@ -126,13 +139,13 @@ const ChatPage = () => {
     const fetchMessages = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/chat/admin/all-messages`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
             });
             setMessages(response.data);
-            
+
             const lastMessageTimes = {};
             const statuses = {};
-            response.data.forEach(message => {
+            response.data.forEach((message) => {
                 const time = new Date(message.timestamp).getTime();
                 if (!lastMessageTimes[message.senderId] || time > lastMessageTimes[message.senderId]) {
                     lastMessageTimes[message.senderId] = time;
@@ -142,56 +155,56 @@ const ChatPage = () => {
             setUserLastMessageTime(lastMessageTimes);
             setMessageStatuses(statuses);
         } catch (error) {
-            console.error('Error fetching messages:', error);
+            console.error("Error fetching messages:", error);
         }
     };
 
     const fetchUsers = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/users/getall`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
             });
-            
-            const validUsers = (response.data.data || []).filter(user => 
-                user && typeof user.userId === 'number' && user.name
+
+            const validUsers = (response.data.data || []).filter(
+                (user) => user && typeof user.userId === "number" && user.name
             );
-            
+
             setUsers(validUsers);
         } catch (error) {
-            console.error('Error fetching users:', error);
-            alert('Failed to load users. Please refresh the page.');
+            console.error("Error fetching users:", error);
+            toast.error("Failed to load users. Please refresh the page.");
         }
     };
 
     const handleNewMessage = (message) => {
-        setMessages(prev => {
-            const exists = prev.some(msg => msg.id === message.id);
+        setMessages((prev) => {
+            const exists = prev.some((msg) => msg.id === message.id);
             if (exists) return prev;
             return [...prev, message];
         });
 
-        setUserLastMessageTime(prev => ({
+        setUserLastMessageTime((prev) => ({
             ...prev,
-            [message.senderId]: new Date(message.timestamp).getTime()
+            [message.senderId]: new Date(message.timestamp).getTime(),
         }));
 
         // Only update unread count for received messages
         if (message.senderId !== parseInt(user.userId, 10)) {
-            setUnreadCounts(prev => ({
+            setUnreadCounts((prev) => ({
                 ...prev,
-                [message.senderId]: (prev[message.senderId] || 0) + 1
+                [message.senderId]: (prev[message.senderId] || 0) + 1,
             }));
         }
 
-        setMessageStatuses(prev => ({
+        setMessageStatuses((prev) => ({
             ...prev,
-            [message.senderId]: 'sent'
+            [message.senderId]: "sent",
         }));
 
         if (selectedUser && message.senderId === parseInt(selectedUser.userId, 10)) {
-            socketRef.current.emit('mark_as_read', {
+            socketRef.current.emit("mark_as_read", {
                 roomId: `admin-${selectedUser.userId}`,
-                messageId: message.id
+                messageId: message.id,
             });
         }
 
@@ -199,9 +212,9 @@ const ChatPage = () => {
     };
 
     const handleUserTyping = ({ userId, isTyping }) => {
-        setTypingUsers(prev => ({
+        setTypingUsers((prev) => ({
             ...prev,
-            [userId]: isTyping
+            [userId]: isTyping,
         }));
     };
 
@@ -216,26 +229,22 @@ const ChatPage = () => {
             const messageData = {
                 roomId: `admin-${selectedUser.userId}`,
                 content: newMessage,
-                receiverId: parseInt(selectedUser.userId, 10)
+                receiverId: parseInt(selectedUser.userId, 10),
             };
 
-            await axios.post(
-                `${process.env.REACT_APP_API_BASE_URL}/chat/send`, 
-                messageData,
-                {
-                    headers: { 
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                        'Content-Type': 'application/json'
-                    }
-                }
-            );
+            await axios.post(`${process.env.REACT_APP_API_BASE_URL}/chat/send`, messageData, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json",
+                },
+            });
 
-            socketRef.current.emit('send_message', messageData);
-            setNewMessage('');
+            socketRef.current.emit("send_message", messageData);
+            setNewMessage("");
             scrollToBottom();
         } catch (error) {
-            console.error('Error sending message:', error);
-            alert('Failed to send message. Please try again.');
+            console.error("Error sending message:", error);
+            toast.error("Failed to send message. Please try again.");
         }
     };
 
@@ -246,15 +255,12 @@ const ChatPage = () => {
 
         searchTimeoutRef.current = setTimeout(async () => {
             try {
-                const response = await axios.get(
-                    `${process.env.REACT_APP_API_BASE_URL}/chat/search?query=${query}`,
-                    {
-                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                    }
-                );
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/chat/search?query=${query}`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+                });
                 setMessages(response.data);
             } catch (error) {
-                console.error('Error searching messages:', error);
+                console.error("Error searching messages:", error);
             }
         }, 300);
     };
@@ -265,39 +271,36 @@ const ChatPage = () => {
                 `${process.env.REACT_APP_API_BASE_URL}/chat/reaction`,
                 { messageId, reaction },
                 {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
                 }
             );
-            socketRef.current.emit('add_reaction', {
+            socketRef.current.emit("add_reaction", {
                 messageId,
                 reaction,
-                roomId: `admin-${selectedUser.userId}`
+                roomId: `admin-${selectedUser.userId}`,
             });
         } catch (error) {
-            console.error('Error adding reaction:', error);
+            console.error("Error adding reaction:", error);
         }
     };
 
     const deleteMessage = async (messageId) => {
         try {
-            await axios.delete(
-                `${process.env.REACT_APP_API_BASE_URL}/chat/${messageId}`,
-                {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                }
-            );
-            socketRef.current.emit('delete_message', {
+            await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/chat/${messageId}`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+            });
+            socketRef.current.emit("delete_message", {
                 messageId,
-                roomId: `admin-${selectedUser.userId}`
+                roomId: `admin-${selectedUser.userId}`,
             });
             setShowMessageOptions(null);
         } catch (error) {
-            console.error('Error deleting message:', error);
+            console.error("Error deleting message:", error);
         }
     };
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
     const formatTimestamp = (timestamp) => {
@@ -316,7 +319,7 @@ const ChatPage = () => {
     };
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages, selectedUser]);
 
     const sortedUsers = [...users].sort((a, b) => {
@@ -327,11 +330,11 @@ const ChatPage = () => {
 
     const getMessageStatusIcon = (status) => {
         switch (status) {
-            case 'read':
+            case "read":
                 return <FaCheckDouble className="text-blue-500" />;
-            case 'delivered':
+            case "delivered":
                 return <FaCheckDouble className="text-gray-400" />;
-            case 'sent':
+            case "sent":
                 return <FaCheck className="text-gray-400" />;
             default:
                 return null;
@@ -341,14 +344,14 @@ const ChatPage = () => {
     const handleUserSelect = (user) => {
         setSelectedUser(user);
         // Reset unread count for selected user
-        setUnreadCounts(prev => ({
+        setUnreadCounts((prev) => ({
             ...prev,
-            [user.userId]: 0
+            [user.userId]: 0,
         }));
         // Mark messages as read
-        socketRef.current.emit('mark_as_read', {
+        socketRef.current.emit("mark_as_read", {
             roomId: `admin-${user.userId}`,
-            messageId: null
+            messageId: null,
         });
     };
 
@@ -383,15 +386,13 @@ const ChatPage = () => {
                 {/* Users List */}
                 <div className="flex-1 overflow-y-auto">
                     {sortedUsers
-                        .filter(user => 
-                            user.name.toLowerCase().includes(searchQuery.toLowerCase())
-                        )
-                        .map(user => (
+                        .filter((user) => user.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                        .map((user) => (
                             <div
                                 key={user.userId}
                                 onClick={() => handleUserSelect(user)}
                                 className={`p-3 cursor-pointer hover:bg-gray-100 transition-colors ${
-                                    selectedUser?.userId === user.userId ? 'bg-gray-100' : ''
+                                    selectedUser?.userId === user.userId ? "bg-gray-100" : ""
                                 }`}
                             >
                                 <div className="flex items-center space-x-3">
@@ -408,7 +409,10 @@ const ChatPage = () => {
                                             <p className="font-semibold text-gray-800 truncate">{user.name}</p>
                                             {userLastMessageTime[user.userId] && (
                                                 <span className="text-xs text-gray-500">
-                                                    {new Date(userLastMessageTime[user.userId]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    {new Date(userLastMessageTime[user.userId]).toLocaleTimeString([], {
+                                                        hour: "2-digit",
+                                                        minute: "2-digit",
+                                                    })}
                                                 </span>
                                             )}
                                         </div>
@@ -455,7 +459,7 @@ const ChatPage = () => {
                                 <div>
                                     <h2 className="text-lg font-semibold text-gray-800">{selectedUser.name}</h2>
                                     <p className="text-sm text-gray-500">
-                                        {onlineUsers[selectedUser.userId] ? 'Active now' : 'Offline'}
+                                        {onlineUsers[selectedUser.userId] ? "Active now" : "Offline"}
                                     </p>
                                 </div>
                             </div>
@@ -475,40 +479,53 @@ const ChatPage = () => {
                         {/* Messages */}
                         <div className="flex-1 overflow-y-auto p-4 space-y-4">
                             {messages
-                                .filter(msg => {
+                                .filter((msg) => {
                                     const roomId = `admin-${selectedUser.userId}`;
-                                    return msg.roomId === roomId || 
-                                           (msg.senderId === parseInt(selectedUser.userId, 10) && 
+                                    return (
+                                        msg.roomId === roomId ||
+                                        (msg.senderId === parseInt(selectedUser.userId, 10) &&
                                             msg.receiverId === parseInt(user.userId, 10)) ||
-                                           (msg.senderId === parseInt(user.userId, 10) && 
-                                            msg.receiverId === parseInt(selectedUser.userId, 10));
+                                        (msg.senderId === parseInt(user.userId, 10) &&
+                                            msg.receiverId === parseInt(selectedUser.userId, 10))
+                                    );
                                 })
                                 .map((message, index) => (
                                     <div
                                         key={index}
                                         className={`flex w-full ${
-                                            message.senderId === parseInt(user.userId, 10) ? 'justify-end' : 'justify-start'
+                                            message.senderId === parseInt(user.userId, 10)
+                                                ? "justify-end"
+                                                : "justify-start"
                                         }`}
                                     >
-                                        <div className="relative group" style={{ maxWidth: '70%' }}>
+                                        <div className="relative group" style={{ maxWidth: "70%" }}>
                                             <div
                                                 className={`rounded-2xl p-3 ${
                                                     message.senderId === parseInt(user.userId, 10)
-                                                        ? 'bg-blue-500 text-white'
-                                                        : 'bg-white shadow-sm'
+                                                        ? "bg-blue-500 text-white"
+                                                        : "bg-white shadow-sm"
                                                 }`}
                                             >
-                                                <div style={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
+                                                <div style={{ wordBreak: "break-word", whiteSpace: "pre-wrap" }}>
                                                     {message.content}
                                                 </div>
                                                 <div className="flex items-center justify-end mt-1">
-                                                    <p className={`text-xs ${message.senderId === parseInt(user.userId, 10) ? 'text-blue-100' : 'text-gray-500'}`}>
+                                                    <p
+                                                        className={`text-xs ${
+                                                            message.senderId === parseInt(user.userId, 10)
+                                                                ? "text-blue-100"
+                                                                : "text-gray-500"
+                                                        }`}
+                                                    >
                                                         {formatTimestamp(message.timestamp)}
                                                     </p>
                                                     {message.senderId === parseInt(user.userId, 10) && (
                                                         <span className="text-xs ml-2">
-                                                            {message.status === 'read' ? '✓✓' : 
-                                                             message.status === 'delivered' ? '✓✓' : '✓'}
+                                                            {message.status === "read"
+                                                                ? "✓✓"
+                                                                : message.status === "delivered"
+                                                                ? "✓✓"
+                                                                : "✓"}
                                                         </span>
                                                     )}
                                                 </div>
@@ -552,7 +569,7 @@ const ChatPage = () => {
                                     <div className="absolute bottom-20 left-4">
                                         <EmojiPicker
                                             onEmojiClick={(emojiObject) => {
-                                                setNewMessage(prev => prev + emojiObject.emoji);
+                                                setNewMessage((prev) => prev + emojiObject.emoji);
                                                 setShowEmojiPicker(false);
                                             }}
                                         />
@@ -565,10 +582,7 @@ const ChatPage = () => {
                                     placeholder="Aa"
                                     className="flex-1 p-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
-                                <button
-                                    type="submit"
-                                    className="p-2 text-blue-500 hover:bg-gray-100 rounded-full"
-                                >
+                                <button type="submit" className="p-2 text-blue-500 hover:bg-gray-100 rounded-full">
                                     <FaPaperPlane className="text-xl" />
                                 </button>
                             </div>

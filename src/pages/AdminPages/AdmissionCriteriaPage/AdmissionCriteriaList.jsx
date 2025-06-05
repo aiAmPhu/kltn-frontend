@@ -3,6 +3,7 @@ import axios from "axios";
 import InfoModal from "../Modals/AdmissionCriteriaModal/InfoModal";
 import AdmissionCriteriaFormModal from "../Modals/AdmissionCriteriaModal/AdmissionCriteriaFormModal";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { toast } from "react-toastify";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -50,7 +51,7 @@ const AdmissionCriteriaList = ({ criterias = [], setCriterias }) => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 await loadAdmissionCriteria();
-                alert(`Đã xóa diện ${criteria.criteriaName} thành công`);
+                toast.success(`Đã xóa diện ${criteria.criteriaName} thành công`);
                 setError("");
             } catch (error) {
                 setError(error.response?.data?.message || "Lỗi khi xóa diện xét tuyển");

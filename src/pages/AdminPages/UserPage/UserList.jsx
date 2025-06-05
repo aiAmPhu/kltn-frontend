@@ -3,6 +3,7 @@ import axios from "axios";
 import InfoModal from "../Modals/UserModal/InfoModal";
 import UserFormModal from "../Modals/UserModal/UserFormModal";
 import { ChevronDownIcon, ChevronUpIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { toast } from "react-toastify";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -155,7 +156,7 @@ const UserList = ({ users: usersProp = [], setUsers: setUsersProp }) => {
                 });
                 await loadUsers();
                 setError("");
-                alert(`Đã xóa người dùng ${user.name} thành công`);
+                toast.success(`Đã xóa người dùng ${user.name} thành công`);
             } catch (error) {
                 setError(error.response?.data?.message || "Lỗi khi xóa người dùng");
             }

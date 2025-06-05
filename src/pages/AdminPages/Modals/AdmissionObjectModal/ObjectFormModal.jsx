@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaCheck, FaTimes } from "react-icons/fa";
-
+import { toast } from "react-toastify";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const ObjectFormModal = ({ objectId, objectToEdit, setObjects, onClose, isEditing }) => {
@@ -33,12 +33,12 @@ const ObjectFormModal = ({ objectId, objectToEdit, setObjects, onClose, isEditin
                 await axios.put(`${API_BASE_URL}/ados/update/${objectId}`, objectData, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                alert("Cập nhật đối tượng ưu tiên thành công!");
+                toast.success("Cập nhật đối tượng ưu tiên thành công!");
             } else {
                 await axios.post(`${API_BASE_URL}/ados/add`, objectData, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                alert("Thêm đối tượng ưu tiên thành công!");
+                toast.success("Thêm đối tượng ưu tiên thành công!");
             }
 
             const response = await axios.get(`${API_BASE_URL}/ados/getall`, {

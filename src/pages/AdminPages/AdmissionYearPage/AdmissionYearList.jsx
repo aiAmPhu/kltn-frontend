@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CreateYearModal from "../Modals/AdmissionYearModal/CreateYearModal.jsx";
 import ConfigModal from "../Modals/AdmissionYearModal/ConfigModal.jsx";
+import { toast } from "react-toastify";
 
 const AdmissionYearList = () => {
     const [years, setYears] = useState([]);
@@ -73,7 +74,7 @@ const AdmissionYearList = () => {
     const handleConfigureClick = async (year) => {
         // Thêm kiểm tra quyền
         if (year.status !== "active") {
-            alert("Chỉ có thể cấu hình năm tuyển sinh đang hoạt động!");
+            toast.error("Chỉ có thể cấu hình năm tuyển sinh đang hoạt động!");
             return;
         }
         setSelectedYear(year);
@@ -93,9 +94,9 @@ const AdmissionYearList = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setShowConfigForm(false);
-            alert("Cấu hình năm tuyển sinh thành công!");
+            toast.success("Cấu hình năm tuyển sinh thành công!");
         } catch (error) {
-            alert("Lỗi: " + (error.response?.data?.message || "Không thể cấu hình"));
+            toast.error("Lỗi: " + (error.response?.data?.message || "Không thể cấu hình"));
         }
     };
     // Load years
@@ -128,9 +129,9 @@ const AdmissionYearList = () => {
             setShowCreateForm(false);
             setFormData({ yearId: "", yearName: "", startDate: "", endDate: "", description: "" });
             fetchYears();
-            alert("Tạo năm tuyển sinh thành công!");
+            toast.success("Tạo năm tuyển sinh thành công!");
         } catch (error) {
-            alert("Lỗi: " + (error.response?.data?.message || "Không thể tạo năm"));
+            toast.error("Lỗi: " + (error.response?.data?.message || "Không thể tạo năm"));
         }
     };
     // Activate year
@@ -147,9 +148,9 @@ const AdmissionYearList = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             fetchYears();
-            alert("Kích hoạt năm tuyển sinh thành công! Các năm khác đã được tự động vô hiệu hóa.");
+            toast.success("Kích hoạt năm tuyển sinh thành công! Các năm khác đã được tự động vô hiệu hóa.");
         } catch (error) {
-            alert("Lỗi: " + (error.response?.data?.message || "Không thể kích hoạt"));
+            toast.error("Lỗi: " + (error.response?.data?.message || "Không thể kích hoạt"));
         }
     };
     const formatDisplayDate = (dateString) => {

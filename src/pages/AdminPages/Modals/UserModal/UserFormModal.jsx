@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaEye, FaEyeSlash, FaCheck, FaTimes, FaUserPlus } from "react-icons/fa";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
-
+import { toast } from "react-toastify";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing }) => {
@@ -51,12 +51,12 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing }) => 
                 await axios.put(`${API_BASE_URL}/users/update/${userId}`, newUser, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                alert("Cập nhật người dùng thành công!");
+                toast.success("Cập nhật người dùng thành công!");
             } else {
                 await axios.post(`${API_BASE_URL}/users/add`, newUser, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                alert("Thêm người dùng thành công!");
+                toast.success("Thêm người dùng thành công!");
             }
 
             const response = await axios.get(`${API_BASE_URL}/users/getall`, {

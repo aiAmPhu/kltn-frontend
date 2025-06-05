@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaCheck, FaTimes, FaPlus } from "react-icons/fa";
-
+import { toast } from "react-toastify";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const AdmissionRegionFormModal = ({ regionId, regionToEdit, setRegions, onClose, isEditing }) => {
@@ -37,12 +37,12 @@ const AdmissionRegionFormModal = ({ regionId, regionToEdit, setRegions, onClose,
                 await axios.put(`${API_BASE_URL}/adrs/update/${regionId}`, newRegion, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                alert("Cập nhật khu vực ưu tiên thành công!");
+                toast.success("Cập nhật khu vực ưu tiên thành công!");
             } else {
                 await axios.post(`${API_BASE_URL}/adrs/add`, newRegion, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                alert("Thêm khu vực ưu tiên thành công!");
+                toast.success("Thêm khu vực ưu tiên thành công!");
             }
 
             const response = await axios.get(`${API_BASE_URL}/adrs/getall`, {

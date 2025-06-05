@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaCheck, FaTimes, FaGraduationCap, FaListAlt, FaChartBar } from "react-icons/fa";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
-
+import { toast } from "react-toastify";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const AdmissionQuantityFormModal = ({
@@ -52,12 +52,12 @@ const AdmissionQuantityFormModal = ({
                 await axios.put(`${API_BASE_URL}/adqs/update`, updateData, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                alert("Cập nhật chỉ tiêu thành công!");
+                toast.success("Cập nhật chỉ tiêu thành công!");
             } else {
                 await axios.post(`${API_BASE_URL}/adqs/add`, quantityData, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                alert("Thêm chỉ tiêu thành công!");
+                toast.success("Thêm chỉ tiêu thành công!");
             }
 
             const response = await axios.get(`${API_BASE_URL}/adqs/getall`, {
