@@ -16,7 +16,6 @@ import HomePage from "./components/HomePage.jsx";
 import Majors from "./pages/UserPages/Major.jsx";
 import Criteria from "./pages/UserPages/Criteria.jsx";
 import MajorDetail from "./pages/UserPages/MajorDetail.jsx";
-import Chatbot from "./pages/Chatbot.jsx";
 import Block from "./pages/UserPages/Block.jsx";
 import Wish from "./pages/UserPages/Wish.jsx";
 import AdmissionResult from "./pages/UserPages/AdmissionResult.jsx";
@@ -68,7 +67,6 @@ function App() {
                     <Route path="/majors/:id" element={<MajorDetail />} />
                     <Route path="/block" element={<Block />} />
                     <Route path="/criteria" element={<Criteria />} />
-                    <Route path="/chatbot" element={<Chatbot />} />
                     <Route path="/editor" element={<TinyMCEEditor />} />
                     <Route path="/forgot-password/step1" element={<ForgotPasswordStep1 />} />
                     <Route path="/forgot-password/step2" element={<ForgotPasswordStep2 />} />
