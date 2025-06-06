@@ -130,18 +130,18 @@ const AdmissionCriteriaFormModal = ({ criteriaToEdit, setCriterias, onClose, isE
 
                     <div className="flex justify-between mt-6">
                         <button
-                            type="submit"
-                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-2"
-                        >
-                            {isEditing ? <FaCheck /> : <FaPlus />}
-                            {isEditing ? "Cập nhật" : "Thêm"}
-                        </button>
-                        <button
                             type="button"
                             onClick={onClose}
                             className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 flex items-center gap-2"
                         >
                             <FaTimes /> Đóng
+                        </button>
+                        <button
+                            type="submit"
+                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-2"
+                        >
+                            {isEditing ? <FaCheck /> : <FaPlus />}
+                            {isEditing ? "Cập nhật" : "Thêm"}
                         </button>
                     </div>
                 </form>

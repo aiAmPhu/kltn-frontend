@@ -11,6 +11,31 @@ const AdmissionBlockFormModal = ({ admissionBlockToEdit, setAdmissionBlocks, onC
     const [admissionBlockSubject2, setAdmissionBlockSubject2] = useState("");
     const [admissionBlockSubject3, setAdmissionBlockSubject3] = useState("");
     const [error, setError] = useState("");
+    const [subjects, setSubjects] = useState([]);
+    const [isLoadingSubjects, setIsLoadingSubjects] = useState(true);
+
+    // Fetch subjects from API
+    useEffect(() => {
+        const fetchSubjects = async () => {
+            try {
+                setIsLoadingSubjects(true);
+                const response = await axios.get(`${API_BASE_URL}/subjects`);
+                if (response.data.success) {
+                    setSubjects(response.data.data);
+                }
+            } catch (error) {
+                console.error("Error fetching subjects:", error);
+                toast.error("Không thể tải danh sách môn học", {
+                    position: "top-right",
+                    autoClose: 3000,
+                });
+            } finally {
+                setIsLoadingSubjects(false);
+            }
+        };
+
+        fetchSubjects();
+    }, []);
 
     useEffect(() => {
         if (admissionBlockToEdit) {
@@ -63,6 +88,10 @@ const AdmissionBlockFormModal = ({ admissionBlockToEdit, setAdmissionBlocks, onC
         }
     };
 
+    const getFilteredSubjects = (excludeSubjects = []) => {
+        return subjects.filter(subject => !excludeSubjects.includes(subject.subject));
+    };
+
     return (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-center items-center px-4">
             <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl">
@@ -100,54 +129,85 @@ const AdmissionBlockFormModal = ({ admissionBlockToEdit, setAdmissionBlocks, onC
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Môn học 1</label>
-                        <input
-                            type="text"
+                        <select
                             value={admissionBlockSubject1}
                             onChange={(e) => setAdmissionBlockSubject1(e.target.value)}
-                            placeholder="Nhập môn học 1"
                             required
-                            className="w-full border border-gray-300 rounded-md px-3 py-2"
-                        />
+                            disabled={isLoadingSubjects}
+                            className={`w-full border border-gray-300 rounded-md px-3 py-2 ${
+                                isLoadingSubjects ? "bg-gray-200 text-gray-600 cursor-not-allowed" : ""
+                            }`}
+                        >
+                            <option value="">
+                                {isLoadingSubjects ? "Đang tải..." : "Chọn môn học 1"}
+                            </option>
+                            {getFilteredSubjects([admissionBlockSubject2, admissionBlockSubject3]).map((subject) => (
+                                <option key={subject.suId} value={subject.subject}>
+                                    {subject.subject}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Môn học 2</label>
-                        <input
-                            type="text"
+                        <select
                             value={admissionBlockSubject2}
                             onChange={(e) => setAdmissionBlockSubject2(e.target.value)}
-                            placeholder="Nhập môn học 2"
                             required
-                            className="w-full border border-gray-300 rounded-md px-3 py-2"
-                        />
+                            disabled={isLoadingSubjects}
+                            className={`w-full border border-gray-300 rounded-md px-3 py-2 ${
+                                isLoadingSubjects ? "bg-gray-200 text-gray-600 cursor-not-allowed" : ""
+                            }`}
+                        >
+                            <option value="">
+                                {isLoadingSubjects ? "Đang tải..." : "Chọn môn học 2"}
+                            </option>
+                            {getFilteredSubjects([admissionBlockSubject1, admissionBlockSubject3]).map((subject) => (
+                                <option key={subject.suId} value={subject.subject}>
+                                    {subject.subject}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Môn học 3</label>
-                        <input
-                            type="text"
+                        <select
                             value={admissionBlockSubject3}
                             onChange={(e) => setAdmissionBlockSubject3(e.target.value)}
-                            placeholder="Nhập môn học 3"
                             required
-                            className="w-full border border-gray-300 rounded-md px-3 py-2"
-                        />
+                            disabled={isLoadingSubjects}
+                            className={`w-full border border-gray-300 rounded-md px-3 py-2 ${
+                                isLoadingSubjects ? "bg-gray-200 text-gray-600 cursor-not-allowed" : ""
+                            }`}
+                        >
+                            <option value="">
+                                {isLoadingSubjects ? "Đang tải..." : "Chọn môn học 3"}
+                            </option>
+                            {getFilteredSubjects([admissionBlockSubject1, admissionBlockSubject2]).map((subject) => (
+                                <option key={subject.suId} value={subject.subject}>
+                                    {subject.subject}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="flex justify-between mt-6">
-                        <button
-                            type="submit"
-                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-2"
-                        >
-                            {isEditing ? <FaCheck /> : <FaPlus />}
-                            {isEditing ? "Cập nhật" : "Thêm"}
-                        </button>
                         <button
                             type="button"
                             onClick={onClose}
                             className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 flex items-center gap-2"
                         >
                             <FaTimes /> Đóng
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isLoadingSubjects}
+                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-2 disabled:opacity-50"
+                        >
+                            {isEditing ? <FaCheck /> : <FaPlus />}
+                            {isLoadingSubjects ? "Đang tải..." : isEditing ? "Cập nhật" : "Thêm"}
                         </button>
                     </div>
                 </form>
