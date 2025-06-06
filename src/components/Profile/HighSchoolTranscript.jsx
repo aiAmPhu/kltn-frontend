@@ -13,7 +13,7 @@ const HighSchoolTranscript = () => {
 
     const subjects = [
         "Toán",
-        "Vật lý",
+        "Vật Lý",
         "Hóa học",
         "Sinh học",
         "Tin học",
