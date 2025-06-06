@@ -22,22 +22,66 @@ const LearningProcess = () => {
     });
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+    const [priorityGroupOptions, setPriorityGroupOptions] = useState([]);
+    const [regionOptions, setRegionOptions] = useState([]);
+    const [isLoadingOptions, setIsLoadingOptions] = useState(true);
 
-    const priorityGroupOptions = [
-        { value: "OBJ001", label: "Ưu tiên khu vực miền núi" },
-        { value: "OBJ002", label: "Không ưu tiên" },
-    ];
+    // Fetch priority groups and regions from API
+    useEffect(() => {
+        const fetchOptions = async () => {
+            try {
+                setIsLoadingOptions(true);
+                
+                // Fetch priority groups (admission objects)
+                const priorityResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/ados/getall`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                
+                // Fetch regions (admission regions)
+                const regionsResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adrs/getall`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
 
-    const regionOptions = [
-        { value: "R001", label: "Miền Bắc" },
-        { value: "R002", label: "Khu vực 1" },
-        { value: "R003", label: "Khu vực 2" },
-        { value: "R004", label: "Khu vực 2-NT" },
-        { value: "R005", label: "Khu vực 3" },
-    ];
+                // Map the API response to the expected format
+                if (priorityResponse.data) {
+                    const mappedPriorityGroups = priorityResponse.data.map(item => ({
+                        value: item.objectId,
+                        label: item.objectName
+                    }));
+                    setPriorityGroupOptions(mappedPriorityGroups);
+                }
+
+                if (regionsResponse.data) {
+                    const mappedRegions = regionsResponse.data.map(item => ({
+                        value: item.regionId,
+                        label: item.regionName
+                    }));
+                    setRegionOptions(mappedRegions);
+                }
+            } catch (error) {
+                console.error("Error fetching options:", error);
+                toast.error("Không thể tải dữ liệu tùy chọn. Vui lòng thử lại.", {
+                    position: "top-right",
+                    autoClose: 3000,
+                });
+                
+                // Fallback to empty arrays if API fails
+                setPriorityGroupOptions([]);
+                setRegionOptions([]);
+            } finally {
+                setIsLoadingOptions(false);
+            }
+        };
+
+        if (token) {
+            fetchOptions();
+        }
+    }, [token]);
 
     useEffect(() => {
         const fetchData = async () => {
+            if (!priorityGroupOptions.length || !regionOptions.length) return;
+            
             try {
                 const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/learning/getLPByE/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` },
@@ -66,8 +110,11 @@ const LearningProcess = () => {
                 console.error("Error fetching data:", error);
             }
         };
-        fetchData();
-    }, [userId]);
+        
+        if (userId && !isLoadingOptions) {
+            fetchData();
+        }
+    }, [userId, priorityGroupOptions, regionOptions, isLoadingOptions, token]);
 
     const validateForm = () => {
         const newErrors = {};
@@ -202,8 +249,6 @@ const LearningProcess = () => {
             <section className="mb-8">
                 <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Quá Trình Học Tập Của Thí Sinh</h1>
 
-
-
                 <div className="p-8 bg-white rounded-lg shadow-xl max-w-4xl mx-auto">
                     {["10", "11", "12"].map((grade) => (
                         <React.Fragment key={grade}>{renderGradeInputs(grade)}</React.Fragment>
@@ -216,11 +261,14 @@ const LearningProcess = () => {
                         <select
                             value={formData.priorityGroup}
                             onChange={(e) => setFormData({ ...formData, priorityGroup: e.target.value })}
-                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            disabled={isLoadingOptions}
+                            className={`w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                                isLoadingOptions ? "bg-gray-200 text-gray-600 cursor-not-allowed" : ""
+                            }`}
                         >
-                            <option value="">Chọn đối tượng ưu tiên</option>
-                            {/* <option value="OBJ001">Nhóm 1</option>
-                            <option value="OBJ002">Nhóm 2</option> */}
+                            <option value="">
+                                {isLoadingOptions ? "Đang tải..." : "Chọn đối tượng ưu tiên"}
+                            </option>
                             {priorityGroupOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
@@ -229,6 +277,7 @@ const LearningProcess = () => {
                         </select>
                         {errors.priorityGroup && <p className="text-red-500 text-sm">{errors.priorityGroup}</p>}
                     </div>
+                    
                     <div className="mb-6">
                         <label className="font-medium mb-1 text-gray-700 flex items-center gap-2">
                             <FaMapMarkerAlt className="text-blue-500" /> Khu vực ưu tiên
@@ -236,14 +285,14 @@ const LearningProcess = () => {
                         <select
                             value={formData.region}
                             onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            disabled={isLoadingOptions}
+                            className={`w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                                isLoadingOptions ? "bg-gray-200 text-gray-600 cursor-not-allowed" : ""
+                            }`}
                         >
-                            <option value="">Chọn khu vực ưu tiên</option>
-                            {/* <option value="R001">Khu vực 1</option>
-                            <option value="R002">Khu vực 2</option>
-                            <option value="R003">Khu vực 3</option>
-                            <option value="R004">Khu vực 4</option>
-                            <option value="R005">Khu vực 5</option> */}
+                            <option value="">
+                                {isLoadingOptions ? "Đang tải..." : "Chọn khu vực ưu tiên"}
+                            </option>
                             {regionOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
@@ -252,6 +301,7 @@ const LearningProcess = () => {
                         </select>
                         {errors.region && <p className="text-red-500 text-sm">{errors.region}</p>}
                     </div>
+                    
                     <div className="mb-6">
                         <label className="font-medium mb-1 text-gray-700 flex items-center gap-2">
                             <FaCalendarAlt className="text-blue-500" /> Năm tốt nghiệp
@@ -265,13 +315,14 @@ const LearningProcess = () => {
                         />
                         {errors.graduationYear && <p className="text-red-500 text-sm">{errors.graduationYear}</p>}
                     </div>
+                    
                     <button
                         type="button"
                         onClick={handleSubmit}
-                        disabled={isLoading}
+                        disabled={isLoading || isLoadingOptions}
                         className="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium hover:bg-blue-600 transition duration-200 disabled:opacity-50"
                     >
-                        {isLoading ? "Đang xử lý..." : "Cập nhật"}
+                        {isLoading ? "Đang xử lý..." : isLoadingOptions ? "Đang tải dữ liệu..." : "Cập nhật"}
                     </button>
                 </div>
             </section>
