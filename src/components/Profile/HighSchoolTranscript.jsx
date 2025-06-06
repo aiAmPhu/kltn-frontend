@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { FaCheck, FaTimes } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 const HighSchoolTranscript = () => {
     const token = localStorage.getItem("token");
@@ -8,23 +8,9 @@ const HighSchoolTranscript = () => {
     const [grades, setGrades] = useState({});
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [message, setMessage] = useState({ type: "", text: "" });
+    const [subjects, setSubjects] = useState([]);
+    const [isLoadingSubjects, setIsLoadingSubjects] = useState(true);
     const inputsRef = useRef([]);
-
-    const subjects = [
-        "Toán",
-        "Vật Lý",
-        "Hóa học",
-        "Sinh học",
-        "Tin học",
-        "Ngữ văn",
-        "Lịch sử",
-        "Địa lý",
-        "Tiếng Anh",
-        "Giáo dục Công dân",
-        "Công nghệ",
-        "Giáo dục Quốc phòng An Ninh",
-    ];
 
     const years = [
         {
@@ -53,8 +39,33 @@ const HighSchoolTranscript = () => {
         },
     ];
 
+    // Fetch subjects từ API
+    useEffect(() => {
+        const fetchSubjects = async () => {
+            try {
+                setIsLoadingSubjects(true);
+                const response = await axios.get(
+                    `${process.env.REACT_APP_API_BASE_URL}/subjects`
+                );
+                if (response.data.success) {
+                    // Lấy tên môn học từ data
+                    const subjectNames = response.data.data.map(subject => subject.subject);
+                    setSubjects(subjectNames);
+                }
+            } catch (error) {
+                console.error("Lỗi khi lấy danh sách môn học:", error);
+                toast.error("Không thể tải danh sách môn học. Vui lòng thử lại.");
+            } finally {
+                setIsLoadingSubjects(false);
+            }
+        };
+        fetchSubjects();
+    }, []);
+
     useEffect(() => {
         const fetchTranscript = async () => {
+            if (subjects.length === 0) return; // Chờ subjects được load trước
+            
             try {
                 const response = await axios.get(
                     `${process.env.REACT_APP_API_BASE_URL}/transcripts/getTranscriptByE/${userId}`,
@@ -87,8 +98,11 @@ const HighSchoolTranscript = () => {
                 console.error("Lỗi khi lấy học bạ:", error);
             }
         };
-        fetchTranscript();
-    }, [userId]);
+        
+        if (userId) {
+            fetchTranscript();
+        }
+    }, [userId, subjects]); // Thêm subjects vào dependency array
 
     const handleInputChange = (subjectIndex, yearIndex, field, value) => {
         const newGrades = grades ? { ...grades } : {};
@@ -143,11 +157,25 @@ const HighSchoolTranscript = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
-            setMessage({ type: "success", text: "Cập nhật học bạ thành công!" });
+            toast.success("Cập nhật học bạ thành công!", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
             return true;
         } catch (error) {
             console.error("Error updating transcript:", error);
-            setMessage({ type: "error", text: error.message || "Cập nhật học bạ thất bại. Vui lòng thử lại." });
+            toast.error(error.message || "Cập nhật học bạ thất bại. Vui lòng thử lại.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
             return false;
         } finally {
             setIsLoading(false);
@@ -159,22 +187,22 @@ const HighSchoolTranscript = () => {
         await updateTranscript();
     };
 
+    if (isLoadingSubjects) {
+        return (
+            <div className="p-6">
+                <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Học bạ THPT</h1>
+                <div className="flex justify-center items-center py-10">
+                    <div className="text-lg text-gray-600">🔄 Đang tải danh sách môn học...</div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="p-6">
             <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Học bạ THPT</h1>
 
-            {message.text && (
-                <div
-                    className={`w-full max-w-4xl mx-auto mb-6 p-4 rounded-lg ${
-                        message.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                    }`}
-                >
-                    <div className="flex items-center gap-2">
-                        {message.type === "success" ? <FaCheck /> : <FaTimes />}
-                        <span>{message.text}</span>
-                    </div>
-                </div>
-            )}
+
 
             <table className="w-full border-collapse border border-gray-300 text-sm">
                 <thead>

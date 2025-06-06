@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaCheck, FaTimes, FaSchool, FaMapMarkerAlt, FaCity, FaCalendarAlt, FaFlag } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { FaSchool, FaMapMarkerAlt, FaCity, FaCalendarAlt, FaFlag } from "react-icons/fa";
 
 const LearningProcess = () => {
     const token = localStorage.getItem("token");
@@ -21,7 +22,6 @@ const LearningProcess = () => {
     });
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [message, setMessage] = useState({ type: "", text: "" });
 
     const priorityGroupOptions = [
         { value: "OBJ001", label: "Ưu tiên khu vực miền núi" },
@@ -100,11 +100,25 @@ const LearningProcess = () => {
             await axios.put(`${process.env.REACT_APP_API_BASE_URL}/learning/update/${userId}`, formData, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setMessage({ type: "success", text: "Cập nhật thông tin thành công!" });
+            toast.success("Cập nhật thông tin thành công!", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
             return true;
         } catch (error) {
             console.error("Error updating learning process:", error);
-            setMessage({ type: "error", text: "Cập nhật thông tin thất bại. Vui lòng thử lại." });
+            toast.error("Cập nhật thông tin thất bại. Vui lòng thử lại.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
             return false;
         } finally {
             setIsLoading(false);
@@ -114,7 +128,10 @@ const LearningProcess = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) {
-            setMessage({ type: "error", text: "Vui lòng kiểm tra lại thông tin!" });
+            toast.error("Vui lòng kiểm tra lại thông tin!", {
+                position: "top-right",
+                autoClose: 5000,
+            });
             return;
         }
         await updateLearningProcess();
@@ -185,18 +202,7 @@ const LearningProcess = () => {
             <section className="mb-8">
                 <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Quá Trình Học Tập Của Thí Sinh</h1>
 
-                {message.text && (
-                    <div
-                        className={`w-full max-w-4xl mx-auto mb-6 p-4 rounded-lg ${
-                            message.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                        }`}
-                    >
-                        <div className="flex items-center gap-2">
-                            {message.type === "success" ? <FaCheck /> : <FaTimes />}
-                            <span>{message.text}</span>
-                        </div>
-                    </div>
-                )}
+
 
                 <div className="p-8 bg-white rounded-lg shadow-xl max-w-4xl mx-auto">
                     {["10", "11", "12"].map((grade) => (

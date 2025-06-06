@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import {
-    FaCheck,
-    FaTimes,
     FaUser,
     FaCalendarAlt,
     FaVenusMars,
@@ -13,6 +12,7 @@ import {
     FaBuilding,
     FaHome,
     FaRoad,
+    FaCheck,
 } from "react-icons/fa";
 
 const AdmissionInformation = () => {
@@ -21,7 +21,6 @@ const AdmissionInformation = () => {
     const tokenEmail = token ? JSON.parse(atob(token.split(".")[1])).email : null;
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [message, setMessage] = useState({ type: "", text: "" });
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
@@ -151,7 +150,10 @@ const AdmissionInformation = () => {
 
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) {
-            setMessage({ type: "error", text: "Vui lòng kiểm tra lại thông tin!" });
+            toast.error("Vui lòng kiểm tra lại thông tin!", {
+                position: "top-right",
+                autoClose: 5000,
+            });
             return false;
         }
 
@@ -160,11 +162,25 @@ const AdmissionInformation = () => {
             await axios.put(`${process.env.REACT_APP_API_BASE_URL}/adis/update/${userId}`, formData, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setMessage({ type: "success", text: "Cập nhật thông tin thành công!" });
+            toast.success("Cập nhật thông tin thành công!", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
             return true;
         } catch (error) {
             console.error("Error updating information:", error);
-            setMessage({ type: "error", text: "Cập nhật thông tin thất bại. Vui lòng thử lại." });
+            toast.error("Cập nhật thông tin thất bại. Vui lòng thử lại.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
             return false;
         } finally {
             setIsLoading(false);
@@ -186,18 +202,7 @@ const AdmissionInformation = () => {
             <section className="mb-8">
                 <h1 className="text-3xl font-bold text-center text-blue-600 flex-grow mb-6">Thông tin xét tuyển</h1>
 
-                {message.text && (
-                    <div
-                        className={`w-full max-w-4xl mx-auto mb-6 p-4 rounded-lg ${
-                            message.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                        }`}
-                    >
-                        <div className="flex items-center gap-2">
-                            {message.type === "success" ? <FaCheck /> : <FaTimes />}
-                            <span>{message.text}</span>
-                        </div>
-                    </div>
-                )}
+
 
                 <form className="bg-white shadow-md rounded-lg p-6 space-y-6" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
