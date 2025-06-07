@@ -37,14 +37,6 @@ const Footer = () => {
                         <li className="flex items-center gap-2">
                             <FaPhoneAlt /> (028) 3722 5724 - (028) 3896 1333
                         </li>
-                        <li className="flex items-start gap-2">
-                            <FaEnvelope className="mt-1" />
-                            <span>
-                                tuyensinh@hcmute.edu.vn<br />
-                                huukhanhch@hcmute.edu.vn<br />
-                                suongptt@hcmute.edu.vn
-                            </span>
-                        </li>
                     </ul>
                 </div>
 
@@ -91,7 +83,7 @@ const Footer = () => {
             {/* Bottom Bar */}
             <div className="bg-blue-600 text-white text-sm flex flex-col md:flex-row justify-between items-center px-6 py-4">
                 <p className="text-center">
-                    ©2025 - NGUYỄN DUY SƠN - PHẠM LÊ THIÊN PHÚ
+                    ©2025 - Sản phẩm là khoá luận tốt nghiệp không mang tính chất thương mại
                 </p>
                 <p className="mt-2 md:mt-0 text-center">
                     HOTLINE: (028) 3722 5724

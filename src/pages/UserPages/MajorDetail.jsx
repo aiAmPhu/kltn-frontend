@@ -34,14 +34,6 @@ function MajorDetail() {
         <div className="max-w-6xl mx-auto px-4 py-10 mt-12">
             <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-8">
                 <div className="relative mb-8">
-                    <span
-                        className={`self-end px-4 py-1 rounded-full text-sm font-semibold text-white ${
-                            isActive ? "bg-green-500" : "bg-gray-500"
-                        }`}
-                    >
-                        {isActive ? "Đang xét tuyển" : "Không xét tuyển"}
-                    </span>
-
                     <h1 className="text-4xl font-bold text-red-600 mt-2 text-center">{major.majorName}</h1>
                 </div>
 
