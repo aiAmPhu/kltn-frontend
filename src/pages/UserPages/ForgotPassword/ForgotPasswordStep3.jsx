@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Lock, Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import hcmuteLogo from "../../../assets/hcmuteLogo.png";
+import rightImage from "../../../assets/chibi_hcmute.jpg";
 import Header from "../../../components/Header";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const ForgotPasswordStep3 = () => {
     const location = useLocation();
@@ -15,6 +17,7 @@ const ForgotPasswordStep3 = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    
     useEffect(() => {
         if (!email) {
             navigate("/forgot-password/step1");
@@ -61,74 +64,82 @@ const ForgotPasswordStep3 = () => {
         <div>
             <Header />
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
-                <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-8">
-                    <h2 className="text-2xl font-bold mb-6 text-center">Đặt mật khẩu mới</h2>
-                    <p className="text-gray-600 text-center mb-6">
-                        Nhập mật khẩu mới cho tài khoản <br />
-                        <span className="font-semibold">{email}</span>
-                    </p>
+                <div className="w-full max-w-5xl bg-white shadow-lg flex rounded-lg overflow-hidden">
+                    {/* Left - Form */}
+                    <div className="w-full md:w-1/2 p-10">
+                        <div className="mb-8 flex justify-center">
+                            <img src={hcmuteLogo} alt="Logo" className="h-24" />
+                        </div>
+                        <h2 className="text-2xl font-bold mb-6 text-center">Đặt mật khẩu mới</h2>
 
-                    <div className="space-y-4">
-                        <div className="flex items-center border border-gray-300 p-3 rounded-lg focus-within:ring focus-within:border-blue-500">
-                            <Lock className="w-5 h-5 text-gray-400 mr-3" />
+                        <div className="mb-4">
+                            <label className="block mb-1 text-sm font-medium text-gray-700">Email</label>
                             <input
-                                type={showPassword ? "text" : "password"}
-                                placeholder="Mật khẩu mới"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full outline-none"
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") handleResetPassword();
-                                }}
+                                type="email"
+                                value={email}
+                                disabled
+                                className="w-full px-4 py-2 border border-gray-300 rounded bg-gray-100 cursor-not-allowed"
                             />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="ml-2 text-gray-400 hover:text-gray-600"
-                            >
-                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                            </button>
                         </div>
 
-                        <div className="flex items-center border border-gray-300 p-3 rounded-lg focus-within:ring focus-within:border-blue-500">
-                            <Lock className="w-5 h-5 text-gray-400 mr-3" />
-                            <input
-                                type={showConfirmPassword ? "text" : "password"}
-                                placeholder="Xác nhận mật khẩu mới"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full outline-none"
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") handleResetPassword();
-                                }}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                className="ml-2 text-gray-400 hover:text-gray-600"
-                            >
-                                {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                            </button>
+                        <div className="mb-4">
+                            <label className="block mb-1 text-sm font-medium text-gray-700">Mật khẩu mới</label>
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="Nhập mật khẩu mới"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500 pr-10"
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") handleResetPassword();
+                                    }}
+                                />
+                                <div
+                                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-500"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                </div>
+                            </div>
                         </div>
 
-                        {error && <p className="text-red-500 text-sm">{error}</p>}
+                        <div className="mb-4">
+                            <label className="block mb-1 text-sm font-medium text-gray-700">Xác nhận mật khẩu</label>
+                            <div className="relative">
+                                <input
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    placeholder="Xác nhận mật khẩu mới"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500 pr-10"
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") handleResetPassword();
+                                    }}
+                                />
+                                <div
+                                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-500"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                >
+                                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                                </div>
+                            </div>
+                        </div>
+
+                        {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
 
                         <button
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded transition"
                             onClick={handleResetPassword}
                             disabled={loading}
-                            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 rounded-lg transition"
                         >
                             {loading ? "Đang xử lý..." : "Đặt mật khẩu mới"}
                         </button>
+                    </div>
 
-                        <div className="text-center">
-                            <button
-                                onClick={() => navigate("/login")}
-                                className="text-blue-600 hover:underline text-sm"
-                            >
-                                Quay lại đăng nhập
-                            </button>
-                        </div>
+                    {/* Right - Image */}
+                    <div className="hidden md:block w-1/2">
+                        <img src={rightImage} alt="Minh hoạ" className="w-full h-full object-cover" />
                     </div>
                 </div>
             </div>
