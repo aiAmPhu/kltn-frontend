@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 
 function WishRegistration() {
     const [criteriaList, setCriteriaList] = useState([]);
@@ -15,6 +16,9 @@ function WishRegistration() {
         majorId: "",
     });
 
+    const location = useLocation();
+    const selectedMajor = location.state?.selectedMajor;
+    
     const token = localStorage.getItem("token");
     const userId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
     const userRole = token ? JSON.parse(atob(token.split(".")[1])).role : null;
@@ -35,6 +39,15 @@ function WishRegistration() {
                 setBlockList(blocks);
                 setMajorList(majors);
                 setUserWishes(userWishes);
+                
+                // Set selected major if passed from HomePage
+                if (selectedMajor) {
+                    setSelected(prev => ({
+                        ...prev,
+                        majorId: selectedMajor.majorId
+                    }));
+                }
+                
                 // Fetch accepted wishes if user is admin
                 if (userRole === "admin") {
                     try {
@@ -54,6 +67,13 @@ function WishRegistration() {
         };
         fetchData();
     }, [userId, userRole]);
+
+    // Handle major selection from HomePage
+    useEffect(() => {
+        if (selectedMajor && blockList.length > 0) {
+            handleMajorSelectionFromHome(selectedMajor.majorId);
+        }
+    }, [selectedMajor, blockList]);
 
     const handleSave = async () => {
         try {
@@ -76,6 +96,21 @@ function WishRegistration() {
         } catch (err) {
             toast.error(err.response?.data?.message);
             console.error(err);
+        }
+    };
+
+    const handleMajorSelectionFromHome = async (majorId) => {
+        try {
+            const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getCombination/${majorId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const combinationIds = res.data.majorCombination;
+            // Lọc danh sách khối dựa trên combinationIds
+            const filtered = blockList.filter((block) => combinationIds.includes(block.admissionBlockId));
+            setAvailableBlocks(filtered);
+        } catch (error) {
+            console.error("Lỗi khi lấy tổ hợp khối:", error);
+            setAvailableBlocks([]);
         }
     };
 

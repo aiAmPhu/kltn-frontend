@@ -90,7 +90,10 @@ function HomePage() {
                                         <span className="text-blue-800 font-medium text-lg">{major.majorName}</span>
                                     </div>
                                     <div className="flex space-x-2">
-                                        <button className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg shadow hover:shadow-lg flex items-center text-sm transition-all duration-200 hover:translate-y-px">
+                                        <button 
+                                            onClick={() => navigate('/wish', { state: { selectedMajor: major } })}
+                                            className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg shadow hover:shadow-lg flex items-center text-sm transition-all duration-200 hover:translate-y-px"
+                                        >
                                             <UserPlus className="w-4 h-4 mr-1" />
                                             Đăng ký
                                         </button>
