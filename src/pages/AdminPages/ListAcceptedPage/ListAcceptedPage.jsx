@@ -13,12 +13,16 @@ import {
     FaPlus
 } from "react-icons/fa";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import useDocumentTitle from "../../../hooks/useDocumentTitle";
 
 const ListAcceptedPage = () => {
     const [wishes, setWishes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [successMsg, setSuccessMsg] = useState("");
+
+    // Set document title
+    useDocumentTitle("Danh sách trúng tuyển");
     // Filter states
     const [filterType, setFilterType] = useState("all");
     const [filterValue, setFilterValue] = useState("");

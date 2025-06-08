@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import useDocumentTitle from "../../../hooks/useDocumentTitle";
 import { 
     FaChartBar, 
     FaSpinner, 
@@ -42,6 +43,9 @@ const StatisticsPage = () => {
     const [comparisonData, setComparisonData] = useState(null);
     const [viewMode, setViewMode] = useState("overview"); // overview, comparison, detailed
     const [error, setError] = useState("");
+
+    // Set document title
+    useDocumentTitle("Thống kê và so sánh");
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
     const token = localStorage.getItem("token");

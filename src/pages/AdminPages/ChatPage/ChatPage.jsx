@@ -17,6 +17,7 @@ import {
 import { useAuth } from "../../../contexts/AuthContext";
 import EmojiPicker from "emoji-picker-react";
 import { toast } from "react-toastify";
+import useDocumentTitle from "../../../hooks/useDocumentTitle";
 
 const ChatPage = () => {
     const { user } = useAuth();
@@ -36,6 +37,9 @@ const ChatPage = () => {
     const [activeUsers, setActiveUsers] = useState(new Set());
     const [userLastMessageTime, setUserLastMessageTime] = useState({});
     const [messageStatuses, setMessageStatuses] = useState({});
+
+    // Set document title
+    useDocumentTitle("Chat với sinh viên");
 
     useEffect(() => {
         socketRef.current = io(process.env.REACT_APP_API_BASE_URL.replace("/api", ""), {

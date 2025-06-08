@@ -2,12 +2,16 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaPlay, FaSpinner, FaInfoCircle, FaCalendarAlt, FaChartBar } from "react-icons/fa";
 import { toast } from "react-toastify";
+import useDocumentTitle from "../../../hooks/useDocumentTitle";
 
 const FilterPage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [successMsg, setSuccessMsg] = useState("");
     const [filtering, setFiltering] = useState(false);
+
+    // Set document title
+    useDocumentTitle("Xét duyệt nguyện vọng");
 
     // Thêm state cho snapshot
     const [snapshotOption, setSnapshotOption] = useState({
