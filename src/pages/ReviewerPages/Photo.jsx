@@ -543,13 +543,6 @@ const Photo = ({ userId }) => {
                     {/* Document Images Section */}
                     <div className="lg:col-span-2">
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                            <div className="border-b border-gray-200 p-6">
-                                <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
-                                    <FaFileImage className="w-5 h-5 text-slate-600" />
-                                    Tài liệu hồ sơ
-                                </h2>
-                                <p className="text-slate-600 text-sm mt-1">Các tài liệu cần thiết cho hồ sơ đăng ký</p>
-                            </div>
                             <div className="p-6">
                                 <ImageCarousel />
                             </div>
