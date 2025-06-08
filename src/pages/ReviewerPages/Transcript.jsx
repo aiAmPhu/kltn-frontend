@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { FaCheckCircle, FaTimesCircle, FaClock, FaBook, FaImages, FaTimes } from "react-icons/fa";
+import { FaCheckCircle, FaTimesCircle, FaClock, FaBook, FaImages, FaTimes, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const statusMap = {
     accepted: {
@@ -35,6 +35,7 @@ const Transcript = ({ userId }) => {
     const [showRejectInput, setShowRejectInput] = useState(false);
     const [rejectionReason, setRejectionReason] = useState("");
     const [selectedImage, setSelectedImage] = useState(null);
+    const [currentGrade, setCurrentGrade] = useState("Lớp 10");
     const token = localStorage.getItem("token");
 
     useEffect(() => {
@@ -148,6 +149,22 @@ const Transcript = ({ userId }) => {
         groupedScores[s.year].push(s);
     }
 
+    const grades = ["Lớp 10", "Lớp 11", "Lớp 12"];
+    const currentGradeIndex = grades.indexOf(currentGrade);
+    const currentScores = groupedScores[currentGrade] || [];
+
+    const goToPreviousGrade = () => {
+        if (currentGradeIndex > 0) {
+            setCurrentGrade(grades[currentGradeIndex - 1]);
+        }
+    };
+
+    const goToNextGrade = () => {
+        if (currentGradeIndex < grades.length - 1) {
+            setCurrentGrade(grades[currentGradeIndex + 1]);
+        }
+    };
+
     const statusInfo = getStatusInfo(data.status);
 
     return (
@@ -156,26 +173,69 @@ const Transcript = ({ userId }) => {
                 {/* Thông tin điểm số bên trái */}
                 <div className="w-full md:w-2/3 lg:w-1/2 flex-shrink-0 overflow-y-auto">
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                        <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                            <FaBook className="w-5 h-5 text-blue-500" />
-                            Bảng điểm
-                        </h2>
-                        <div className="space-y-4">
-                            {Object.entries(groupedScores).map(([year, subjects]) => (
-                                <div key={year} className="bg-gray-50 p-4 rounded-lg">
-                                    <h3 className="font-semibold text-lg mb-2">{year}</h3>
-                                    <ul className="space-y-2">
-                                        {subjects.map((s, idx) => (
-                                            <li key={idx} className="flex items-center gap-2">
-                                                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                                                <span className="text-gray-700">
-                                                    Môn {s.subject}: HK1 - {s.score1}, HK2 - {s.score2 ?? "Không xét"}
-                                                </span>
-                                            </li>
-                                        ))}
-                                    </ul>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                <FaBook className="w-5 h-5 text-blue-500" />
+                                Bảng điểm
+                            </h2>
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={goToPreviousGrade}
+                                    disabled={currentGradeIndex === 0}
+                                    className={`p-2 rounded-lg transition-colors ${
+                                        currentGradeIndex === 0
+                                            ? 'text-gray-300 cursor-not-allowed'
+                                            : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                                    }`}
+                                >
+                                    <FaChevronLeft className="w-4 h-4" />
+                                </button>
+                                <span className="text-lg font-semibold text-blue-600 min-w-[80px] text-center">
+                                    {currentGrade}
+                                </span>
+                                <button
+                                    onClick={goToNextGrade}
+                                    disabled={currentGradeIndex === grades.length - 1}
+                                    className={`p-2 rounded-lg transition-colors ${
+                                        currentGradeIndex === grades.length - 1
+                                            ? 'text-gray-300 cursor-not-allowed'
+                                            : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                                    }`}
+                                >
+                                    <FaChevronRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            {currentScores.length > 0 ? (
+                                <div className="overflow-x-auto">
+                                    <table className="w-full">
+                                        <thead>
+                                            <tr className="border-b border-gray-300">
+                                                <th className="text-left py-3 px-4 font-semibold text-gray-700">Môn học</th>
+                                                <th className="text-center py-3 px-4 font-semibold text-gray-700">HK1</th>
+                                                <th className="text-center py-3 px-4 font-semibold text-gray-700">HK2</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {currentScores.map((score, idx) => (
+                                                <tr key={idx} className="border-b border-gray-200 hover:bg-gray-100 transition-colors">
+                                                    <td className="py-3 px-4 text-gray-800">{score.subject}</td>
+                                                    <td className="py-3 px-4 text-center text-gray-800 font-medium">{score.score1}</td>
+                                                    <td className="py-3 px-4 text-center text-gray-800 font-medium">
+                                                        {score.score2 ?? <span className="text-gray-400 italic">Không xét</span>}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
-                            ))}
+                            ) : (
+                                <div className="text-center py-8 text-gray-500">
+                                    Chưa có dữ liệu điểm cho {currentGrade}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
