@@ -3,6 +3,16 @@ import axios from "axios";
 import AdmissionRegionInfoModal from "../Modals/AdmissionRegionModal/AdmissionRegionInfoModal";
 import AdmissionRegionFormModal from "../Modals/AdmissionRegionModal/AdmissionRegionFormModal";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { 
+    FaExclamationCircle, 
+    FaSearch, 
+    FaPlus, 
+    FaSpinner, 
+    FaMapMarkerAlt,
+    FaEdit, 
+    FaTrash, 
+    FaInfoCircle 
+} from "react-icons/fa";
 import { toast } from "react-toastify";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -14,11 +24,11 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [error, setError] = useState("");
-
-    // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
-    const [regionsPerPage, setRegionsPerPage] = useState(5);
+    const [itemsPerPage, setItemsPerPage] = useState(5);
     const [isLoading, setIsLoading] = useState(true);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [regionToDelete, setRegionToDelete] = useState(null);
 
     // Load regions from API
     const loadRegions = async () => {
@@ -29,10 +39,20 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
             const response = await axios.get(`${API_BASE_URL}/adrs/getall`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setRegions(response.data);
+            setRegions(response.data || []);
             setError("");
         } catch (error) {
-            setError(error.response?.data?.message || "Lỗi khi tải danh sách đối tượng ưu tiên");
+            // Chỉ hiển thị lỗi nếu không phải lỗi "không tìm thấy dữ liệu"
+            const errorMessage = error.response?.data?.message || "Lỗi khi tải danh sách khu vực ưu tiên";
+            if (!errorMessage.toLowerCase().includes("không tìm được") && 
+                !errorMessage.toLowerCase().includes("not found") &&
+                error.response?.status !== 404) {
+                setError(errorMessage);
+                toast.error(errorMessage);
+            } else {
+                setError("");
+                setRegions([]);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -42,28 +62,32 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
         loadRegions();
     }, []);
 
-    // Filter regions based on search query
-    const filteredRegions = regions.filter(
-        (region) =>
-            region.regionName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            region.regionId.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
     const handleDelete = async (region) => {
-        const confirmDelete = window.confirm(`Bạn có chắc chắn muốn xóa ${region.regionName}?`);
-        if (confirmDelete) {
-            try {
-                const token = localStorage.getItem("token");
-                await axios.delete(`${API_BASE_URL}/adrs/delete/${region.regionId}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                await loadRegions();
-                toast.success("Xóa đối tượng ưu tiên thành công!");
-                setError("");
-            } catch (error) {
-                setError(error.response?.data?.message || "Lỗi khi xóa đối tượng ưu tiên");
-            }
+        setRegionToDelete(region);
+        setShowDeleteModal(true);
+    };
+
+    const performDelete = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            await axios.delete(`${API_BASE_URL}/adrs/delete/${regionToDelete.regionId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            await loadRegions();
+            toast.success("Xóa khu vực ưu tiên thành công!");
+            setError("");
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Lỗi khi xóa khu vực ưu tiên");
+            setError(error.response?.data?.message || "Lỗi khi xóa khu vực ưu tiên");
+        } finally {
+            setShowDeleteModal(false);
+            setRegionToDelete(null);
         }
+    };
+
+    const handleCancelDelete = () => {
+        setShowDeleteModal(false);
+        setRegionToDelete(null);
     };
 
     const handleMoreClick = (region) => {
@@ -91,16 +115,23 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
         setSearchQuery(e.target.value);
     };
 
-    const handleRegionsPerPageChange = (e) => {
-        setRegionsPerPage(Number(e.target.value));
+    const handleItemsPerPageChange = (e) => {
+        setItemsPerPage(Number(e.target.value));
         setCurrentPage(1);
     };
 
+    // Filter regions based on search query
+    const filteredRegions = regions.filter(
+        (region) =>
+            region.regionName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            region.regionId.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     // Pagination logic
-    const indexOfLastRegion = currentPage * regionsPerPage;
-    const indexOfFirstRegion = indexOfLastRegion - regionsPerPage;
-    const currentRegions = filteredRegions.slice(indexOfFirstRegion, indexOfLastRegion);
-    const totalPages = Math.ceil(filteredRegions.length / regionsPerPage);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredRegions.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredRegions.length / itemsPerPage);
 
     const paginate = (pageNumber) => {
         if (pageNumber > 0 && pageNumber <= totalPages) {
@@ -135,217 +166,138 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
         return range;
     };
 
+    // Reset to page 1 if current page is empty after data changes
+    useEffect(() => {
+        if (filteredRegions.length > 0 && currentItems.length === 0 && currentPage > 1) {
+            setCurrentPage(1);
+        }
+    }, [filteredRegions.length, currentItems.length, currentPage]);
+
     return (
-        <div className="w-full bg-white shadow-md">
-            <div className="p-6">
-                <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-blue-600 text-center">Quản lý đối tượng ưu tiên</h1>
+        <div className="w-full bg-white shadow-lg rounded-xl border border-gray-200">
+            <div className="p-4 sm:p-6 lg:p-8">
+                <div className="mb-6 flex items-center justify-center gap-3">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">Quản lý khu vực ưu tiên</h1>
                 </div>
 
-                {error && (
-                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                        clipRule="evenodd"
-                                    />
-                                </svg>
-                            </div>
-                            <div className="ml-3">
-                                <p className="text-sm text-red-700">{error}</p>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-                    <div className="flex flex-wrap items-center gap-4 flex-grow">
-                        <div className="relative flex-grow max-w-md">
+                {/* Search and Actions */}
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+                    <div className="w-full lg:flex-1 lg:max-w-md">
+                        <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg
-                                    className="h-5 w-5 text-gray-400"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                >
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                        clipRule="evenodd"
-                                    />
-                                </svg>
+                                <FaSearch className="h-5 w-5 text-gray-400" />
                             </div>
                             <input
                                 type="text"
                                 value={searchQuery}
                                 onChange={handleSearchChange}
-                                placeholder="Tìm kiếm theo tên hoặc mã"
-                                className="pl-10 p-2 border border-gray-300 rounded-md w-full focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Tìm kiếm theo tên hoặc mã khu vực"
+                                className="pl-10 p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                             />
                         </div>
                     </div>
 
                     <button
                         onClick={handleAddRegion}
-                        className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors flex items-center whitespace-nowrap"
+                        className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2 shadow-md whitespace-nowrap"
+                        title="Thêm khu vực ưu tiên mới"
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5 mr-1"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        Thêm đối tượng ưu tiên
+                        <FaPlus className="text-sm" />
+                        <span className="hidden sm:inline">Thêm khu vực ưu tiên</span>
+                        <span className="sm:hidden">Thêm</span>
                     </button>
                 </div>
 
-                <div className="border border-gray-300 rounded-md overflow-hidden">
+                {/* Table */}
+                <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th
-                                        scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
-                                        Mã đối tượng
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
-                                        Tên đối tượng
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
-                                        Điểm ưu tiên
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
-                                        Thao tác
-                                    </th>
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã khu vực</th>
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên khu vực</th>
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Điểm ưu tiên</th>
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan="4" className="px-6 py-4 text-center">
+                                        <td colSpan="4" className="px-4 sm:px-6 py-8 text-center">
                                             <div className="flex justify-center items-center">
-                                                <svg
-                                                    className="animate-spin h-5 w-5 text-blue-500 mr-2"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <circle
-                                                        className="opacity-25"
-                                                        cx="12"
-                                                        cy="12"
-                                                        r="10"
-                                                        stroke="currentColor"
-                                                        strokeWidth="4"
-                                                    ></circle>
-                                                    <path
-                                                        className="opacity-75"
-                                                        fill="currentColor"
-                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                    ></path>
-                                                </svg>
-                                                <span>Đang tải...</span>
+                                                <FaSpinner className="animate-spin h-6 w-6 text-blue-500 mr-3" />
+                                                <span className="text-gray-600">Đang tải...</span>
                                             </div>
                                         </td>
                                     </tr>
-                                ) : currentRegions.length === 0 ? (
+                                ) : currentItems.length === 0 ? (
                                     <tr>
-                                        <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
-                                            Không có đối tượng ưu tiên nào
+                                        <td colSpan="4" className="px-4 sm:px-6 py-12 text-center">
+                                            <div className="flex flex-col items-center justify-center space-y-4">
+                                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                                    <FaPlus className="h-5 w-5 text-blue-500" />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <h3 className="text-lg font-semibold text-gray-800">
+                                                        Chưa có khu vực ưu tiên nào
+                                                    </h3>
+                                                    <p className="text-sm text-gray-600 max-w-md">
+                                                        Bắt đầu bằng cách tạo khu vực ưu tiên đầu tiên cho hệ thống của bạn
+                                                    </p>
+                                                </div>
+                                                <button
+                                                    onClick={handleAddRegion}
+                                                    className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 shadow-lg hover:shadow-xl"
+                                                >
+                                                    <FaPlus className="text-sm" />
+                                                    Tạo khu vực ưu tiên đầu tiên
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ) : (
-                                    currentRegions.map((region) => (
-                                        <tr key={region.regionId} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                    currentItems.map((region) => (
+                                        <tr key={region.regionId} className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm font-medium text-gray-900">
                                                     {region.regionId}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-500">{region.regionName}</div>
+                                            <td className="px-4 sm:px-6 py-4">
+                                                <div className="text-sm text-gray-900 font-medium">{region.regionName}</div>
+                                                <div className="text-xs text-gray-500 mt-1 md:hidden">
+                                                    Điểm ưu tiên: <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-medium">{region.regionScored}</span>
+                                                </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-500">{region.regionScored}</div>
+                                            <td className="px-4 sm:px-6 py-4 whitespace-nowrap hidden md:table-cell">
+                                                <div className="text-sm text-gray-900">
+                                                    <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-medium">
+                                                        {region.regionScored} điểm
+                                                    </span>
+                                                </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <div className="flex justify-end space-x-2">
+                                            <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <div className="flex justify-end space-x-1 sm:space-x-2">
                                                     <button
                                                         onClick={() => handleEdit(region)}
-                                                        className="text-yellow-600 hover:text-yellow-900 bg-yellow-100 hover:bg-yellow-200 p-1 rounded-md transition-colors"
-                                                        title="Cập nhật"
+                                                        className="text-yellow-600 hover:text-yellow-900 bg-yellow-100 hover:bg-yellow-200 p-2 rounded-lg transition-colors"
+                                                        title="Chỉnh sửa khu vực ưu tiên"
                                                     >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-5 w-5"
-                                                            fill="none"
-                                                            viewBox="0 0 24 24"
-                                                            stroke="currentColor"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth={2}
-                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                                            />
-                                                        </svg>
+                                                        <FaEdit className="h-4 w-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(region)}
-                                                        className="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 p-1 rounded-md transition-colors"
-                                                        title="Xoá"
+                                                        className="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 p-2 rounded-lg transition-colors"
+                                                        title="Xóa khu vực ưu tiên này"
                                                     >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-5 w-5"
-                                                            fill="none"
-                                                            viewBox="0 0 24 24"
-                                                            stroke="currentColor"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth={2}
-                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                                            />
-                                                        </svg>
+                                                        <FaTrash className="h-4 w-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleMoreClick(region)}
-                                                        className="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 p-1 rounded-md transition-colors"
-                                                        title="Xem thêm"
+                                                        className="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 p-2 rounded-lg transition-colors"
+                                                        title="Xem chi tiết khu vực ưu tiên"
                                                     >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-5 w-5"
-                                                            fill="none"
-                                                            viewBox="0 0 24 24"
-                                                            stroke="currentColor"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth={2}
-                                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                            />
-                                                        </svg>
+                                                        <FaInfoCircle className="h-4 w-4" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -357,24 +309,24 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
                     </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row justify-between items-center mt-4">
-                    <div className="flex items-center mb-4 md:mb-0">
-                        <span className="text-sm text-gray-700 mr-4">
-                            Hiển thị
+                <div className="flex flex-col lg:flex-row justify-between items-center mt-6 gap-4">
+                    <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-700">
+                        <div className="flex items-center">
+                            <span className="mr-2">Hiển thị</span>
                             <select
-                                value={regionsPerPage}
-                                onChange={handleRegionsPerPageChange}
-                                className="mx-1 p-1 border border-gray-300 rounded-md"
+                                value={itemsPerPage}
+                                onChange={handleItemsPerPageChange}
+                                className="mx-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             >
                                 <option value={5}>5</option>
                                 <option value={10}>10</option>
                                 <option value={20}>20</option>
                             </select>
-                            mục / trang
-                        </span>
-                        <span className="text-sm text-gray-700">
-                            Tổng: <span className="font-medium">{filteredRegions.length}</span> đối tượng
-                        </span>
+                            <span className="ml-2">mục / trang</span>
+                        </div>
+                        <div className="text-center sm:text-left">
+                            Tổng: <span className="font-medium text-blue-600">{filteredRegions.length}</span> khu vực ưu tiên
+                        </div>
                     </div>
 
                     {totalPages > 1 && (
@@ -382,29 +334,31 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
                             <button
                                 onClick={() => paginate(currentPage - 1)}
                                 disabled={currentPage === 1}
-                                className={`px-2 py-1 rounded-md flex items-center ${
+                                className={`px-3 py-2 rounded-lg flex items-center transition-colors ${
                                     currentPage === 1
                                         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                         : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                 }`}
+                                title="Trang trước"
                             >
-                                <ChevronLeftIcon className="h-5 w-5" />
+                                <ChevronLeftIcon className="h-4 w-4" />
                             </button>
 
                             {getPageRange().map((page, index) =>
                                 page === "..." ? (
-                                    <span key={`ellipsis-${index}`} className="px-2 py-1">
+                                    <span key={`ellipsis-${index}`} className="px-2 py-2 text-gray-500">
                                         ...
                                     </span>
                                 ) : (
                                     <button
                                         key={`page-${page}`}
                                         onClick={() => paginate(page)}
-                                        className={`px-3 py-1 rounded-md ${
+                                        className={`px-3 py-2 rounded-lg transition-colors ${
                                             currentPage === page
-                                                ? "bg-blue-500 text-white"
+                                                ? "bg-blue-500 text-white shadow-md"
                                                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                         }`}
+                                        title={`Trang ${page}`}
                                     >
                                         {page}
                                     </button>
@@ -414,13 +368,14 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
                             <button
                                 onClick={() => paginate(currentPage + 1)}
                                 disabled={currentPage === totalPages}
-                                className={`px-2 py-1 rounded-md flex items-center ${
+                                className={`px-3 py-2 rounded-lg flex items-center transition-colors ${
                                     currentPage === totalPages
                                         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                         : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                 }`}
+                                title="Trang sau"
                             >
-                                <ChevronRightIcon className="h-5 w-5" />
+                                <ChevronRightIcon className="h-4 w-4" />
                             </button>
                         </div>
                     )}
@@ -437,6 +392,38 @@ const AdmissionRegionList = ({ regions = [], setRegions }) => {
                 )}
 
                 <AdmissionRegionInfoModal region={selectedRegion} onClose={handleCloseModal} />
+
+                {/* Delete Confirmation Modal */}
+                {showDeleteModal && regionToDelete && (
+                    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center px-4">
+                        <div className="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md">
+                            <div className="text-center mb-6">
+                                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <FaExclamationCircle className="w-8 h-8 text-red-600" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-800 mb-2">Xác nhận xóa</h3>
+                                <p className="text-gray-600">
+                                    Bạn có chắc chắn muốn xóa khu vực <span className="font-semibold text-gray-800">{regionToDelete.regionName}</span>?
+                                </p>
+                                <p className="text-sm text-red-500 mt-2">Hành động này không thể hoàn tác!</p>
+                            </div>
+                            <div className="flex gap-3 justify-center">
+                                <button
+                                    onClick={handleCancelDelete}
+                                    className="bg-gray-500 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-gray-600 transition-colors shadow-md"
+                                >
+                                    Hủy bỏ
+                                </button>
+                                <button
+                                    onClick={performDelete}
+                                    className="bg-red-500 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors shadow-md"
+                                >
+                                    Xác nhận xóa
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
