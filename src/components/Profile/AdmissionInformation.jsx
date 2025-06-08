@@ -53,7 +53,7 @@ const AdmissionInformation = () => {
                         firstName: res.data.firstName ?? "",
                         lastName: res.data.lastName ?? "",
                         birthDate: formatDate(res.data.birthDate) ?? "",
-                        gender: res.data.gender ?? "",
+                        gender: res.data.gender ?? "Nam",
                         birthPlace: res.data.birthPlace ?? "",
                         phone: res.data.phone ?? "",
                         email: res.data.email || tokenEmail,
@@ -105,6 +105,11 @@ const AdmissionInformation = () => {
                     break;
                 case "lastName":
                     if (!value) newErrors.lastName = "Tên là bắt buộc.";
+                    break;
+                case "gender":
+                    if (!value || !["Nam", "Nữ"].includes(value)) {
+                        newErrors.gender = "Vui lòng chọn giới tính.";
+                    }
                     break;
                 case "birthDate":
                     if (!value) newErrors.birthDate = "Ngày sinh là bắt buộc.";
@@ -265,9 +270,10 @@ const AdmissionInformation = () => {
                                 onKeyDown={handleKeyDown}
                                 className="border border-gray-300 rounded-lg w-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                                <option>Nam</option>
-                                <option>Nữ</option>
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
                             </select>
+                            {errors.gender && <p className="text-red-500 text-sm">{errors.gender}</p>}
                         </div>
                         <div>
                             <label className=" text-gray-700 font-medium mb-2 flex items-center gap-2">
