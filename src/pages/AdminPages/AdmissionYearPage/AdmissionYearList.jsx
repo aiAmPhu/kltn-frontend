@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CreateYearModal from "../Modals/AdmissionYearModal/CreateYearModal.jsx";
 import ConfigModal from "../Modals/AdmissionYearModal/ConfigModal.jsx";
+import useDocumentTitle from "../../../hooks/useDocumentTitle";
 import { 
     FaExclamationCircle, 
     FaPlus, 
@@ -16,6 +17,8 @@ import {
 import { toast } from "react-toastify";
 
 const AdmissionYearList = () => {
+    useDocumentTitle("Quản lý năm tuyển sinh");
+    
     const [years, setYears] = useState([]);
     const [activeYear, setActiveYear] = useState(null);
     const [showCreateForm, setShowCreateForm] = useState(false);
