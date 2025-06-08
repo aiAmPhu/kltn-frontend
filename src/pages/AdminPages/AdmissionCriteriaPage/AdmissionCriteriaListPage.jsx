@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react"; 
 import axios from "axios";
 import AdmissionCriteriaList from "./AdmissionCriteriaList";
+import useDocumentTitle from "../../../hooks/useDocumentTitle";
+import { toast } from "react-toastify";
 
 const AdmissionCriteriaListPage = () => {
     const [criterias, setCriterias] = useState([]);
+
+    // Set document title
+    useDocumentTitle("Quản lý diện xét tuyển");
 
     useEffect(() => {
         const fetchCriterias = async () => {
@@ -21,6 +26,7 @@ const AdmissionCriteriaListPage = () => {
 
                 setCriterias(response.data);
             } catch (error) {
+                toast.error("Không thể tải danh sách diện xét tuyển. Vui lòng thử lại sau!");
                 console.error("Error fetching admission criteria", error);
             }
         };

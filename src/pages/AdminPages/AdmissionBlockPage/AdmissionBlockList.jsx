@@ -219,7 +219,6 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
         <div className="w-full bg-white shadow-lg rounded-xl border border-gray-200">
             <div className="p-4 sm:p-6 lg:p-8">
                 <div className="mb-6 flex items-center justify-center gap-3">
-                    <FaGraduationCap className="w-8 h-8 text-blue-600" />
                     <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">Quản lý khối xét tuyển</h1>
                 </div>
 
