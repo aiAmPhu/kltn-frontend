@@ -18,6 +18,7 @@ import {
     FaChartPie,
 } from "react-icons/fa";
 import logo from "../../assets/logo_hcmute.png";
+import useDocumentTitle from "../../hooks/useDocumentTitle";
 
 const menuItems = [
     {
@@ -87,10 +88,16 @@ const menuItems = [
     },
 ];
 
+// ===== LAYOUT ĐÃ ĐƯỢC CỐ ĐỊNH - KHÔNG THAY ĐỔI =====
+// Layout này sẽ được giữ nguyên để tập trung cải thiện giao diện các trang con
+
 const AdminPage = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const location = useLocation();
     const navigate = useNavigate();
+    
+    // Set document title cho trang admin
+    useDocumentTitle("Quản trị hệ thống");
 
     const toggleSidebar = () => {
         setSidebarOpen((prev) => !prev);
@@ -113,11 +120,20 @@ const AdminPage = () => {
 
     return (
         <div className="flex h-screen">
+            <style jsx>{`
+                .scrollbar-hide {
+                    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+                    scrollbar-width: none;  /* Firefox */
+                }
+                .scrollbar-hide::-webkit-scrollbar { 
+                    display: none;  /* Safari and Chrome */
+                }
+            `}</style>
             {/* Sidebar */}
             <div
                 className={`${
                     sidebarOpen ? "w-64" : "w-16"
-                } bg-[#00548f] text-white flex flex-col transition-all duration-300 ease-in-out border-r border-blue-950`}
+                } bg-[#00548f] text-white flex flex-col transition-all duration-300 ease-in-out border-r border-blue-950 overflow-hidden`}
             >
                 {/* Logo */}
                 <div className="flex flex-col items-center py-4">
@@ -130,7 +146,7 @@ const AdminPage = () => {
                 </div>
 
                 {/* Menu items */}
-                <nav className={`flex-1 ${sidebarOpen ? "px-2" : "px-1"} space-y-1`}>
+                <nav className={`flex-1 ${sidebarOpen ? "px-2" : "px-1"} space-y-1 overflow-y-auto scrollbar-hide`}>
                     {menuItems.map((item) => (
                         <Link key={item.to} to={item.to} className={linkClass(item.to)}>
                             <span
@@ -199,7 +215,7 @@ const AdminPage = () => {
                 </div>
 
                 {/* Outlet hiển thị nội dung page con */}
-                <div className="p-6 overflow-y-auto bg-gray-100 h-full">
+                <div className="flex-1 p-6 overflow-y-auto bg-gray-100">
                     <Outlet />
                 </div>
             </div>
