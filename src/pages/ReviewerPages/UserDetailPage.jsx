@@ -233,15 +233,11 @@ const UserDetailPage = () => {
                 </div>
 
                 {/* Content Area */}
-                <div className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto bg-gray-100">
-                    <div className="bg-white rounded-xl shadow-sm p-3 sm:p-4 lg:p-6 h-full">
-                        <div className="h-full overflow-y-auto">
-                            {activeTab === "photo" && <Photo userId={id} />}
-                            {activeTab === "info" && <Information userId={id} />}
-                            {activeTab === "progress" && <LearningProccess userId={id} />}
-                            {activeTab === "transcript" && <Transcript userId={id} />}
-                        </div>
-                    </div>
+                <div className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto bg-white rounded-xl shadow-sm">
+                    {activeTab === "photo" && <Photo userId={id} />}
+                    {activeTab === "info" && <Information userId={id} />}
+                    {activeTab === "progress" && <LearningProccess userId={id} />}
+                    {activeTab === "transcript" && <Transcript userId={id} />}
                 </div>
             </div>
         </div>

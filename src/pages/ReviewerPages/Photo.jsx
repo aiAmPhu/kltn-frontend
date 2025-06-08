@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import { FaCheckCircle, FaTimesCircle, FaClock, FaImages, FaTimes, FaExclamationTriangle, FaChevronLeft, FaChevronRight, FaSearchPlus, FaFileImage, FaUser, FaIdCard } from "react-icons/fa";
 
 const statusMap = {
@@ -32,7 +33,7 @@ const Photo = ({ userId }) => {
     const [error, setError] = useState("");
     const [showRejectInput, setShowRejectInput] = useState(false);
     const [rejectionReason, setRejectionReason] = useState("");
-    const [actionStatus, setActionStatus] = useState("");
+
     const [selectedImage, setSelectedImage] = useState(null);
     const token = localStorage.getItem("token");
     
@@ -64,16 +65,16 @@ const Photo = ({ userId }) => {
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
-            setActionStatus("Hồ sơ ảnh đã được phê duyệt thành công.");
+            toast.success("Hồ sơ ảnh đã được phê duyệt thành công.");
             await fetchData();
         } catch {
-            setActionStatus("Có lỗi xảy ra khi phê duyệt hồ sơ.");
+            toast.error("Có lỗi xảy ra khi phê duyệt hồ sơ.");
         }
     };
 
     const handleReject = async () => {
         if (!rejectionReason.trim()) {
-            setActionStatus("Vui lòng nhập lý do không phê duyệt.");
+            toast.warning("Vui lòng nhập lý do không phê duyệt.");
             return;
         }
         try {
@@ -86,12 +87,12 @@ const Photo = ({ userId }) => {
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
-            setActionStatus("Hồ sơ đã được từ chối với lý do đã ghi nhận.");
+            toast.success("Hồ sơ đã được từ chối với lý do đã ghi nhận.");
             setShowRejectInput(false);
             setRejectionReason("");
             await fetchData();
         } catch {
-            setActionStatus("Có lỗi xảy ra khi từ chối hồ sơ.");
+            toast.error("Có lỗi xảy ra khi từ chối hồ sơ.");
         }
     };
 
@@ -604,12 +605,7 @@ const Photo = ({ userId }) => {
                                             Từ chối
                                         </button>
                                     </div>
-                                    
-                                    {actionStatus && (
-                                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                                            <p className="text-blue-800 font-medium text-sm">{actionStatus}</p>
-                                        </div>
-                                    )}
+
 
                                     {/* Reject Input */}
                                     {showRejectInput && (
