@@ -93,17 +93,23 @@ const AdmissionBlockFormModal = ({ admissionBlockToEdit, setAdmissionBlocks, onC
     };
 
     return (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-center items-center px-4">
-            <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl">
-                <h2 className="text-2xl font-bold text-blue-600 text-center mb-6">
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center px-4">
+            <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-2xl w-full max-w-lg sm:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto">
+                <h2 className="text-xl sm:text-2xl font-bold text-blue-600 text-center mb-4 sm:mb-6">
                     {isEditing ? "Cập nhật" : "Thêm"} khối xét tuyển
                 </h2>
 
-                {error && <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm">{error}</div>}
+                {error && (
+                    <div className="mb-4 bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm">
+                        {error}
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Mã khối</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Mã khối <span className="text-red-500">*</span>
+                        </label>
                         <input
                             type="text"
                             value={admissionBlockId}
@@ -111,102 +117,115 @@ const AdmissionBlockFormModal = ({ admissionBlockToEdit, setAdmissionBlocks, onC
                             placeholder="Nhập mã khối"
                             required
                             disabled={isEditing}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2"
+                            className={`w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                                isEditing ? "bg-gray-100 text-gray-600 cursor-not-allowed" : ""
+                            }`}
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Tên khối</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Tên khối <span className="text-red-500">*</span>
+                        </label>
                         <input
                             type="text"
                             value={admissionBlockName}
                             onChange={(e) => setAdmissionBlockName(e.target.value)}
                             placeholder="Nhập tên khối"
                             required
-                            className="w-full border border-gray-300 rounded-md px-3 py-2"
+                            className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         />
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Môn học 1</label>
-                        <select
-                            value={admissionBlockSubject1}
-                            onChange={(e) => setAdmissionBlockSubject1(e.target.value)}
-                            required
-                            disabled={isLoadingSubjects}
-                            className={`w-full border border-gray-300 rounded-md px-3 py-2 ${
-                                isLoadingSubjects ? "bg-gray-200 text-gray-600 cursor-not-allowed" : ""
-                            }`}
-                        >
-                            <option value="">
-                                {isLoadingSubjects ? "Đang tải..." : "Chọn môn học 1"}
-                            </option>
-                            {getFilteredSubjects([admissionBlockSubject2, admissionBlockSubject3]).map((subject) => (
-                                <option key={subject.suId} value={subject.subject}>
-                                    {subject.subject}
+                    <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Môn học 1 <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                value={admissionBlockSubject1}
+                                onChange={(e) => setAdmissionBlockSubject1(e.target.value)}
+                                required
+                                disabled={isLoadingSubjects}
+                                className={`w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                                    isLoadingSubjects ? "bg-gray-100 text-gray-600 cursor-not-allowed" : ""
+                                }`}
+                            >
+                                <option value="">
+                                    {isLoadingSubjects ? "Đang tải..." : "Chọn môn học 1"}
                                 </option>
-                            ))}
-                        </select>
+                                {getFilteredSubjects([admissionBlockSubject2, admissionBlockSubject3]).map((subject) => (
+                                    <option key={subject.suId} value={subject.subject}>
+                                        {subject.subject}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Môn học 2 <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                value={admissionBlockSubject2}
+                                onChange={(e) => setAdmissionBlockSubject2(e.target.value)}
+                                required
+                                disabled={isLoadingSubjects}
+                                className={`w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                                    isLoadingSubjects ? "bg-gray-100 text-gray-600 cursor-not-allowed" : ""
+                                }`}
+                            >
+                                <option value="">
+                                    {isLoadingSubjects ? "Đang tải..." : "Chọn môn học 2"}
+                                </option>
+                                {getFilteredSubjects([admissionBlockSubject1, admissionBlockSubject3]).map((subject) => (
+                                    <option key={subject.suId} value={subject.subject}>
+                                        {subject.subject}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Môn học 3 <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                value={admissionBlockSubject3}
+                                onChange={(e) => setAdmissionBlockSubject3(e.target.value)}
+                                required
+                                disabled={isLoadingSubjects}
+                                className={`w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                                    isLoadingSubjects ? "bg-gray-100 text-gray-600 cursor-not-allowed" : ""
+                                }`}
+                            >
+                                <option value="">
+                                    {isLoadingSubjects ? "Đang tải..." : "Chọn môn học 3"}
+                                </option>
+                                {getFilteredSubjects([admissionBlockSubject1, admissionBlockSubject2]).map((subject) => (
+                                    <option key={subject.suId} value={subject.subject}>
+                                        {subject.subject}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Môn học 2</label>
-                        <select
-                            value={admissionBlockSubject2}
-                            onChange={(e) => setAdmissionBlockSubject2(e.target.value)}
-                            required
-                            disabled={isLoadingSubjects}
-                            className={`w-full border border-gray-300 rounded-md px-3 py-2 ${
-                                isLoadingSubjects ? "bg-gray-200 text-gray-600 cursor-not-allowed" : ""
-                            }`}
-                        >
-                            <option value="">
-                                {isLoadingSubjects ? "Đang tải..." : "Chọn môn học 2"}
-                            </option>
-                            {getFilteredSubjects([admissionBlockSubject1, admissionBlockSubject3]).map((subject) => (
-                                <option key={subject.suId} value={subject.subject}>
-                                    {subject.subject}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Môn học 3</label>
-                        <select
-                            value={admissionBlockSubject3}
-                            onChange={(e) => setAdmissionBlockSubject3(e.target.value)}
-                            required
-                            disabled={isLoadingSubjects}
-                            className={`w-full border border-gray-300 rounded-md px-3 py-2 ${
-                                isLoadingSubjects ? "bg-gray-200 text-gray-600 cursor-not-allowed" : ""
-                            }`}
-                        >
-                            <option value="">
-                                {isLoadingSubjects ? "Đang tải..." : "Chọn môn học 3"}
-                            </option>
-                            {getFilteredSubjects([admissionBlockSubject1, admissionBlockSubject2]).map((subject) => (
-                                <option key={subject.suId} value={subject.subject}>
-                                    {subject.subject}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="flex justify-between mt-6">
+                    <div className="flex flex-col sm:flex-row justify-between gap-3 mt-6 pt-4 border-t border-gray-200">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 flex items-center gap-2"
+                            className="order-2 sm:order-1 bg-gray-500 text-white px-4 py-3 rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
                         >
-                            <FaTimes /> Đóng
+                            <FaTimes className="text-sm" /> 
+                            Đóng
                         </button>
                         <button
                             type="submit"
                             disabled={isLoadingSubjects}
-                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-2 disabled:opacity-50"
+                            className="order-1 sm:order-2 bg-blue-500 text-white px-4 py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium shadow-md"
                         >
-                            {isEditing ? <FaCheck /> : <FaPlus />}
+                            {isEditing ? <FaCheck className="text-sm" /> : <FaPlus className="text-sm" />}
                             {isLoadingSubjects ? "Đang tải..." : isEditing ? "Cập nhật" : "Thêm"}
                         </button>
                     </div>

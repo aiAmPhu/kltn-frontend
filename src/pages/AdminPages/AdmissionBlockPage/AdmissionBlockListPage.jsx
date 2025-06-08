@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AdmissionBlockList from "./AdmissionBlockList";
+import useDocumentTitle from "../../../hooks/useDocumentTitle";
 
 const AdmissionBlockListPage = () => {
     const [admissionBlocks, setAdmissionBlocks] = useState([]);
+
+    // Set document title
+    useDocumentTitle("Quản lý khối xét tuyển");
 
     useEffect(() => {
         const fetchAdmissionBlocks = async () => {
@@ -26,8 +30,10 @@ const AdmissionBlockListPage = () => {
     }, []);
 
     return (
-        <div>
-            <AdmissionBlockList admissionBlocks={admissionBlocks} setAdmissionBlocks={setAdmissionBlocks} />
+        <div className="min-h-screen bg-gray-50">
+            <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+                <AdmissionBlockList admissionBlocks={admissionBlocks} setAdmissionBlocks={setAdmissionBlocks} />
+            </div>
         </div>
     );
 };

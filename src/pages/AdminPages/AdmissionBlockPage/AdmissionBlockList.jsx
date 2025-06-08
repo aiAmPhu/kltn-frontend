@@ -195,15 +195,15 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
     };
 
     return (
-        <div className="w-full bg-white shadow-md">
-            <div className="p-6">
+        <div className="w-full bg-white shadow-lg rounded-xl border border-gray-200">
+            <div className="p-4 sm:p-6 lg:p-8">
                 <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-blue-600 text-center">Quản lý Khối xét tuyển</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 text-center">Quản lý Khối xét tuyển</h1>
                 </div>
 
                 {error && (
-                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-                        <div className="flex items-center">
+                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
+                        <div className="flex items-start">
                             <div className="flex-shrink-0">
                                 <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path
@@ -221,20 +221,20 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                 )}
 
                 {importError && (
-                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
                         <p className="text-sm text-red-700">{importError}</p>
                     </div>
                 )}
 
                 {importSuccess && (
-                    <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
+                    <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-r-lg">
                         <p className="text-sm text-green-700">{importSuccess}</p>
                     </div>
                 )}
 
-                <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-                    <div className="flex flex-wrap items-center gap-4 flex-grow">
-                        <div className="relative flex-grow max-w-md">
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+                    <div className="w-full lg:flex-1 lg:max-w-md">
+                        <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg
                                     className="h-5 w-5 text-gray-400"
@@ -254,66 +254,69 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                                 value={searchQuery}
                                 onChange={handleSearchChange}
                                 placeholder="Tìm kiếm theo tên hoặc mã khối"
-                                className="pl-10 p-2 border border-gray-300 rounded-md w-full focus:ring-blue-500 focus:border-blue-500"
+                                className="pl-10 p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                             />
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
                         <button
                             onClick={handleExport}
-                            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors flex items-center gap-2"
+                            className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 shadow-md"
                         >
-                            <FaFileExport /> Xuất
+                            <FaFileExport className="text-sm" /> 
+                            <span className="hidden sm:inline">Xuất</span>
                         </button>
-                        <label className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors flex items-center gap-2 cursor-pointer">
-                            <FaFileImport /> Nhập
+                        <label className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md">
+                            <FaFileImport className="text-sm" /> 
+                            <span className="hidden sm:inline">Nhập</span>
                             <input type="file" accept=".json" onChange={handleImport} className="hidden" />
                         </label>
                         <button
                             onClick={handleAddBlock}
-                            className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors flex items-center whitespace-nowrap"
+                            className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2 shadow-md whitespace-nowrap"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 mr-1"
+                                className="h-4 w-4"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
                             >
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
-                            Thêm khối xét tuyển
+                            <span className="hidden sm:inline">Thêm khối xét tuyển</span>
+                            <span className="sm:hidden">Thêm</span>
                         </button>
                     </div>
                 </div>
 
-                <div className="border border-gray-300 rounded-md overflow-hidden">
+                <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
                                     <th
                                         scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
                                         Mã khối
                                     </th>
                                     <th
                                         scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
                                         Tên khối
                                     </th>
                                     <th
                                         scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
                                     >
                                         Môn học
                                     </th>
                                     <th
                                         scope="col"
-                                        className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
                                         Thao tác
                                     </th>
@@ -322,10 +325,10 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan="4" className="px-6 py-4 text-center">
+                                        <td colSpan="4" className="px-4 sm:px-6 py-8 text-center">
                                             <div className="flex justify-center items-center">
                                                 <svg
-                                                    className="animate-spin h-5 w-5 text-blue-500 mr-2"
+                                                    className="animate-spin h-6 w-6 text-blue-500 mr-3"
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     fill="none"
                                                     viewBox="0 0 24 24"
@@ -344,28 +347,43 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                                     ></path>
                                                 </svg>
-                                                <span>Đang tải...</span>
+                                                <span className="text-gray-600">Đang tải...</span>
                                             </div>
                                         </td>
                                     </tr>
                                 ) : currentBlocks.length === 0 ? (
                                     <tr>
-                                        <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
-                                            Không có khối xét tuyển phù hợp
+                                        <td colSpan="4" className="px-4 sm:px-6 py-8 text-center text-gray-500">
+                                            <div className="flex flex-col items-center">
+                                                <svg className="h-12 w-12 text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                Không có khối xét tuyển phù hợp
+                                            </div>
                                         </td>
                                     </tr>
                                 ) : (
                                     currentBlocks.map((block) => (
-                                        <tr key={block.admissionBlockId} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                        <tr key={block.admissionBlockId} className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm font-medium text-gray-900">
                                                     {block.admissionBlockId}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-500">{block.admissionBlockName}</div>
+                                            <td className="px-4 sm:px-6 py-4">
+                                                <div className="text-sm text-gray-900 font-medium">{block.admissionBlockName}</div>
+                                                {/* Hiển thị môn học trên mobile */}
+                                                <div className="text-xs text-gray-500 mt-1 md:hidden">
+                                                    {[
+                                                        block.admissionBlockSubject1,
+                                                        block.admissionBlockSubject2,
+                                                        block.admissionBlockSubject3,
+                                                    ]
+                                                        .filter(Boolean)
+                                                        .join(", ")}
+                                                </div>
                                             </td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-4 sm:px-6 py-4 hidden md:table-cell">
                                                 <div className="text-sm text-gray-500">
                                                     {[
                                                         block.admissionBlockSubject1,
@@ -376,16 +394,16 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                                                         .join(", ")}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <div className="flex justify-end space-x-2">
+                                            <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <div className="flex justify-end space-x-1 sm:space-x-2">
                                                     <button
                                                         onClick={() => handleEdit(block)}
-                                                        className="text-yellow-600 hover:text-yellow-900 bg-yellow-100 hover:bg-yellow-200 p-1 rounded-md transition-colors"
+                                                        className="text-yellow-600 hover:text-yellow-900 bg-yellow-100 hover:bg-yellow-200 p-2 rounded-lg transition-colors"
                                                         title="Cập nhật"
                                                     >
                                                         <svg
                                                             xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-5 w-5"
+                                                            className="h-4 w-4"
                                                             fill="none"
                                                             viewBox="0 0 24 24"
                                                             stroke="currentColor"
@@ -400,12 +418,12 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(block)}
-                                                        className="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 p-1 rounded-md transition-colors"
+                                                        className="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 p-2 rounded-lg transition-colors"
                                                         title="Xoá"
                                                     >
                                                         <svg
                                                             xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-5 w-5"
+                                                            className="h-4 w-4"
                                                             fill="none"
                                                             viewBox="0 0 24 24"
                                                             stroke="currentColor"
@@ -420,12 +438,12 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                                                     </button>
                                                     <button
                                                         onClick={() => handleMoreClick(block)}
-                                                        className="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 p-1 rounded-md transition-colors"
+                                                        className="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 p-2 rounded-lg transition-colors"
                                                         title="Xem thêm"
                                                     >
                                                         <svg
                                                             xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-5 w-5"
+                                                            className="h-4 w-4"
                                                             fill="none"
                                                             viewBox="0 0 24 24"
                                                             stroke="currentColor"
@@ -448,24 +466,24 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                     </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row justify-between items-center mt-4">
-                    <div className="flex items-center mb-4 md:mb-0">
-                        <span className="text-sm text-gray-700 mr-4">
-                            Hiển thị
+                <div className="flex flex-col lg:flex-row justify-between items-center mt-6 gap-4">
+                    <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-700">
+                        <div className="flex items-center">
+                            <span className="mr-2">Hiển thị</span>
                             <select
                                 value={blocksPerPage}
                                 onChange={handleBlocksPerPageChange}
-                                className="mx-1 p-1 border border-gray-300 rounded-md"
+                                className="mx-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             >
                                 <option value={5}>5</option>
                                 <option value={10}>10</option>
                                 <option value={20}>20</option>
                             </select>
-                            mục / trang
-                        </span>
-                        <span className="text-sm text-gray-700">
-                            Tổng: <span className="font-medium">{filteredBlocks.length}</span> khối xét tuyển
-                        </span>
+                            <span className="ml-2">mục / trang</span>
+                        </div>
+                        <div className="text-center sm:text-left">
+                            Tổng: <span className="font-medium text-blue-600">{filteredBlocks.length}</span> khối xét tuyển
+                        </div>
                     </div>
 
                     {totalPages > 1 && (
@@ -473,27 +491,27 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                             <button
                                 onClick={() => paginate(currentPage - 1)}
                                 disabled={currentPage === 1}
-                                className={`px-2 py-1 rounded-md flex items-center ${
+                                className={`px-3 py-2 rounded-lg flex items-center transition-colors ${
                                     currentPage === 1
                                         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                         : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                 }`}
                             >
-                                <ChevronLeftIcon className="h-5 w-5" />
+                                <ChevronLeftIcon className="h-4 w-4" />
                             </button>
 
                             {getPageRange().map((page, index) =>
                                 page === "..." ? (
-                                    <span key={`ellipsis-${index}`} className="px-2 py-1">
+                                    <span key={`ellipsis-${index}`} className="px-2 py-2 text-gray-500">
                                         ...
                                     </span>
                                 ) : (
                                     <button
                                         key={`page-${page}`}
                                         onClick={() => paginate(page)}
-                                        className={`px-3 py-1 rounded-md ${
+                                        className={`px-3 py-2 rounded-lg transition-colors ${
                                             currentPage === page
-                                                ? "bg-blue-500 text-white"
+                                                ? "bg-blue-500 text-white shadow-md"
                                                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                         }`}
                                     >
@@ -505,13 +523,13 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                             <button
                                 onClick={() => paginate(currentPage + 1)}
                                 disabled={currentPage === totalPages}
-                                className={`px-2 py-1 rounded-md flex items-center ${
+                                className={`px-3 py-2 rounded-lg flex items-center transition-colors ${
                                     currentPage === totalPages
                                         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                         : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                 }`}
                             >
-                                <ChevronRightIcon className="h-5 w-5" />
+                                <ChevronRightIcon className="h-4 w-4" />
                             </button>
                         </div>
                     )}
