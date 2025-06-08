@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import { FaCheckCircle, FaTimesCircle, FaClock, FaGraduationCap, FaIdCard, FaBirthdayCake, FaTimes } from "react-icons/fa";
 
 const statusMap = {
     accepted: {
-        text: "Đã duyệt",
-        color: "bg-green-50 text-green-700",
-        icon: <FaCheckCircle className="w-4 h-4 text-green-500" />,
+        text: "Đã phê duyệt",
+        color: "bg-emerald-50 text-emerald-800 border-emerald-200",
+        icon: <FaCheckCircle className="w-4 h-4 text-emerald-600" />,
     },
     rejected: {
-        text: "Từ chối",
-        color: "bg-red-50 text-red-700",
-        icon: <FaTimesCircle className="w-4 h-4 text-red-500" />,
+        text: "Không phê duyệt",
+        color: "bg-red-50 text-red-800 border-red-200",
+        icon: <FaTimesCircle className="w-4 h-4 text-red-600" />,
     },
     waiting: {
-        text: "Đang chờ",
-        color: "bg-yellow-50 text-yellow-700",
-        icon: <FaClock className="w-4 h-4 text-yellow-500" />,
+        text: "Chờ xét duyệt",
+        color: "bg-amber-50 text-amber-800 border-amber-200",
+        icon: <FaClock className="w-4 h-4 text-amber-600" />,
     },
 };
 
@@ -33,39 +34,39 @@ const LearningProccess = ({ userId }) => {
     const [error, setError] = useState("");
     const [showRejectInput, setShowRejectInput] = useState(false);
     const [rejectionReason, setRejectionReason] = useState("");
-    const [actionStatus, setActionStatus] = useState("");
     const [selectedImage, setSelectedImage] = useState(null);
     const token = localStorage.getItem("token");
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [learningRes, photoRes] = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/learning/getLPByE/${userId}`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/photo/getPhoto/${userId}`, {
-                        headers: { Authorization: `Bearer ${token}` },
-                    })
-                ]);
-
-                if (!learningRes) {
-                    setError("Không tìm thấy dữ liệu quá trình học.");
-                } else {
-                    setLearningData(learningRes.data.data);
-                    setPhotoData(photoRes.data.data);
-                }
-            } catch (err) {
-                console.error(err);
-                setError("Lỗi khi lấy dữ liệu.");
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchData();
     }, [userId, token]);
+
+    const fetchData = async () => {
+        try {
+            const [learningRes, photoRes] = await Promise.all([
+                axios.get(`${process.env.REACT_APP_API_BASE_URL}/learning/getLPByE/${userId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }),
+                axios.get(`${process.env.REACT_APP_API_BASE_URL}/photo/getPhoto/${userId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                })
+            ]);
+
+            if (!learningRes) {
+                setError("Không tìm thấy dữ liệu quá trình học.");
+            } else {
+                setLearningData(learningRes.data.data);
+                setPhotoData(photoRes.data.data);
+            }
+        } catch (err) {
+            console.error(err);
+            setError("Lỗi khi lấy dữ liệu.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleAccept = async () => {
         try {
@@ -78,16 +79,17 @@ const LearningProccess = ({ userId }) => {
                     },
                 }
             );
-            setActionStatus("Đã đồng ý.");
+            toast.success("Hồ sơ quá trình học tập đã được phê duyệt thành công.");
+            await fetchData();
         } catch (err) {
             console.error(err);
-            setActionStatus("Lỗi khi gửi yêu cầu đồng ý.");
+            toast.error("Có lỗi xảy ra khi phê duyệt hồ sơ.");
         }
     };
 
     const handleReject = async () => {
         if (!rejectionReason.trim()) {
-            setActionStatus("Vui lòng nhập lý do từ chối.");
+            toast.warning("Vui lòng nhập lý do không phê duyệt.");
             return;
         }
         try {
@@ -100,10 +102,13 @@ const LearningProccess = ({ userId }) => {
                     },
                 }
             );
-            setActionStatus("Đã từ chối.");
+            toast.success("Hồ sơ đã được từ chối với lý do đã ghi nhận.");
+            setShowRejectInput(false);
+            setRejectionReason("");
+            await fetchData();
         } catch (err) {
             console.error(err);
-            setActionStatus("Lỗi khi gửi yêu cầu từ chối.");
+            toast.error("Có lỗi xảy ra khi từ chối hồ sơ.");
         }
     };
 
@@ -135,7 +140,7 @@ const LearningProccess = ({ userId }) => {
         );
     };
 
-    if (loading) return <p>Đang tải dữ liệu...</p>;
+    if (loading) return <p className="text-gray-500">Đang tải dữ liệu...</p>;
     if (error) return <p className="text-red-500">{error}</p>;
     if (!learningData) return null;
 
@@ -146,9 +151,9 @@ const LearningProccess = ({ userId }) => {
             <div className="flex flex-col md:flex-row h-full flex-1 p-4 gap-6">
                 {/* Thông tin quá trình học bên trái */}
                 <div className="w-full md:w-2/3 lg:w-1/2 flex-shrink-0 overflow-y-auto">
-                    <div className="bg-white rounded-lg shadow-sm p-6 h-full">
-                        <h2 className="text-2xl font-bold text-blue-700 mb-4 flex items-center gap-2">
-                            <FaGraduationCap className="w-6 h-6 text-blue-500" />
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                        <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                            <FaGraduationCap className="w-5 h-5 text-blue-500" />
                             Quá trình học tập
                         </h2>
                         <div className="space-y-4">
@@ -197,15 +202,30 @@ const LearningProccess = ({ userId }) => {
                                 <FaIdCard className="w-5 h-5 text-blue-500" />
                                 <span>Ảnh CCCD và giấy khai sinh</span>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-3 gap-4">
                                 <div className="space-y-2">
-                                    <div className="text-sm font-medium text-gray-600">CCCD mặt trước</div>
+                                    <div className="text-sm font-medium text-gray-600">Mặt trước</div>
                                     {photoData?.frontCCCD ? (
                                         <img 
                                             src={photoData.frontCCCD} 
                                             alt="CCCD mặt trước" 
                                             className="w-full h-24 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
                                             onClick={() => setSelectedImage({ url: photoData.frontCCCD, label: "CCCD mặt trước" })}
+                                        />
+                                    ) : (
+                                        <div className="w-full h-24 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
+                                            Chưa có ảnh
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="text-sm font-medium text-gray-600">Mặt sau</div>
+                                    {photoData?.backCCCD ? (
+                                        <img 
+                                            src={photoData.backCCCD} 
+                                            alt="CCCD mặt sau" 
+                                            className="w-full h-24 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                                            onClick={() => setSelectedImage({ url: photoData.backCCCD, label: "CCCD mặt sau" })}
                                         />
                                     ) : (
                                         <div className="w-full h-24 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
@@ -234,66 +254,75 @@ const LearningProccess = ({ userId }) => {
                         </div>
 
                         {/* Trạng thái và phản hồi */}
-                        <div className="flex flex-col gap-2">
-                            <div className="flex items-center gap-2">
-                                <span className="font-medium text-gray-700">Trạng thái:</span>
-                                <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold ${statusInfo.color}`}>
+                        <div className="flex flex-col gap-3">
+                            <div className="flex items-center justify-between">
+                                <span className="text-slate-600 font-medium text-sm">Tình trạng:</span>
+                                <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold border ${statusInfo.color}`}>
                                     {statusInfo.icon}
                                     <span>{statusInfo.text}</span>
                                 </span>
                             </div>
-                            {learningData.feedback && (
-                                <div className="flex items-center">
-                                    <span className="font-medium text-gray-700">Phản hồi:</span>
-                                    <span className="ml-2 text-gray-600">{learningData.feedback}</span>
+                            {learningData.feedback && learningData.status === "rejected" && (
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                                    <div className="flex items-start gap-2">
+                                        <FaTimesCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                            <span className="font-semibold text-red-800 text-sm block">Lý do không phê duyệt:</span>
+                                            <span className="text-red-700 text-sm">{learningData.feedback}</span>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
 
                         {/* Hành động */}
-                        <div className="flex flex-col gap-2">
-                            <div className="flex gap-3">
+                        <div className="flex flex-col gap-4">
+                            <div className="grid grid-cols-2 gap-3">
                                 <button
                                     onClick={handleAccept}
-                                    className="px-5 py-2 bg-green-600 text-white rounded-md font-semibold hover:bg-green-700 transition-colors"
+                                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all"
                                 >
-                                    Đồng ý
+                                    <FaCheckCircle className="w-4 h-4" />
+                                    Phê duyệt
                                 </button>
                                 <button
                                     onClick={() => setShowRejectInput(true)}
-                                    className="px-5 py-2 bg-red-600 text-white rounded-md font-semibold hover:bg-red-700 transition-colors"
+                                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all"
                                 >
+                                    <FaTimesCircle className="w-4 h-4" />
                                     Từ chối
                                 </button>
                             </div>
-                            {actionStatus && (
-                                <p className="text-blue-600 font-medium">{actionStatus}</p>
-                            )}
                         </div>
 
                         {/* Nhập lý do từ chối */}
                         {showRejectInput && (
-                            <div className="bg-gray-50 rounded-md p-3 mt-2">
-                                <label className="block font-medium text-gray-700 mb-1">Lý do từ chối:</label>
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
+                                <label className="block font-semibold text-slate-800 text-sm">
+                                    Lý do không phê duyệt <span className="text-red-500">*</span>
+                                </label>
                                 <textarea
-                                    className="w-full p-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-400"
-                                    rows={3}
-                                    placeholder="Nhập lý do từ chối..."
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors text-sm"
+                                    rows={4}
+                                    placeholder="Vui lòng mô tả chi tiết lý do không phê duyệt hồ sơ..."
                                     value={rejectionReason}
                                     onChange={(e) => setRejectionReason(e.target.value)}
                                 />
-                                <div className="flex justify-end gap-2 mt-2">
+                                <div className="flex justify-end gap-2">
                                     <button
-                                        onClick={() => setShowRejectInput(false)}
-                                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                                        onClick={() => {
+                                            setShowRejectInput(false);
+                                            setRejectionReason("");
+                                        }}
+                                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all text-sm font-medium"
                                     >
-                                        Hủy
+                                        Hủy bỏ
                                     </button>
                                     <button
                                         onClick={handleReject}
-                                        className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900 transition-colors"
+                                        className="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 transition-all text-sm font-medium"
                                     >
-                                        Gửi lý do
+                                        Xác nhận từ chối
                                     </button>
                                 </div>
                             </div>
