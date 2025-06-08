@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import {
     FaUsers,
@@ -93,14 +93,37 @@ const menuItems = [
 
 const AdminPage = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [isMobile, setIsMobile] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
     
     // Set document title cho trang admin
     useDocumentTitle("Quản trị hệ thống");
 
+    // Check screen size to determine mobile view
+    useEffect(() => {
+        const checkScreenSize = () => {
+            const mobile = window.innerWidth < 768; // md breakpoint
+            setIsMobile(mobile);
+            if (mobile) {
+                setSidebarOpen(false); // Auto close sidebar on mobile
+            }
+        };
+
+        checkScreenSize();
+        window.addEventListener('resize', checkScreenSize);
+        return () => window.removeEventListener('resize', checkScreenSize);
+    }, []);
+
     const toggleSidebar = () => {
         setSidebarOpen((prev) => !prev);
+    };
+
+    // Close sidebar when clicking on overlay (mobile only)
+    const closeSidebar = () => {
+        if (isMobile) {
+            setSidebarOpen(false);
+        }
     };
 
     // Custom link class for active/inactive and compact/expanded
@@ -119,7 +142,7 @@ const AdminPage = () => {
     };
 
     return (
-        <div className="flex h-screen">
+        <div className="flex h-screen relative">
             <style jsx>{`
                 .scrollbar-hide {
                     -ms-overflow-style: none;  /* Internet Explorer 10+ */
@@ -129,10 +152,25 @@ const AdminPage = () => {
                     display: none;  /* Safari and Chrome */
                 }
             `}</style>
+            
+            {/* Mobile Overlay */}
+            {isMobile && sidebarOpen && (
+                <div 
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+                    onClick={closeSidebar}
+                />
+            )}
+
             {/* Sidebar */}
             <div
                 className={`${
+                    isMobile ? 'fixed' : 'relative'
+                } ${
                     sidebarOpen ? "w-64" : "w-16"
+                } ${
+                    isMobile && !sidebarOpen ? '-translate-x-full' : 'translate-x-0'
+                } ${
+                    isMobile ? 'z-50 h-full' : ''
                 } bg-[#00548f] text-white flex flex-col transition-all duration-300 ease-in-out border-r border-blue-950 overflow-hidden`}
             >
                 {/* Logo */}
@@ -148,7 +186,12 @@ const AdminPage = () => {
                 {/* Menu items */}
                 <nav className={`flex-1 ${sidebarOpen ? "px-2" : "px-1"} space-y-1 overflow-y-auto scrollbar-hide`}>
                     {menuItems.map((item) => (
-                        <Link key={item.to} to={item.to} className={linkClass(item.to)}>
+                        <Link 
+                            key={item.to} 
+                            to={item.to} 
+                            className={linkClass(item.to)}
+                            onClick={() => isMobile && setSidebarOpen(false)} // Close sidebar after clicking on mobile
+                        >
                             <span
                                 className={`${
                                     location.pathname === item.to
@@ -174,14 +217,14 @@ const AdminPage = () => {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col">
+            <div className={`flex-1 flex flex-col ${isMobile ? 'w-full' : ''}`}>
                 {/* Topbar */}
                 <div className="bg-[#00548f] text-white py-3 px-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <button
                             onClick={toggleSidebar}
                             className={`
-                ml-3 flex items-center justify-center
+                flex items-center justify-center
                 w-9 h-9 rounded-full
                 bg-white/20 hover:bg-white/30
                 text-white transition
@@ -200,8 +243,10 @@ const AdminPage = () => {
                                 <FaAngleDoubleRight className="text-lg" />
                             )}
                         </button>
-                        <span className="text-lg font-semibold uppercase">
-                            TRƯỜNG ĐẠI HỌC SƯ PHẠM KỸ THUẬT THÀNH PHỐ HỒ CHÍ MINH
+                        <span className="text-sm sm:text-base lg:text-lg font-semibold uppercase truncate">
+                            <span className="hidden lg:inline">TRƯỜNG ĐẠI HỌC SƯ PHẠM KỸ THUẬT THÀNH PHỐ HỒ CHÍ MINH</span>
+                            <span className="hidden md:inline lg:hidden">ĐH SƯ PHẠM KỸ THUẬT TP.HCM</span>
+                            <span className="md:hidden">HCMUTE</span>
                         </span>
                     </div>
                     <button
@@ -215,7 +260,7 @@ const AdminPage = () => {
                 </div>
 
                 {/* Outlet hiển thị nội dung page con */}
-                <div className="flex-1 p-6 overflow-y-auto bg-gray-100">
+                <div className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto bg-gray-100">
                     <Outlet />
                 </div>
             </div>
