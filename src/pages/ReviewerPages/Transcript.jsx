@@ -207,24 +207,24 @@ const Transcript = ({ userId }) => {
                             </div>
                         </div>
                         
-                        <div className="bg-gray-50 rounded-lg p-4">
+                        <div>
                             {currentScores.length > 0 ? (
                                 <div className="overflow-x-auto">
                                     <table className="w-full">
                                         <thead>
                                             <tr className="border-b border-gray-300">
-                                                <th className="text-left py-3 px-4 font-semibold text-gray-700">Môn học</th>
-                                                <th className="text-center py-3 px-4 font-semibold text-gray-700">HK1</th>
-                                                <th className="text-center py-3 px-4 font-semibold text-gray-700">HK2</th>
+                                                <th className="text-left py-2 px-3 font-semibold text-gray-700 text-sm">Môn học</th>
+                                                <th className="text-center py-2 px-3 font-semibold text-gray-700 text-sm">HK1</th>
+                                                <th className="text-center py-2 px-3 font-semibold text-gray-700 text-sm">HK2</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {currentScores.map((score, idx) => (
                                                 <tr key={idx} className="border-b border-gray-200 hover:bg-gray-100 transition-colors">
-                                                    <td className="py-3 px-4 text-gray-800">{score.subject}</td>
-                                                    <td className="py-3 px-4 text-center text-gray-800 font-medium">{score.score1}</td>
-                                                    <td className="py-3 px-4 text-center text-gray-800 font-medium">
-                                                        {score.score2 ?? <span className="text-gray-400 italic">Không xét</span>}
+                                                    <td className="py-2 px-3 text-gray-800 text-sm">{score.subject}</td>
+                                                    <td className="py-2 px-3 text-center text-gray-800 font-medium text-sm">{score.score1}</td>
+                                                    <td className="py-2 px-3 text-center text-gray-800 font-medium text-sm">
+                                                        {score.score2 ?? <span className="text-gray-400 italic text-xs">Không xét</span>}
                                                     </td>
                                                 </tr>
                                             ))}
@@ -232,7 +232,7 @@ const Transcript = ({ userId }) => {
                                     </table>
                                 </div>
                             ) : (
-                                <div className="text-center py-8 text-gray-500">
+                                <div className="text-center py-6 text-gray-500 text-sm">
                                     Chưa có dữ liệu điểm cho {currentGrade}
                                 </div>
                             )}
