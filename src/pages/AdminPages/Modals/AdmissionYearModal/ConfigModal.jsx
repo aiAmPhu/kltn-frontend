@@ -380,7 +380,7 @@ const ConfigModal = ({ show, onClose, selectedYear, currentConfig, availableOpti
                                         {availableOptions?.majors && (
                                             <div className="text-xs text-gray-500">
                                                 / {availableOptions.majors.filter(m => m && m.majorId).length} tổng
-                                            </div>
+                                </div>
                                         )}
                                     </div>
                                     <div className="text-center">
@@ -389,7 +389,7 @@ const ConfigModal = ({ show, onClose, selectedYear, currentConfig, availableOpti
                                         {availableOptions?.objects && (
                                             <div className="text-xs text-gray-500">
                                                 / {availableOptions.objects.filter(o => o && o.objectId).length} tổng
-                                            </div>
+                                </div>
                                         )}
                                     </div>
                                     <div className="text-center">
@@ -398,11 +398,11 @@ const ConfigModal = ({ show, onClose, selectedYear, currentConfig, availableOpti
                                         {availableOptions?.regions && (
                                             <div className="text-xs text-gray-500">
                                                 / {availableOptions.regions.filter(r => r && r.regionId).length} tổng
-                                            </div>
-                                        )}
-                                    </div>
                                 </div>
-                                
+                                        )}
+                                </div>
+                            </div>
+
                                 {/* Total summary */}
                                 <div className="mt-4 pt-4 border-t border-blue-200">
                                     <div className="text-center">

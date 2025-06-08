@@ -52,8 +52,8 @@ const InfoModal = ({ user, onClose }) => {
                                     <div className="flex-1">
                                         <p className="text-sm font-medium text-gray-600 mb-1">Tên người dùng</p>
                                         <p className="text-lg font-bold text-gray-900">
-                                            {user.name}
-                                        </p>
+                        {user.name}
+                    </p>
                                     </div>
                                 </div>
                             </div>
@@ -103,7 +103,7 @@ const InfoModal = ({ user, onClose }) => {
                                             <span>ID người dùng:</span>
                                             <span className="font-mono text-xs bg-gray-200 px-2 py-1 rounded">
                                                 {user.userId || 'N/A'}
-                                            </span>
+                        </span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span>Trạng thái:</span>

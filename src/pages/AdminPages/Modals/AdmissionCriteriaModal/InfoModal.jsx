@@ -39,7 +39,7 @@ const InfoModal = ({ criteria, onClose }) => {
                                         <p className="text-sm font-medium text-gray-600 mb-1">Mã diện xét tuyển</p>
                                         <p className="text-lg font-bold text-gray-900">
                                             {criteria.criteriaId}
-                                        </p>
+                    </p>
                                     </div>
                                 </div>
                             </div>
@@ -53,7 +53,7 @@ const InfoModal = ({ criteria, onClose }) => {
                                         <p className="text-sm font-medium text-gray-600 mb-1">Tên diện xét tuyển</p>
                                         <p className="text-lg font-bold text-gray-900 break-words">
                                             {criteria.criteriaName}
-                                        </p>
+                    </p>
                                     </div>
                                 </div>
                             </div>
@@ -70,8 +70,8 @@ const InfoModal = ({ criteria, onClose }) => {
                         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                             <div 
                                 className="text-gray-700 prose prose-sm max-w-none"
-                                dangerouslySetInnerHTML={{ __html: criteria.criteriaDescription || "Không có mô tả" }}
-                            />
+                            dangerouslySetInnerHTML={{ __html: criteria.criteriaDescription || "Không có mô tả" }}
+                        />
                         </div>
                     </div>
                 </div>

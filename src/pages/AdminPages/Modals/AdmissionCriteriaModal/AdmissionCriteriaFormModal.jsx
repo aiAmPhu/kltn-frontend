@@ -75,7 +75,7 @@ const AdmissionCriteriaFormModal = ({ criteriaToEdit, setCriterias, onClose, isE
                         </div>
                         <h2 className="text-2xl font-bold text-gray-800 mb-2">
                             {isEditing ? "Cập nhật diện xét tuyển" : "Thêm diện xét tuyển mới"}
-                        </h2>
+                </h2>
                     </div>
                 </div>
 
@@ -89,40 +89,40 @@ const AdmissionCriteriaFormModal = ({ criteriaToEdit, setCriterias, onClose, isE
                         </h3>
                         
                         <div className="grid grid-cols-1 gap-4">
-                            <div>
+                    <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <FaIdCard className="inline-block w-4 h-4 mr-2 text-gray-500" />
                                     Mã diện <span className="text-red-500">*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    value={criteriaId}
-                                    onChange={(e) => setCriteriaId(e.target.value)}
+                        <input
+                            type="text"
+                            value={criteriaId}
+                            onChange={(e) => setCriteriaId(e.target.value)}
                                     placeholder="Ví dụ: D1, D2, D3..."
-                                    required
-                                    disabled={isEditing}
+                            required
+                            disabled={isEditing}
                                     className={`w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
                                         isEditing ? "bg-gray-100 text-gray-600 cursor-not-allowed" : "hover:border-gray-400"
                                     }`}
-                                />
+                        />
                                 {isEditing && (
                                     <p className="mt-1 text-xs text-gray-500">Mã diện không thể thay đổi khi chỉnh sửa</p>
                                 )}
-                            </div>
+                    </div>
 
-                            <div>
+                    <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <FaTag className="inline-block w-4 h-4 mr-2 text-gray-500" />
                                     Tên diện <span className="text-red-500">*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    value={criteriaName}
-                                    onChange={(e) => setCriteriaName(e.target.value)}
+                        <input
+                            type="text"
+                            value={criteriaName}
+                            onChange={(e) => setCriteriaName(e.target.value)}
                                     placeholder="Ví dụ: Ưu tiên xét tuyển HSG, top 200,..."
-                                    required
+                            required
                                     className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
-                                />
+                        />
                             </div>
                         </div>
                     </div>
@@ -133,41 +133,41 @@ const AdmissionCriteriaFormModal = ({ criteriaToEdit, setCriterias, onClose, isE
                             <FaFileAlt className="inline-block w-4 h-4 mr-2 text-gray-500" />
                             Mô tả chi tiết
                         </h3>
-                        
-                        <div>
+
+                    <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Mô tả diện xét tuyển
                             </label>
                             <div className="border border-gray-300 rounded-lg overflow-hidden">
-                                <CKEditor
-                                    editor={ClassicEditor}
-                                    data={criteriaDescription}
-                                    onChange={(event, editor) => {
-                                        const data = editor.getData();
-                                        setCriteriaDescription(data);
-                                    }}
-                                    config={{
-                                        toolbar: [
-                                            "heading",
-                                            "|",
-                                            "bold",
-                                            "italic",
-                                            "link",
-                                            "bulletedList",
-                                            "numberedList",
-                                            "|",
-                                            "outdent",
-                                            "indent",
-                                            "|",
-                                            "blockQuote",
-                                            "insertTable",
-                                            "undo",
-                                            "redo",
-                                        ],
-                                        language: "vi",
-                                        height: "300px",
-                                    }}
-                                />
+                            <CKEditor
+                                editor={ClassicEditor}
+                                data={criteriaDescription}
+                                onChange={(event, editor) => {
+                                    const data = editor.getData();
+                                    setCriteriaDescription(data);
+                                }}
+                                config={{
+                                    toolbar: [
+                                        "heading",
+                                        "|",
+                                        "bold",
+                                        "italic",
+                                        "link",
+                                        "bulletedList",
+                                        "numberedList",
+                                        "|",
+                                        "outdent",
+                                        "indent",
+                                        "|",
+                                        "blockQuote",
+                                        "insertTable",
+                                        "undo",
+                                        "redo",
+                                    ],
+                                    language: "vi",
+                                    height: "300px",
+                                }}
+                            />
                             </div>
                             <p className="mt-1 text-xs text-gray-500">
                                 Mô tả chi tiết về điều kiện và yêu cầu của diện xét tuyển này

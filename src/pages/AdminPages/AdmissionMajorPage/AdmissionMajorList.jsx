@@ -69,17 +69,17 @@ const AdmissionMajorList = ({ majors = [], setMajors }) => {
     };
 
     const performDelete = async () => {
-        try {
-            const token = localStorage.getItem("token");
+            try {
+                const token = localStorage.getItem("token");
             await axios.delete(`${API_BASE_URL}/adms/delete/${majorToDelete.majorId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            await loadAdmissionMajors();
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                await loadAdmissionMajors();
             toast.success("Xóa ngành xét tuyển thành công!");
-            setError("");
-        } catch (error) {
+                setError("");
+            } catch (error) {
             toast.error(error.response?.data?.message || "Lỗi khi xóa ngành xét tuyển");
-            setError(error.response?.data?.message || "Lỗi khi xóa ngành xét tuyển");
+                setError(error.response?.data?.message || "Lỗi khi xóa ngành xét tuyển");
         } finally {
             setShowDeleteModal(false);
             setMajorToDelete(null);
@@ -314,11 +314,11 @@ const AdmissionMajorList = ({ majors = [], setMajors }) => {
                                             </td>
                                             <td className="px-4 sm:px-6 py-4 hidden md:table-cell">
                                                 <div className="text-sm text-gray-500 line-clamp-2">
-                                                    <div
-                                                        dangerouslySetInnerHTML={{
-                                                            __html: major.majorDescription || "Không có mô tả",
-                                                        }}
-                                                    />
+                                                <div
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: major.majorDescription || "Không có mô tả",
+                                                    }}
+                                                />
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

@@ -106,7 +106,7 @@ const AdmissionBlockFormModal = ({ admissionBlockToEdit, setAdmissionBlocks, onC
                     </div>
                     <h2 className="text-2xl font-bold text-gray-800 mb-2">
                         {isEditing ? "Cập nhật khối xét tuyển" : "Thêm khối xét tuyển mới"}
-                    </h2>
+                </h2>
                     <p className="text-gray-600 text-sm">
                         {isEditing 
                             ? "Chỉnh sửa thông tin khối xét tuyển hiện tại"
@@ -132,40 +132,40 @@ const AdmissionBlockFormModal = ({ admissionBlockToEdit, setAdmissionBlocks, onC
                         </h3>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
+                    <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <FaIdCard className="inline-block w-4 h-4 mr-2 text-gray-500" />
                                     Mã khối <span className="text-red-500">*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    value={admissionBlockId}
-                                    onChange={(e) => setAdmissionBlockId(e.target.value)}
+                        <input
+                            type="text"
+                            value={admissionBlockId}
+                            onChange={(e) => setAdmissionBlockId(e.target.value)}
                                     placeholder="Ví dụ: A00, A01, D01..."
-                                    required
-                                    disabled={isEditing}
+                            required
+                            disabled={isEditing}
                                     className={`w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
                                         isEditing ? "bg-gray-100 text-gray-600 cursor-not-allowed" : "hover:border-gray-400"
                                     }`}
-                                />
+                        />
                                 {isEditing && (
                                     <p className="mt-1 text-xs text-gray-500">Mã khối không thể thay đổi khi chỉnh sửa</p>
                                 )}
-                            </div>
+                    </div>
 
-                            <div>
+                    <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <FaTag className="inline-block w-4 h-4 mr-2 text-gray-500" />
                                     Tên khối <span className="text-red-500">*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    value={admissionBlockName}
-                                    onChange={(e) => setAdmissionBlockName(e.target.value)}
+                        <input
+                            type="text"
+                            value={admissionBlockName}
+                            onChange={(e) => setAdmissionBlockName(e.target.value)}
                                     placeholder="Ví dụ: Khối A00 - Toán, Lý, Hóa"
-                                    required
+                            required
                                     className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
-                                />
+                        />
                             </div>
                         </div>
                     </div>
@@ -184,61 +184,61 @@ const AdmissionBlockFormModal = ({ admissionBlockToEdit, setAdmissionBlocks, onC
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
+                    <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Môn học 1 <span className="text-red-500">*</span>
                                     </label>
-                                    <select
-                                        value={admissionBlockSubject1}
-                                        onChange={(e) => setAdmissionBlockSubject1(e.target.value)}
-                                        required
+                        <select
+                            value={admissionBlockSubject1}
+                            onChange={(e) => setAdmissionBlockSubject1(e.target.value)}
+                            required
                                         className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
-                                    >
+                        >
                                         <option value="">-- Chọn môn 1 --</option>
-                                        {getFilteredSubjects([admissionBlockSubject2, admissionBlockSubject3]).map((subject) => (
-                                            <option key={subject.suId} value={subject.subject}>
-                                                {subject.subject}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+                            {getFilteredSubjects([admissionBlockSubject2, admissionBlockSubject3]).map((subject) => (
+                                <option key={subject.suId} value={subject.subject}>
+                                    {subject.subject}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-                                <div>
+                    <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Môn học 2 <span className="text-red-500">*</span>
                                     </label>
-                                    <select
-                                        value={admissionBlockSubject2}
-                                        onChange={(e) => setAdmissionBlockSubject2(e.target.value)}
-                                        required
+                        <select
+                            value={admissionBlockSubject2}
+                            onChange={(e) => setAdmissionBlockSubject2(e.target.value)}
+                            required
                                         className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
-                                    >
+                        >
                                         <option value="">-- Chọn môn 2 --</option>
-                                        {getFilteredSubjects([admissionBlockSubject1, admissionBlockSubject3]).map((subject) => (
-                                            <option key={subject.suId} value={subject.subject}>
-                                                {subject.subject}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+                            {getFilteredSubjects([admissionBlockSubject1, admissionBlockSubject3]).map((subject) => (
+                                <option key={subject.suId} value={subject.subject}>
+                                    {subject.subject}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-                                <div>
+                    <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Môn học 3 <span className="text-red-500">*</span>
                                     </label>
-                                    <select
-                                        value={admissionBlockSubject3}
-                                        onChange={(e) => setAdmissionBlockSubject3(e.target.value)}
-                                        required
+                        <select
+                            value={admissionBlockSubject3}
+                            onChange={(e) => setAdmissionBlockSubject3(e.target.value)}
+                            required
                                         className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
-                                    >
+                        >
                                         <option value="">-- Chọn môn 3 --</option>
-                                        {getFilteredSubjects([admissionBlockSubject1, admissionBlockSubject2]).map((subject) => (
-                                            <option key={subject.suId} value={subject.subject}>
-                                                {subject.subject}
-                                            </option>
-                                        ))}
-                                    </select>
+                            {getFilteredSubjects([admissionBlockSubject1, admissionBlockSubject2]).map((subject) => (
+                                <option key={subject.suId} value={subject.subject}>
+                                    {subject.subject}
+                                </option>
+                            ))}
+                        </select>
                                 </div>
                             </div>
                         )}

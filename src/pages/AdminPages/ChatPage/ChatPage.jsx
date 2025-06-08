@@ -480,14 +480,14 @@ const ChatPage = () => {
                                     );
                                 })
                                 .map((message, index) => (
-                                                        <div
-                        key={index}
+                                    <div
+                                        key={index}
                         className={`flex w-full min-w-0 ${
-                            message.senderId === parseInt(user.userId, 10)
-                                ? "justify-end"
-                                : "justify-start"
-                        }`}
-                    >
+                                            message.senderId === parseInt(user.userId, 10)
+                                                ? "justify-end"
+                                                : "justify-start"
+                                        }`}
+                                    >
                                         <div className="relative group max-w-[60%] min-w-0">
                                             <div
                                                 className={`rounded-2xl p-3 ${

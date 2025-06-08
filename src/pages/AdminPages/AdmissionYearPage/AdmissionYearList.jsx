@@ -240,16 +240,16 @@ const AdmissionYearList = () => {
                         )}
                     </div>
 
-                    <button
-                        onClick={() => setShowCreateForm(true)}
+                <button
+                    onClick={() => setShowCreateForm(true)}
                         className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2 shadow-md whitespace-nowrap"
                         title="Tạo năm tuyển sinh mới"
-                    >
+                >
                         <FaPlus className="text-sm" />
                         <span className="hidden sm:inline">Tạo năm mới</span>
                         <span className="sm:hidden">Tạo</span>
-                    </button>
-                </div>
+                </button>
+            </div>
 
                 {/* Years Grid */}
                 <div className="space-y-4">
@@ -267,11 +267,11 @@ const AdmissionYearList = () => {
                                 <div className="space-y-2">
                                     <h3 className="text-xl font-semibold text-gray-800">
                                         Chưa có năm tuyển sinh nào
-                                    </h3>
+                    </h3>
                                     <p className="text-gray-600 max-w-md">
                                         Bắt đầu bằng cách tạo năm tuyển sinh đầu tiên cho hệ thống của bạn
-                                    </p>
-                                </div>
+                    </p>
+                </div>
                                 <button
                                     onClick={() => setShowCreateForm(true)}
                                     className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 shadow-lg hover:shadow-xl"
@@ -283,7 +283,7 @@ const AdmissionYearList = () => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {years.map((year) => (
+                {years.map((year) => (
                                 <div key={year.yearId} className="border border-gray-200 rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 bg-white">
                                     <div className="flex justify-between items-start mb-4">
                                         <div className="flex items-center gap-3">
@@ -294,13 +294,13 @@ const AdmissionYearList = () => {
                                                 <h3 className="text-lg font-semibold text-gray-900">{year.yearName}</h3>
                                             </div>
                                         </div>
-                                        <span
+                            <span
                                             className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
-                                                year.status === "active"
+                                    year.status === "active"
                                                     ? "bg-green-100 text-green-700"
                                                     : "bg-gray-100 text-gray-700"
-                                            }`}
-                                        >
+                                }`}
+                            >
                                             {year.status === "active" ? (
                                                 <>
                                                     <FaCheckCircle className="w-3 h-3" />
@@ -312,15 +312,15 @@ const AdmissionYearList = () => {
                                                     Không hoạt động
                                                 </>
                                             )}
-                                        </span>
-                                    </div>
+                            </span>
+                        </div>
 
                                     <div className="space-y-3 mb-6">
                                         <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
                                             <p className="text-sm font-medium text-gray-600 mb-1">Thời gian</p>
                                             <p className="text-sm text-gray-900">
-                                                {formatDisplayDate(year.startDate)} - {formatDisplayDate(year.endDate)}
-                                            </p>
+                            {formatDisplayDate(year.startDate)} - {formatDisplayDate(year.endDate)}
+                        </p>
                                         </div>
 
                                         {year.description && (
@@ -331,51 +331,51 @@ const AdmissionYearList = () => {
                                         )}
                                     </div>
 
-                                    <div className="flex gap-2">
-                                        {year.status !== "active" ? (
-                                            <button
+                        <div className="flex gap-2">
+                            {year.status !== "active" ? (
+                                <button
                                                 onClick={() => handleActivateClick(year)}
                                                 className="flex-1 bg-green-500 text-white py-2 px-3 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2 text-sm shadow-md"
                                                 title="Kích hoạt năm tuyển sinh này"
-                                            >
+                                >
                                                 <FaPlay className="w-3 h-3" />
-                                                Kích hoạt
-                                            </button>
-                                        ) : (
-                                            <button
-                                                onClick={() => handleConfigureClick(year)}
+                                    Kích hoạt
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => handleConfigureClick(year)}
                                                 className="flex-1 bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 text-sm shadow-md"
                                                 title="Cấu hình năm tuyển sinh này"
-                                            >
+                                >
                                                 <FaCog className="w-3 h-3" />
-                                                Cấu hình
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
+                                    Cấu hình
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                ))}
                         </div>
                     )}
-                </div>
+            </div>
 
-                {/* Modals */}
-                <CreateYearModal
-                    show={showCreateForm}
-                    onClose={() => setShowCreateForm(false)}
-                    formData={formData}
-                    setFormData={setFormData}
-                    onSubmit={handleCreateYear}
-                />
+            {/* Modals */}
+            <CreateYearModal
+                show={showCreateForm}
+                onClose={() => setShowCreateForm(false)}
+                formData={formData}
+                setFormData={setFormData}
+                onSubmit={handleCreateYear}
+            />
 
-                <ConfigModal
-                    show={showConfigForm}
-                    onClose={() => setShowConfigForm(false)}
-                    selectedYear={selectedYear}
-                    currentConfig={currentConfig}
-                    availableOptions={availableOptions}
-                    loading={loading}
-                    onSaveConfig={handleSaveConfig}
-                />
+            <ConfigModal
+                show={showConfigForm}
+                onClose={() => setShowConfigForm(false)}
+                selectedYear={selectedYear}
+                currentConfig={currentConfig}
+                availableOptions={availableOptions}
+                loading={loading}
+                onSaveConfig={handleSaveConfig}
+            />
 
                 {/* Activate Confirmation Modal */}
                 {showActivateModal && yearToActivate && (

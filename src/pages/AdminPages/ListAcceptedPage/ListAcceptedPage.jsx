@@ -203,7 +203,7 @@ const ListAcceptedPage = () => {
 
         if (start > 2) {
             range.push("...");
-        }
+    }
 
         for (let i = start; i <= end; i++) {
             range.push(i);
@@ -233,65 +233,65 @@ const ListAcceptedPage = () => {
                 {/* Header */}
                 <div className="mb-6 flex items-center justify-center gap-3">
                     <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">Danh sách trúng tuyển</h1>
-                </div>
+            </div>
 
                 {/* Filter and Export Section */}
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
                     <div className="flex flex-col sm:flex-row gap-4 flex-1">
-                        {/* Filter Type */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Loại lọc:</label>
-                            <select
-                                value={filterType}
-                                onChange={(e) => handleFilterTypeChange(e.target.value)}
+                    {/* Filter Type */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Loại lọc:</label>
+                        <select
+                            value={filterType}
+                            onChange={(e) => handleFilterTypeChange(e.target.value)}
                                 className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        >
+                            {filterOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Major Filter */}
+                    {filterType === "byMajor" && (
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Chọn ngành:</label>
+                            <select
+                                value={filterValue}
+                                onChange={(e) => handleFilterValueChange(e.target.value)}
+                                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                             >
-                                {filterOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
+                                <option value="">-- Chọn ngành --</option>
+                                {majorOptions.map((major) => (
+                                    <option key={major} value={major}>
+                                        {major}
                                     </option>
                                 ))}
                             </select>
                         </div>
+                    )}
 
-                        {/* Major Filter */}
-                        {filterType === "byMajor" && (
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Chọn ngành:</label>
-                                <select
-                                    value={filterValue}
-                                    onChange={(e) => handleFilterValueChange(e.target.value)}
+                    {/* Criteria Filter */}
+                    {filterType === "byCriteria" && (
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Chọn diện xét tuyển:</label>
+                            <select
+                                value={filterValue}
+                                onChange={(e) => handleFilterValueChange(e.target.value)}
                                     className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                >
-                                    <option value="">-- Chọn ngành --</option>
-                                    {majorOptions.map((major) => (
-                                        <option key={major} value={major}>
-                                            {major}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        )}
-
-                        {/* Criteria Filter */}
-                        {filterType === "byCriteria" && (
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Chọn diện xét tuyển:</label>
-                                <select
-                                    value={filterValue}
-                                    onChange={(e) => handleFilterValueChange(e.target.value)}
-                                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                >
-                                    <option value="">-- Chọn diện xét tuyển --</option>
-                                    {criteriaOptions.map((criteria) => (
-                                        <option key={criteria} value={criteria}>
-                                            {criteria}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        )}
-                    </div>
+                            >
+                                <option value="">-- Chọn diện xét tuyển --</option>
+                                {criteriaOptions.map((criteria) => (
+                                    <option key={criteria} value={criteria}>
+                                        {criteria}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+            </div>
 
                     {/* Export Button */}
                     <button
@@ -310,14 +310,14 @@ const ListAcceptedPage = () => {
                 {successMsg && (
                     <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-green-700 mb-6">
                         <div className="font-medium">{successMsg}</div>
-                    </div>
-                )}
+                </div>
+            )}
 
                 {/* Error Message */}
                 {error && (
                     <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 mb-6">
                         <div className="font-medium">{error}</div>
-                    </div>
+                </div>
                 )}
 
                 {/* Table */}
@@ -325,7 +325,7 @@ const ListAcceptedPage = () => {
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
-                                <tr>
+                            <tr>
                                     <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
                                     <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã nguyện vọng</th>
                                     <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sinh viên</th>
@@ -335,8 +335,8 @@ const ListAcceptedPage = () => {
                                     <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Khối XT</th>
                                     <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngành</th>
                                     <th scope="col" className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Điểm</th>
-                                </tr>
-                            </thead>
+                            </tr>
+                        </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {loading ? (
                                     <tr>
@@ -391,19 +391,19 @@ const ListAcceptedPage = () => {
                                             <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                                     {wish.priority}
-                                                </span>
-                                            </td>
+                                        </span>
+                                    </td>
                                             <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">{wish.criteriaId}</td>
                                             <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">{wish.admissionBlockId}</td>
                                             <td className="px-4 sm:px-6 py-4">
                                                 <div className="text-sm font-medium text-gray-900">{wish.majorId}</div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-blue-600">{wish.scores}</td>
-                                        </tr>
+                                </tr>
                                     ))
                                 )}
-                            </tbody>
-                        </table>
+                        </tbody>
+                    </table>
                     </div>
                 </div>
 
@@ -476,8 +476,8 @@ const ListAcceptedPage = () => {
                             >
                                 <ChevronRightIcon className="h-4 w-4" />
                             </button>
-                        </div>
-                    )}
+                </div>
+            )}
                 </div>
             </div>
         </div>

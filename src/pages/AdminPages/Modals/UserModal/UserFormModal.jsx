@@ -62,9 +62,9 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing, reloa
             if (typeof reloadUsers === "function") {
                 await reloadUsers();
             } else {
-                const response = await axios.get(`${API_BASE_URL}/users/getall`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+            const response = await axios.get(`${API_BASE_URL}/users/getall`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
                 setUsers(response.data?.data || response.data || []);
             }
             
@@ -93,7 +93,7 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing, reloa
                         </div>
                         <h2 className="text-2xl font-bold text-gray-800 mb-2">
                             {isEditing ? "Cập nhật người dùng" : "Thêm người dùng mới"}
-                        </h2>
+                </h2>
                     </div>
                 </div>
 
@@ -110,12 +110,12 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing, reloa
                                     <FaUser className="inline-block w-4 h-4 mr-2 text-gray-500" />
                                     Tên người dùng <span className="text-red-500">*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                    <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                                     placeholder="Nhập tên đầy đủ"
-                                    required
+                        required
                                     className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
                                 />
                             </div>
@@ -125,13 +125,13 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing, reloa
                                     <FaEnvelope className="inline-block w-4 h-4 mr-2 text-gray-500" />
                                     Email <span className="text-red-500">*</span>
                                 </label>
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                                     placeholder="example@email.com"
-                                    required
-                                    disabled={isEditing}
+                            required
+                            disabled={isEditing}
                                     className={`w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
                                         isEditing ? "bg-gray-100 text-gray-600 cursor-not-allowed" : "hover:border-gray-400"
                                     }`}
@@ -140,31 +140,31 @@ const UserFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing, reloa
                                     <p className="mt-1 text-xs text-gray-500">Email không thể thay đổi khi chỉnh sửa</p>
                                 )}
                             </div>
-                        </div>
+                    </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 <FaLock className="inline-block w-4 h-4 mr-2 text-gray-500" />
                                 Mật khẩu {!isEditing && <span className="text-red-500">*</span>}
                             </label>
-                            <div className="relative">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                    <div className="relative">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                                     placeholder={isEditing ? "Để trống nếu không muốn thay đổi" : "Nhập mật khẩu"}
-                                    required={!isEditing}
+                            required={!isEditing}
                                     className="w-full border border-gray-300 rounded-lg px-4 py-3 pr-12 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
                                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
                                     title={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
-                                >
+                        >
                                     {showPassword ? <FaEyeSlash className="w-4 h-4" /> : <FaEye className="w-4 h-4" />}
-                                </button>
-                            </div>
+                        </button>
+                    </div>
                             {isEditing && (
                                 <p className="mt-1 text-xs text-gray-500">Để trống nếu không muốn thay đổi mật khẩu</p>
                             )}

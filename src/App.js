@@ -34,7 +34,6 @@ import ListAcceptedPage from "./pages/AdminPages/ListAcceptedPage/ListAcceptedPa
 import FilterPage from "./pages/AdminPages/FilterPage/FilterPage.jsx";
 import ChatPage from "./pages/AdminPages/ChatPage/ChatPage.jsx";
 import UserChat from "./pages/UserPages/Chat.jsx";
-import ReviewerChat from "./pages/ReviewerPages/Chat.jsx";
 import GoogleCallback from "./pages/GoogleCallback.jsx";
 import TinyMCEEditor from "./components/TinyMCEEditor.jsx";
 // Import các component con của UserDetailPage
@@ -147,9 +146,7 @@ function App() {
                             <ReviewerPage />
                         </ProtectedRoute>
                     }
-                >
-                    <Route index element={<Navigate to="chat" replace />} />
-                    <Route path="chat" element={<ReviewerChat />} />
+                >            
                 </Route>
 
                 {/* Reviewer User Detail Routes */}

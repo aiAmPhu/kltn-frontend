@@ -82,8 +82,8 @@ const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing,
                             <FaUserShield className="w-6 h-6 text-blue-600" />
                         </div>
                         <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                            Cập nhật phân quyền
-                        </h2>
+                    Cập nhật phân quyền
+                </h2>
                     </div>
                 </div>
 
@@ -100,10 +100,10 @@ const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing,
                                     <FaUser className="inline-block w-4 h-4 mr-2 text-gray-500" />
                                     Tên người dùng
                                 </label>
-                                <input
-                                    type="text"
-                                    value={name}
-                                    disabled
+                        <input
+                            type="text"
+                            value={name}
+                            disabled
                                     className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm bg-gray-100 text-gray-600 cursor-not-allowed"
                                 />
                             </div>
@@ -113,12 +113,12 @@ const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing,
                                     <FaEnvelope className="inline-block w-4 h-4 mr-2 text-gray-500" />
                                     Email
                                 </label>
-                                <input
-                                    type="text"
-                                    value={email}
-                                    disabled
+                        <input
+                            type="text"
+                            value={email}
+                            disabled
                                     className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm bg-gray-100 text-gray-600 cursor-not-allowed"
-                                />
+                        />
                             </div>
                         </div>
                     </div>
@@ -129,38 +129,38 @@ const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing,
                             <FaUserTag className="inline-block w-4 h-4 mr-2 text-gray-500" />
                             Phân quyền
                         </h3>
-                        
-                        <div>
+                    
+                    <div>
                             <label className="block text-sm font-medium text-gray-700 mb-3">
                                 Chọn vai trò <span className="text-red-500">*</span>
-                            </label>
+                        </label>
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                                 <label className="flex items-start p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                                    <input
-                                        type="radio"
-                                        name="role"
-                                        value="user"
-                                        checked={selectedRole === "user"}
-                                        onChange={() => handleRoleChange("user")}
+                                <input
+                                    type="radio"
+                                    name="role"
+                                    value="user"
+                                    checked={selectedRole === "user"}
+                                    onChange={() => handleRoleChange("user")}
                                         className="form-radio h-5 w-5 text-blue-600 mt-1 mr-3"
-                                    />
+                                />
                                     <div className="flex-1">
                                         <div className="font-medium text-gray-900 mb-1">Người dùng thường</div>
                                         <div className="text-sm text-gray-500">
                                             Không có quyền duyệt hồ sơ, chỉ có thể xem thông tin cá nhân
                                         </div>
-                                    </div>
-                                </label>
-                                
+                                </div>
+                            </label>
+                            
                                 <label className="flex items-start p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                                    <input
-                                        type="radio"
-                                        name="role"
-                                        value="reviewer"
-                                        checked={selectedRole === "reviewer"}
-                                        onChange={() => handleRoleChange("reviewer")}
+                                <input
+                                    type="radio"
+                                    name="role"
+                                    value="reviewer"
+                                    checked={selectedRole === "reviewer"}
+                                    onChange={() => handleRoleChange("reviewer")}
                                         className="form-radio h-5 w-5 text-blue-600 mt-1 mr-3"
-                                    />
+                                />
                                     <div className="flex-1">
                                         <div className="font-medium text-gray-900 mb-1">Người duyệt hồ sơ</div>
                                         <div className="text-sm text-gray-500">
@@ -183,12 +183,12 @@ const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing,
                                         <div className="text-sm text-gray-500">
                                             Có thể quản lý toàn bộ hệ thống, phân quyền cho người dùng và duyệt tất cả hồ sơ
                                         </div>
-                                    </div>
-                                </label>
+                                </div>
+                            </label>
                             </div>
                         </div>
                     </div>
-
+                    
                     {/* Error Display */}
                     {error && (
                         <div className="bg-red-50 border border-red-200 rounded-lg p-4">

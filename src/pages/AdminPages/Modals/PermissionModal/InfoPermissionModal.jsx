@@ -56,8 +56,8 @@ const InfoPermissionModal = ({ user, onClose }) => {
                                         </p>
                                     </div>
                                 </div>
-                            </div>
-
+                    </div>
+                    
                             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
@@ -70,8 +70,8 @@ const InfoPermissionModal = ({ user, onClose }) => {
                                         </p>
                                     </div>
                                 </div>
-                            </div>
-
+                    </div>
+                    
                             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
@@ -80,9 +80,9 @@ const InfoPermissionModal = ({ user, onClose }) => {
                                     <div className="flex-1">
                                         <p className="text-sm font-medium text-gray-600 mb-1">Vai trò</p>
                                         <span className={`px-2 py-1 rounded-full text-sm font-semibold ${roleInfo.class}`}>
-                                            {roleInfo.text}
-                                        </span>
-                                    </div>
+                            {roleInfo.text}
+                        </span>
+                    </div>
                                 </div>
                             </div>
                         </div>
@@ -97,7 +97,7 @@ const InfoPermissionModal = ({ user, onClose }) => {
                         
                         <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
                             <div className="text-gray-700 prose prose-sm max-w-none">
-                                {user.role === 'admin' && (
+                            {user.role === 'admin' && (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-purple-200">
                                             <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
@@ -116,8 +116,8 @@ const InfoPermissionModal = ({ user, onClose }) => {
                                             <span>Quản lý cấu hình hệ thống</span>
                                         </div>
                                     </div>
-                                )}
-                                {user.role === 'reviewer' && (
+                            )}
+                            {user.role === 'reviewer' && (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-200">
                                             <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
@@ -132,8 +132,8 @@ const InfoPermissionModal = ({ user, onClose }) => {
                                             <span>Xuất báo cáo</span>
                                         </div>
                                     </div>
-                                )}
-                                {user.role === 'user' && (
+                            )}
+                            {user.role === 'user' && (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-200">
                                             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
@@ -144,7 +144,7 @@ const InfoPermissionModal = ({ user, onClose }) => {
                                             <span className="text-gray-500">Không có quyền duyệt hồ sơ</span>
                                         </div>
                                     </div>
-                                )}
+                            )}
                             </div>
                         </div>
                     </div>

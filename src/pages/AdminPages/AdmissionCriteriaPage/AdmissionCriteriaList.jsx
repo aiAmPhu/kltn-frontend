@@ -69,17 +69,17 @@ const AdmissionCriteriaList = ({ criterias = [], setCriterias }) => {
     };
 
     const performDelete = async () => {
-        try {
-            const token = localStorage.getItem("token");
+            try {
+                const token = localStorage.getItem("token");
             await axios.delete(`${API_BASE_URL}/adcs/delete/${criteriaToDelete.criteriaId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            await loadAdmissionCriteria();
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                await loadAdmissionCriteria();
             toast.success("Xóa diện xét tuyển thành công!");
-            setError("");
-        } catch (error) {
+                setError("");
+            } catch (error) {
             toast.error(error.response?.data?.message || "Lỗi khi xóa diện xét tuyển");
-            setError(error.response?.data?.message || "Lỗi khi xóa diện xét tuyển");
+                setError(error.response?.data?.message || "Lỗi khi xóa diện xét tuyển");
         } finally {
             setShowDeleteModal(false);
             setCriteriaToDelete(null);
@@ -278,11 +278,11 @@ const AdmissionCriteriaList = ({ criterias = [], setCriterias }) => {
                                             </td>
                                             <td className="px-4 sm:px-6 py-4 hidden md:table-cell">
                                                 <div className="text-sm text-gray-500 line-clamp-2">
-                                                    <div
-                                                        dangerouslySetInnerHTML={{
-                                                            __html: criteria.criteriaDescription || "Không có mô tả",
-                                                        }}
-                                                    />
+                                                <div
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: criteria.criteriaDescription || "Không có mô tả",
+                                                    }}
+                                                />
                                                 </div>
                                             </td>
                                             <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -291,21 +291,21 @@ const AdmissionCriteriaList = ({ criterias = [], setCriterias }) => {
                                                         onClick={() => handleEdit(criteria)}
                                                         className="text-yellow-600 hover:text-yellow-900 bg-yellow-100 hover:bg-yellow-200 p-2 rounded-lg transition-colors"
                                                         title="Chỉnh sửa diện xét tuyển"
-                                                    >
+                                                        >
                                                         <FaEdit className="h-4 w-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(criteria)}
                                                         className="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 p-2 rounded-lg transition-colors"
                                                         title="Xóa diện xét tuyển này"
-                                                    >
+                                                        >
                                                         <FaTrash className="h-4 w-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleMoreClick(criteria)}
                                                         className="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 p-2 rounded-lg transition-colors"
                                                         title="Xem chi tiết diện xét tuyển"
-                                                    >
+                                                        >
                                                         <FaInfoCircle className="h-4 w-4" />
                                                     </button>
                                                 </div>

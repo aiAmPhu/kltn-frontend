@@ -266,7 +266,7 @@ const StatisticsPage = () => {
                 </div>
 
                 {/* Error Message */}
-                {error && (
+            {error && (
                     <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
@@ -275,39 +275,39 @@ const StatisticsPage = () => {
                             <div className="text-red-700">{error}</div>
                         </div>
                     </div>
-                )}
+            )}
 
-                {/* View Mode Tabs */}
+            {/* View Mode Tabs */}
                 <div className="bg-gray-50 border border-gray-200 rounded-xl p-2 mb-6">
                     <div className="grid grid-cols-3 gap-2">
                         {viewModes.map((mode) => {
                             const IconComponent = mode.icon;
                             return (
-                                <button
-                                    key={mode.key}
-                                    onClick={() => setViewMode(mode.key)}
+                    <button
+                        key={mode.key}
+                        onClick={() => setViewMode(mode.key)}
                                     className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
-                                        viewMode === mode.key
-                                            ? "bg-blue-500 text-white shadow-md"
-                                            : "text-gray-600 hover:text-gray-800 hover:bg-gray-200"
-                                    }`}
+                            viewMode === mode.key
+                                ? "bg-blue-500 text-white shadow-md"
+                                : "text-gray-600 hover:text-gray-800 hover:bg-gray-200"
+                        }`}
                                     title={`Chuyển sang chế độ ${mode.label.toLowerCase()}`}
-                                >
+                    >
                                     <IconComponent className="text-sm" />
                                     <span className="hidden sm:inline">{mode.label}</span>
-                                </button>
+                    </button>
                             );
                         })}
                     </div>
-                </div>
+            </div>
 
-                {/* Overview Mode */}
-                {viewMode === "overview" && (
-                    <div className="space-y-6">
-                        {/* Summary Cards */}
+            {/* Overview Mode */}
+            {viewMode === "overview" && (
+                <div className="space-y-6">
+                    {/* Summary Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {snapshots.slice(0, 1).map((snapshot) => (
-                                <React.Fragment key={snapshot.snapshotId}>
+                        {snapshots.slice(0, 1).map((snapshot) => (
+                            <React.Fragment key={snapshot.snapshotId}>
                                     <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
                                         <div className="flex items-center gap-3 mb-3">
                                             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -318,20 +318,20 @@ const StatisticsPage = () => {
                                                 <p className="text-sm text-blue-600">Năm {snapshot.yearName}</p>
                                             </div>
                                         </div>
-                                        <p className="text-3xl font-bold text-blue-600">{snapshot.totalStudents}</p>
+                                    <p className="text-3xl font-bold text-blue-600">{snapshot.totalStudents}</p>
                                     </div>
                                     
                                     <div className="bg-green-50 border border-green-200 rounded-xl p-6">
                                         <div className="flex items-center gap-3 mb-3">
                                             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                                                 <FaClipboardList className="text-green-600" />
-                                            </div>
+                                </div>
                                             <div>
                                                 <h3 className="text-lg font-semibold text-green-800">Tổng nguyện vọng</h3>
                                                 <p className="text-sm text-green-600">
                                                     TB: {snapshot.totalStudents > 0 ? (snapshot.totalWishes / snapshot.totalStudents).toFixed(1) : 0} NV/SV
-                                                </p>
-                                            </div>
+                                    </p>
+                                </div>
                                         </div>
                                         <p className="text-3xl font-bold text-green-600">{snapshot.totalWishes}</p>
                                     </div>
@@ -346,32 +346,32 @@ const StatisticsPage = () => {
                                                 <p className="text-sm text-purple-600">Đang tuyển sinh</p>
                                             </div>
                                         </div>
-                                        <p className="text-3xl font-bold text-purple-600">{snapshot.totalMajors}</p>
+                                    <p className="text-3xl font-bold text-purple-600">{snapshot.totalMajors}</p>
                                     </div>
                                     
                                     <div className="bg-orange-50 border border-orange-200 rounded-xl p-6">
                                         <div className="flex items-center gap-3 mb-3">
                                             <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                                                 <FaChartLine className="text-orange-600" />
-                                            </div>
+                                </div>
                                             <div>
                                                 <h3 className="text-lg font-semibold text-orange-800">Tỷ lệ trúng tuyển</h3>
                                                 <p className="text-sm text-orange-600">
-                                                    {snapshot.acceptedWishes}/{snapshot.totalWishes}
+                                        {snapshot.acceptedWishes}/{snapshot.totalWishes}
                                                 </p>
                                             </div>
                                         </div>
                                         <p className="text-3xl font-bold text-orange-600">
                                             {snapshot.totalWishes > 0 ? ((snapshot.acceptedWishes / snapshot.totalStudents) * 100).toFixed(1) : 0}%
-                                        </p>
-                                    </div>
-                                </React.Fragment>
-                            ))}
-                        </div>
+                                    </p>
+                                </div>
+                            </React.Fragment>
+                        ))}
+                    </div>
 
-                        {/* Charts Grid */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {/* Yearly Trend */}
+                    {/* Charts Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Yearly Trend */}
                             <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -387,9 +387,9 @@ const StatisticsPage = () => {
                                         <p>Chưa có dữ liệu để hiển thị</p>
                                     </div>
                                 )}
-                            </div>
+                        </div>
 
-                            {/* Status Distribution */}
+                        {/* Status Distribution */}
                             <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
@@ -398,24 +398,24 @@ const StatisticsPage = () => {
                                     <h3 className="text-lg font-semibold text-gray-800">Phân bố trạng thái</h3>
                                 </div>
                                 {getStatusDistributionData() ? (
-                                    <Pie
-                                        data={getStatusDistributionData()}
-                                        options={{
-                                            responsive: true,
-                                            plugins: {
-                                                legend: { position: "bottom" },
-                                            },
-                                        }}
-                                    />
+                                <Pie
+                                    data={getStatusDistributionData()}
+                                    options={{
+                                        responsive: true,
+                                        plugins: {
+                                            legend: { position: "bottom" },
+                                        },
+                                    }}
+                                />
                                 ) : (
                                     <div className="text-center py-8 text-gray-500">
                                         <FaInfoCircle className="mx-auto mb-2" />
                                         <p>Chưa có dữ liệu để hiển thị</p>
                                     </div>
-                                )}
-                            </div>
+                            )}
+                        </div>
 
-                            {/* Top Majors */}
+                        {/* Top Majors */}
                             <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 lg:col-span-2">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -424,31 +424,31 @@ const StatisticsPage = () => {
                                     <h3 className="text-lg font-semibold text-gray-800">Top 10 ngành được đăng ký nhiều nhất</h3>
                                 </div>
                                 {getTopMajorsData() ? (
-                                    <Bar
-                                        data={getTopMajorsData()}
-                                        options={{
-                                            ...chartOptions,
-                                            indexAxis: "y",
-                                            plugins: {
-                                                legend: { display: false },
-                                            },
-                                        }}
-                                    />
+                                <Bar
+                                    data={getTopMajorsData()}
+                                    options={{
+                                        ...chartOptions,
+                                        indexAxis: "y",
+                                        plugins: {
+                                            legend: { display: false },
+                                        },
+                                    }}
+                                />
                                 ) : (
                                     <div className="text-center py-8 text-gray-500">
                                         <FaInfoCircle className="mx-auto mb-2" />
                                         <p>Chưa có dữ liệu để hiển thị</p>
                                     </div>
-                                )}
-                            </div>
+                            )}
                         </div>
                     </div>
-                )}
+                </div>
+            )}
 
-                {/* Comparison Mode */}
-                {viewMode === "comparison" && (
-                    <div className="space-y-6">
-                        {/* Snapshot Selection */}
+            {/* Comparison Mode */}
+            {viewMode === "comparison" && (
+                <div className="space-y-6">
+                    {/* Snapshot Selection */}
                         <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -457,56 +457,56 @@ const StatisticsPage = () => {
                                 <h3 className="text-lg font-semibold text-gray-800">Chọn snapshots để so sánh</h3>
                             </div>
                             
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                                {snapshots.map((snapshot) => (
-                                    <label
-                                        key={snapshot.snapshotId}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                            {snapshots.map((snapshot) => (
+                                <label
+                                    key={snapshot.snapshotId}
                                         className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedSnapshots.includes(snapshot.snapshotId)}
-                                            onChange={(e) => {
-                                                if (e.target.checked) {
-                                                    setSelectedSnapshots([...selectedSnapshots, snapshot.snapshotId]);
-                                                } else {
-                                                    setSelectedSnapshots(
-                                                        selectedSnapshots.filter((id) => id !== snapshot.snapshotId)
-                                                    );
-                                                }
-                                            }}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedSnapshots.includes(snapshot.snapshotId)}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedSnapshots([...selectedSnapshots, snapshot.snapshotId]);
+                                            } else {
+                                                setSelectedSnapshots(
+                                                    selectedSnapshots.filter((id) => id !== snapshot.snapshotId)
+                                                );
+                                            }
+                                        }}
                                             className="mr-3 h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
-                                        />
+                                    />
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                                                 <FaCalendarAlt className="text-blue-600 text-xs" />
                                             </div>
-                                            <div>
+                                    <div>
                                                 <div className="font-medium text-gray-900">{snapshot.yearName}</div>
-                                                <div className="text-sm text-gray-500">
-                                                    {new Date(snapshot.createdAt).toLocaleDateString("vi-VN")}
-                                                </div>
-                                                <div className="text-xs text-blue-600">
-                                                    {snapshot.totalStudents} SV • {snapshot.totalWishes} NV
-                                                </div>
-                                            </div>
+                                        <div className="text-sm text-gray-500">
+                                            {new Date(snapshot.createdAt).toLocaleDateString("vi-VN")}
                                         </div>
-                                    </label>
-                                ))}
-                            </div>
-                            <button
-                                onClick={handleCompareSnapshots}
-                                disabled={selectedSnapshots.length < 2}
+                                        <div className="text-xs text-blue-600">
+                                            {snapshot.totalStudents} SV • {snapshot.totalWishes} NV
+                                                </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            ))}
+                        </div>
+                        <button
+                            onClick={handleCompareSnapshots}
+                            disabled={selectedSnapshots.length < 2}
                                 className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                                 title="So sánh các snapshots đã chọn"
-                            >
+                        >
                                 <FaExchangeAlt className="text-sm" />
                                 So sánh ({selectedSnapshots.length} snapshots)
-                            </button>
-                        </div>
+                        </button>
+                    </div>
 
-                        {/* Comparison Results */}
-                        {comparisonData && (
+                    {/* Comparison Results */}
+                    {comparisonData && (
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 {/* Basic Comparison */}
                                 <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
@@ -567,13 +567,13 @@ const StatisticsPage = () => {
                                     </div>
                                 </div>
                             </div>
-                        )}
-                    </div>
-                )}
+                    )}
+                </div>
+            )}
 
-                {/* Detailed Mode */}
-                {viewMode === "detailed" && (
-                    <div className="space-y-6">
+            {/* Detailed Mode */}
+            {viewMode === "detailed" && (
+                <div className="space-y-6">
                         <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -582,9 +582,9 @@ const StatisticsPage = () => {
                                 <h3 className="text-lg font-semibold text-gray-800">Chi tiết tất cả snapshots</h3>
                             </div>
                             
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm">
-                                    <thead>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
                                         <tr className="border-b border-gray-300 bg-gray-100">
                                             <th className="text-left py-3 px-4 font-medium text-gray-700">Năm</th>
                                             <th className="text-left py-3 px-4 font-medium text-gray-700">Loại</th>
@@ -594,57 +594,57 @@ const StatisticsPage = () => {
                                             <th className="text-right py-3 px-4 font-medium text-gray-700">Trúng tuyển</th>
                                             <th className="text-left py-3 px-4 font-medium text-gray-700">Thời gian</th>
                                             <th className="text-left py-3 px-4 font-medium text-gray-700">Ghi chú</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {snapshots.map((snapshot) => (
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {snapshots.map((snapshot) => (
                                             <tr key={snapshot.snapshotId} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                                                 <td className="py-3 px-4 font-medium text-gray-900">{snapshot.yearName}</td>
-                                                <td className="py-3 px-4">
-                                                    <span
+                                            <td className="py-3 px-4">
+                                                <span
                                                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                            snapshot.snapshotType === "yearly_summary"
-                                                                ? "bg-blue-100 text-blue-800"
-                                                                : snapshot.snapshotType === "manual"
-                                                                ? "bg-green-100 text-green-800"
-                                                                : snapshot.snapshotType === "auto"
-                                                                ? "bg-purple-100 text-purple-800"
-                                                                : "bg-gray-100 text-gray-800"
-                                                        }`}
-                                                    >
-                                                        {snapshot.snapshotType}
-                                                    </span>
-                                                </td>
+                                                        snapshot.snapshotType === "yearly_summary"
+                                                            ? "bg-blue-100 text-blue-800"
+                                                            : snapshot.snapshotType === "manual"
+                                                            ? "bg-green-100 text-green-800"
+                                                            : snapshot.snapshotType === "auto"
+                                                            ? "bg-purple-100 text-purple-800"
+                                                            : "bg-gray-100 text-gray-800"
+                                                    }`}
+                                                >
+                                                    {snapshot.snapshotType}
+                                                </span>
+                                            </td>
                                                 <td className="text-right py-3 px-4 text-gray-700">
-                                                    {snapshot.totalStudents.toLocaleString()}
-                                                </td>
+                                                {snapshot.totalStudents.toLocaleString()}
+                                            </td>
                                                 <td className="text-right py-3 px-4 text-gray-700">
-                                                    {snapshot.totalWishes.toLocaleString()}
-                                                </td>
+                                                {snapshot.totalWishes.toLocaleString()}
+                                            </td>
                                                 <td className="text-right py-3 px-4 text-gray-700">{snapshot.totalMajors}</td>
-                                                <td className="text-right py-3 px-4">
-                                                    <span className="text-green-600 font-medium">
-                                                        {snapshot.acceptedWishes} (
-                                                        {snapshot.totalWishes > 0
+                                            <td className="text-right py-3 px-4">
+                                                <span className="text-green-600 font-medium">
+                                                    {snapshot.acceptedWishes} (
+                                                    {snapshot.totalWishes > 0
                                                             ? ((snapshot.acceptedWishes / snapshot.totalWishes) * 100).toFixed(1)
-                                                            : 0}
-                                                        %)
-                                                    </span>
-                                                </td>
-                                                <td className="py-3 px-4 text-gray-600">
-                                                    {new Date(snapshot.createdAt).toLocaleDateString("vi-VN")}
-                                                </td>
-                                                <td className="py-3 px-4 text-gray-600 max-w-xs truncate">
-                                                    {snapshot.notes}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                                        : 0}
+                                                    %)
+                                                </span>
+                                            </td>
+                                            <td className="py-3 px-4 text-gray-600">
+                                                {new Date(snapshot.createdAt).toLocaleDateString("vi-VN")}
+                                            </td>
+                                            <td className="py-3 px-4 text-gray-600 max-w-xs truncate">
+                                                {snapshot.notes}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                )}
+                </div>
+            )}
             </div>
         </div>
     );
