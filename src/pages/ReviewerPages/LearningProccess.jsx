@@ -196,21 +196,21 @@ const LearningProccess = ({ userId }) => {
                 {/* Khu vực trạng thái, phản hồi và hành động bên phải */}
                 <div className="w-full md:w-1/3 lg:w-1/2 flex flex-col gap-4 md:sticky md:top-4 self-start" style={{zIndex: 10}}>
                     <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col gap-4 h-fit">
-                        {/* Ảnh CCCD và giấy khai sinh */}
+                        {/* Ảnh học bạ và giấy khai sinh */}
                         <div className="space-y-4">
                             <div className="flex items-center gap-2 text-lg font-semibold text-gray-700">
-                                <FaIdCard className="w-5 h-5 text-blue-500" />
-                                <span>Ảnh CCCD và giấy khai sinh</span>
+                                <FaGraduationCap className="w-5 h-5 text-blue-500" />
+                                <span>Ảnh học bạ và giấy khai sinh</span>
                             </div>
-                            <div className="grid grid-cols-3 gap-4">
+                            <div className="grid grid-cols-4 gap-4">
                                 <div className="space-y-2">
-                                    <div className="text-sm font-medium text-gray-600">Mặt trước</div>
-                                    {photoData?.frontCCCD ? (
+                                    <div className="text-sm font-medium text-gray-600">Học bạ lớp 10</div>
+                                    {photoData?.grade10Pic ? (
                                         <img 
-                                            src={photoData.frontCCCD} 
-                                            alt="CCCD mặt trước" 
+                                            src={photoData.grade10Pic} 
+                                            alt="Học bạ lớp 10" 
                                             className="w-full h-24 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
-                                            onClick={() => setSelectedImage({ url: photoData.frontCCCD, label: "CCCD mặt trước" })}
+                                            onClick={() => setSelectedImage({ url: photoData.grade10Pic, label: "Học bạ lớp 10" })}
                                         />
                                     ) : (
                                         <div className="w-full h-24 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
@@ -219,13 +219,28 @@ const LearningProccess = ({ userId }) => {
                                     )}
                                 </div>
                                 <div className="space-y-2">
-                                    <div className="text-sm font-medium text-gray-600">Mặt sau</div>
-                                    {photoData?.backCCCD ? (
+                                    <div className="text-sm font-medium text-gray-600">Học bạ lớp 11</div>
+                                    {photoData?.grade11Pic ? (
                                         <img 
-                                            src={photoData.backCCCD} 
-                                            alt="CCCD mặt sau" 
+                                            src={photoData.grade11Pic} 
+                                            alt="Học bạ lớp 11" 
                                             className="w-full h-24 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
-                                            onClick={() => setSelectedImage({ url: photoData.backCCCD, label: "CCCD mặt sau" })}
+                                            onClick={() => setSelectedImage({ url: photoData.grade11Pic, label: "Học bạ lớp 11" })}
+                                        />
+                                    ) : (
+                                        <div className="w-full h-24 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
+                                            Chưa có ảnh
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="text-sm font-medium text-gray-600">Học bạ lớp 12</div>
+                                    {photoData?.grade12Pic ? (
+                                        <img 
+                                            src={photoData.grade12Pic} 
+                                            alt="Học bạ lớp 12" 
+                                            className="w-full h-24 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                                            onClick={() => setSelectedImage({ url: photoData.grade12Pic, label: "Học bạ lớp 12" })}
                                         />
                                     ) : (
                                         <div className="w-full h-24 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
@@ -236,14 +251,12 @@ const LearningProccess = ({ userId }) => {
                                 <div className="space-y-2">
                                     <div className="text-sm font-medium text-gray-600">Giấy khai sinh</div>
                                     {photoData?.birthCertificate ? (
-                                        <div className="relative w-full h-24 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
-                                            <img 
-                                                src={photoData.birthCertificate} 
-                                                alt="Giấy khai sinh" 
-                                                className="absolute inset-0 w-full h-full object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                                                onClick={() => setSelectedImage({ url: photoData.birthCertificate, label: "Giấy khai sinh" })}
-                                            />
-                                        </div>
+                                        <img 
+                                            src={photoData.birthCertificate} 
+                                            alt="Giấy khai sinh" 
+                                            className="w-full h-24 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                                            onClick={() => setSelectedImage({ url: photoData.birthCertificate, label: "Giấy khai sinh" })}
+                                        />
                                     ) : (
                                         <div className="w-full h-24 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
                                             Chưa có ảnh
