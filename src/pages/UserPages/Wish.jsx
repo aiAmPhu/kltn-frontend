@@ -15,6 +15,8 @@ function WishRegistration() {
         admissionBlockId: "",
         majorId: "",
     });
+    const [isSaving, setIsSaving] = useState(false);
+    const [isLoadingWishes, setIsLoadingWishes] = useState(false);
 
     const location = useLocation();
     const selectedMajor = location.state?.selectedMajor;
@@ -22,6 +24,22 @@ function WishRegistration() {
     const token = localStorage.getItem("token");
     const userId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
     const userRole = token ? JSON.parse(atob(token.split(".")[1])).role : null;
+
+    // Tách riêng function để fetch user wishes
+    const fetchUserWishes = async () => {
+        setIsLoadingWishes(true);
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/wish/form-data`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const { userWishes } = response.data.data;
+            setUserWishes(userWishes);
+        } catch (error) {
+            console.error("Lỗi khi tải nguyện vọng người dùng:", error);
+        } finally {
+            setIsLoadingWishes(false);
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -31,10 +49,6 @@ function WishRegistration() {
                 });
                 console.log("Dữ liệu nguyện vọng:", response.data.data);
                 const { criteria, majors, blocks, userWishes } = response.data.data;
-                // console.log("Criteria:", criteria);
-                // console.log("Majors:", majors);
-                // console.log("Blocks:", blocks);
-                // console.log("User Wishes:", fo);
                 setCriteriaList(criteria);
                 setBlockList(blocks);
                 setMajorList(majors);
@@ -76,8 +90,9 @@ function WishRegistration() {
     }, [selectedMajor, blockList]);
 
     const handleSave = async () => {
+        setIsSaving(true);
         try {
-            const res = await axios.post(
+            await axios.post(
                 `${process.env.REACT_APP_API_BASE_URL}/wish/add`,
                 {
                     uId: userId, // đổi từ userId → uId
@@ -92,10 +107,22 @@ function WishRegistration() {
                 }
             );
             toast.success("Lưu nguyện vọng thành công!");
-            setUserWishes((prev) => [...prev, res.data]);
+            
+            // Reset form
+            setSelected({
+                criteriaId: "",
+                admissionBlockId: "",
+                majorId: "",
+            });
+            setAvailableBlocks([]);
+            
+            // Refetch user wishes để cập nhật danh sách ngay lập tức
+            await fetchUserWishes();
         } catch (err) {
             toast.error(err.response?.data?.message);
             console.error(err);
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -170,11 +197,31 @@ function WishRegistration() {
             <div className="grid grid-cols-2 gap-8">
                 {/* Left side - Registered Wishes */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                    <h2 className="text-xl font-bold text-gray-800 mb-4">
-                        Nguyện vọng đã đăng ký
-                    </h2>
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-bold text-gray-800">
+                            Nguyện vọng đã đăng ký
+                        </h2>
+                        <button
+                            onClick={fetchUserWishes}
+                            disabled={isLoadingWishes}
+                            className="text-blue-600 hover:text-blue-800 transition-colors disabled:opacity-50"
+                            title="Làm mới danh sách"
+                        >
+                            <svg className={`w-5 h-5 ${isLoadingWishes ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                    </div>
                     <div className="space-y-3">
-                        {userWishes.length > 0 ? (
+                        {isLoadingWishes ? (
+                            <div className="flex items-center justify-center py-8">
+                                <svg className="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span className="ml-2 text-gray-600">Đang tải nguyện vọng...</span>
+                            </div>
+                        ) : userWishes.length > 0 ? (
                             userWishes.map((wish, index) => (
                                 <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                                     <span className="w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full font-semibold mr-3">
@@ -253,10 +300,20 @@ function WishRegistration() {
 
                         <button
                             onClick={handleSave}
-                            disabled={!selected.criteriaId || !selected.admissionBlockId || !selected.majorId}
+                            disabled={!selected.criteriaId || !selected.admissionBlockId || !selected.majorId || isSaving}
                             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200"
                         >
-                            Lưu nguyện vọng
+                            {isSaving ? (
+                                <div className="flex items-center justify-center">
+                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Đang lưu...
+                                </div>
+                            ) : (
+                                "Lưu nguyện vọng"
+                            )}
                         </button>
                     </div>
                 </div>
