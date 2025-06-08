@@ -49,7 +49,7 @@ const menuItems = [
     {
         to: "/admin/filter",
         icon: <FaFilter className="text-lg" />,
-        label: "Lọc danh sách trúng tuyển",
+        label: "Xét duyệt nguyện vọng",
     },
     {
         to: "/admin/list-accepted",
