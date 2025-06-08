@@ -162,17 +162,77 @@ const Information = ({ userId }) => {
     if (error) return <p className="text-red-500">{error}</p>;
     if (!user) return null;
 
-    // Chuẩn bị dữ liệu dạng bảng
-    const tableRows = FIELD_LABELS.map(({ key, label, isDate }) => {
-        let value = user[key];
-        if (isDate && value) value = formatDate(value);
-        return (
-            <tr key={key} className="">
-                <td className="py-1 pr-3 font-medium text-gray-700 w-44">{label}</td>
-                <td className="py-1 text-gray-900">{value || <span className="text-gray-400 italic">-</span>}</td>
-            </tr>
-        );
-    });
+    // Chuẩn bị dữ liệu dạng bảng với gộp hàng
+    const customRows = [
+        {
+            label: "Họ và Tên",
+            value: `${user.firstName || '-'} ${user.lastName || '-'}`
+        },
+        {
+            label: "Giới tính",
+            value: user.gender || '-'
+        },
+        {
+            label: "Ngày sinh", 
+            value: user.birthDate ? formatDate(user.birthDate) : '-'
+        },
+        {
+            label: "Nơi sinh",
+            value: user.birthPlace || '-'
+        },
+        {
+            label: "Số điện thoại",
+            value: user.phone || '-'
+        },
+        {
+            label: "Email",
+            value: user.email || '-'
+        },
+        {
+            label: "Email phụ huynh", 
+            value: user.parentEmail || '-'
+        },
+        {
+            label: "Số CCCD",
+            value: user.idNumber || '-'
+        },
+        {
+            label: "Ngày cấp CCCD",
+            value: user.idIssueDate ? formatDate(user.idIssueDate) : '-'
+        },
+        {
+            label: "Nơi cấp CCCD",
+            value: user.idIssuePlace || '-',
+            smallText: true
+        },
+        {
+            label: "Số nhà",
+            value: user.houseNumber || '-'
+        },
+        {
+            label: "Tên đường",
+            value: user.streetName || '-'
+        },
+        {
+            label: "Xã/Phường",
+            value: user.commune || '-'
+        },
+        {
+            label: "Quận/Huyện",
+            value: user.district || '-'
+        },
+        {
+            label: "Tỉnh/Thành phố",
+            value: user.province || '-'
+        }
+    ];
+
+    const tableRows = customRows.map(({ label, value, smallText }, index) => (
+        <tr key={index} className="">
+            <td className="py-1 pr-3 font-medium text-gray-700 w-32">{label}</td>
+            <td className={`py-1 text-gray-900 ${smallText ? 'text-xs' : ''}`}>{value}</td>
+        </tr>
+    ));
 
     // Địa chỉ gộp
     const address = [user.houseNumber, user.streetName, user.commune, user.district, user.province]
@@ -187,16 +247,13 @@ const Information = ({ userId }) => {
             <div className="flex flex-col md:flex-row h-full flex-1 p-4 gap-6">
                 {/* Thông tin cá nhân bên trái */}
                 <div className="w-full md:w-2/3 lg:w-1/2 flex-shrink-0 overflow-y-auto">
-                    <div className="bg-white rounded-lg shadow-sm p-6 h-full">
-                        <h2 className="text-2xl font-bold text-blue-700 mb-4 flex items-center gap-2">
-                            <FaUser className="w-6 h-6 text-blue-500" />
-                            Thông tin cá nhân
-                        </h2>
-                        <table className="w-full">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                        <h2 className="text-lg font-semibold text-slate-800 mb-4">Thông tin cá nhân</h2>
+                        <table className="w-full text-sm">
                             <tbody>
                                 {tableRows}
                                 <tr>
-                                    <td className="py-1 pr-3 font-medium text-gray-700">Địa chỉ</td>
+                                    <td className="py-1 pr-3 font-medium text-gray-700 w-32">Địa chỉ</td>
                                     <td className="py-1 text-gray-900">{address || <span className="text-gray-400 italic">-</span>}</td>
                                 </tr>
                             </tbody>
