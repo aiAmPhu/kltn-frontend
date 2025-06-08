@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function WishRegistration() {
     const [criteriaList, setCriteriaList] = useState([]);
@@ -17,8 +17,12 @@ function WishRegistration() {
     });
     const [isSaving, setIsSaving] = useState(false);
     const [isLoadingWishes, setIsLoadingWishes] = useState(false);
+    const [profileStatus, setProfileStatus] = useState("waiting"); // waiting, accepted, rejected
+    const [isCheckingProfile, setIsCheckingProfile] = useState(true); // loading state cho việc kiểm tra profile
+    const [showProfileModal, setShowProfileModal] = useState(false); // hiển thị modal thông báo profile
 
     const location = useLocation();
+    const navigate = useNavigate();
     const selectedMajor = location.state?.selectedMajor;
     
     const token = localStorage.getItem("token");
@@ -44,6 +48,28 @@ function WishRegistration() {
     useEffect(() => {
         const fetchData = async () => {
             try {
+                // Kiểm tra profile status trước tiên
+                try {
+                    const profileRes = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adis/getBasicInfo/${userId}`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    const status = profileRes.data.data?.status || "waiting";
+                    setProfileStatus(status);
+                    
+                    // Kiểm tra quyền truy cập trang - hiển thị modal nếu profile chưa được duyệt
+                    if (status !== "accepted") {
+                        setShowProfileModal(true);
+                        setIsCheckingProfile(false);
+                        return;
+                    }
+                } catch (error) {
+                    console.error("Lỗi khi tải trạng thái profile:", error);
+                    toast.error("Không thể kiểm tra trạng thái hồ sơ. Vui lòng thử lại sau.");
+                    setIsCheckingProfile(false);
+                    return;
+                }
+
+                // Nếu profile đã được duyệt, tiếp tục fetch wish form data
                 const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/wish/form-data`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
@@ -77,10 +103,13 @@ function WishRegistration() {
                 }
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu:", error);
+                toast.error("Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.");
+            } finally {
+                setIsCheckingProfile(false);
             }
         };
         fetchData();
-    }, [userId, userRole]);
+    }, [userId, userRole, navigate]);
 
     // Handle major selection from HomePage
     useEffect(() => {
@@ -154,6 +183,74 @@ function WishRegistration() {
             setAvailableBlocks([]);
         }
     };
+
+    // Handle đóng modal và chuyển đến profile
+    const handleGoToProfile = () => {
+        setShowProfileModal(false);
+        navigate("/profile");
+    };
+
+    const handleCloseModal = () => {
+        setShowProfileModal(false);
+        navigate("/"); // Quay về trang chủ
+    };
+
+    // Modal thông báo profile chưa được duyệt
+    const ProfileModal = () => (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center px-4">
+            <div className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full">
+                <div className="text-center">
+                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
+                        <svg className="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.502 0L4.732 15.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">
+                        Thông báo
+                    </h3>
+                    <p className="text-sm text-gray-500 mb-6">
+                        Bạn cần cập nhật thông tin đầy đủ hoặc chờ hồ sơ được duyệt
+                    </p>
+                    <div className="flex gap-3 justify-center">
+                        <button
+                            onClick={handleCloseModal}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                        >
+                            Đóng
+                        </button>
+                        <button
+                            onClick={handleGoToProfile}
+                            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            Đến trang Hồ sơ của tôi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    // Hiển thị modal nếu profile chưa được duyệt
+    if (showProfileModal) {
+        return <ProfileModal />;
+    }
+
+    // Hiển thị loading screen khi đang kiểm tra profile
+    if (isCheckingProfile) {
+        return (
+            <div className="max-w-7xl mx-auto py-10 px-4 mt-12">
+                <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="text-center">
+                        <svg className="animate-spin h-12 w-12 text-blue-500 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 718-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p className="text-lg text-gray-600">Đang kiểm tra quyền truy cập...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-7xl mx-auto py-10 px-4 mt-12">
@@ -244,6 +341,8 @@ function WishRegistration() {
                     <h2 className="text-xl font-bold text-gray-800 mb-4">
                         Đăng ký nguyện vọng mới
                     </h2>
+                    
+
                     
                     <div className="space-y-4">
                         <div>
