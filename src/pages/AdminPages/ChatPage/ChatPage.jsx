@@ -360,21 +360,13 @@ const ChatPage = () => {
     };
 
     return (
-        <div className="flex h-[calc(100vh-4rem)] bg-white">
+        <div className="flex h-full bg-white overflow-hidden">
             {/* Users List - Left Sidebar */}
-            <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+            <div className="w-80 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
                 {/* Header */}
-                <div className="p-4 border-b border-gray-200">
+                <div className="p-4 border-b border-gray-200 flex-shrink-0">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-xl font-semibold text-gray-800">Chats</h2>
-                        <div className="flex space-x-2">
-                            <button className="p-2 hover:bg-gray-100 rounded-full">
-                                <FaVideo className="text-gray-600" />
-                            </button>
-                            <button className="p-2 hover:bg-gray-100 rounded-full">
-                                <FaPhone className="text-gray-600" />
-                            </button>
-                        </div>
                     </div>
                     <div className="relative">
                         <input
@@ -450,7 +442,7 @@ const ChatPage = () => {
                 {selectedUser ? (
                     <>
                         {/* Chat Header */}
-                        <div className="p-4 border-b border-gray-200 bg-white flex justify-between items-center">
+                        <div className="p-4 border-b border-gray-200 bg-white flex justify-between items-center flex-shrink-0">
                             <div className="flex items-center space-x-3">
                                 <div className="relative">
                                     <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
@@ -469,19 +461,13 @@ const ChatPage = () => {
                             </div>
                             <div className="flex space-x-2">
                                 <button className="p-2 hover:bg-gray-100 rounded-full">
-                                    <FaPhone className="text-gray-600" />
-                                </button>
-                                <button className="p-2 hover:bg-gray-100 rounded-full">
-                                    <FaVideo className="text-gray-600" />
-                                </button>
-                                <button className="p-2 hover:bg-gray-100 rounded-full">
                                     <FaInfoCircle className="text-gray-600" />
                                 </button>
                             </div>
                         </div>
 
                         {/* Messages */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4">
                             {messages
                                 .filter((msg) => {
                                     const roomId = `admin-${selectedUser.userId}`;
@@ -494,15 +480,15 @@ const ChatPage = () => {
                                     );
                                 })
                                 .map((message, index) => (
-                                    <div
-                                        key={index}
-                                        className={`flex w-full ${
-                                            message.senderId === parseInt(user.userId, 10)
-                                                ? "justify-end"
-                                                : "justify-start"
-                                        }`}
-                                    >
-                                        <div className="relative group" style={{ maxWidth: "70%" }}>
+                                                        <div
+                        key={index}
+                        className={`flex w-full min-w-0 ${
+                            message.senderId === parseInt(user.userId, 10)
+                                ? "justify-end"
+                                : "justify-start"
+                        }`}
+                    >
+                                        <div className="relative group max-w-[60%] min-w-0">
                                             <div
                                                 className={`rounded-2xl p-3 ${
                                                     message.senderId === parseInt(user.userId, 10)
@@ -510,7 +496,7 @@ const ChatPage = () => {
                                                         : "bg-white shadow-sm"
                                                 }`}
                                             >
-                                                <div style={{ wordBreak: "break-word", whiteSpace: "pre-wrap" }}>
+                                                <div className="break-words whitespace-pre-wrap overflow-hidden">
                                                     {message.content}
                                                 </div>
                                                 <div className="flex items-center justify-end mt-1">
@@ -543,7 +529,7 @@ const ChatPage = () => {
                                                 </button>
                                             )}
                                             {showMessageOptions === message.id && (
-                                                <div className="absolute top-0 right-0 -mr-32 bg-white shadow-lg rounded-lg p-2 z-10">
+                                                <div className="absolute top-0 right-0 bg-white shadow-lg rounded-lg p-2 z-50 transform -translate-x-full mr-2">
                                                     <button
                                                         className="flex items-center space-x-2 w-full p-2 hover:bg-gray-100 rounded"
                                                         onClick={() => deleteMessage(message.id)}
@@ -560,7 +546,7 @@ const ChatPage = () => {
                         </div>
 
                         {/* Message Input */}
-                        <form onSubmit={sendMessage} className="p-4 border-t border-gray-200 bg-white">
+                        <form onSubmit={sendMessage} className="p-4 border-t border-gray-200 bg-white flex-shrink-0 relative">
                             <div className="flex items-center space-x-2">
                                 <button
                                     type="button"
@@ -570,7 +556,7 @@ const ChatPage = () => {
                                     <FaSmile className="text-xl" />
                                 </button>
                                 {showEmojiPicker && (
-                                    <div className="absolute bottom-20 left-4">
+                                    <div className="absolute bottom-16 left-0 z-50">
                                         <EmojiPicker
                                             onEmojiClick={(emojiObject) => {
                                                 setNewMessage((prev) => prev + emojiObject.emoji);
