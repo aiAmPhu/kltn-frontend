@@ -110,21 +110,21 @@ const PermissionList = ({ users: usersProp = [], setUsers: setUsersProp }) => {
         }
     }, [users, debouncedSearchQuery, usersPerPage, currentPage]);
 
-    // Xoá quyền
+    // Reset về user thường
     const handleDelete = async (user) => {
-        const confirmDelete = window.confirm(`Bạn có chắc chắn muốn xóa quyền của ${user.name}?`);
+        const confirmDelete = window.confirm(`Bạn có chắc chắn muốn đặt lại ${user.name} thành người dùng thường?`);
         if (confirmDelete) {
             try {
                 const token = localStorage.getItem("token");
-                console.log("Xoá quyền cho user:", user.userId);
+                console.log("Reset quyền cho user:", user.userId);
                 await axios.delete(`${API_BASE_URL}/permissions/delete/${user.userId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 await loadUsers();
-                toast.success("Xóa quyền thành công!");
+                toast.success("Đặt lại quyền thành công!");
                 setError("");
             } catch (error) {
-                setError(error.response?.data?.message || "Lỗi khi xóa quyền");
+                setError(error.response?.data?.message || "Lỗi khi đặt lại quyền");
             }
         }
     };
@@ -288,7 +288,7 @@ const PermissionList = ({ users: usersProp = [], setUsers: setUsersProp }) => {
                                         scope="col"
                                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
-                                        Trạng thái
+                                        Vai trò
                                     </th>
                                     <th
                                         scope="col"
@@ -346,14 +346,16 @@ const PermissionList = ({ users: usersProp = [], setUsers: setUsersProp }) => {
                                                 <span
                                                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                                     ${
-                                                        user.majorGroup && user.majorGroup.length > 0
+                                                        user.role === "reviewer" || user.role === "admin"
                                                             ? "bg-green-100 text-green-800"
-                                                            : "bg-red-100 text-red-800"
+                                                            : "bg-gray-100 text-gray-800"
                                                     }`}
                                                 >
-                                                    {user.majorGroup && user.majorGroup.length > 0
-                                                        ? "Kích hoạt"
-                                                        : "Chưa kích hoạt"}
+                                                    {user.role === "admin"
+                                                        ? "Quản trị viên"
+                                                        : user.role === "reviewer"
+                                                        ? "Người duyệt"
+                                                        : "Người dùng"}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -381,7 +383,7 @@ const PermissionList = ({ users: usersProp = [], setUsers: setUsersProp }) => {
                                                     <button
                                                         onClick={() => handleDelete(user)}
                                                         className="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 p-1 rounded-md transition-colors"
-                                                        title="Xoá"
+                                                        title="Đặt lại thành người dùng thường"
                                                     >
                                                         <svg
                                                             xmlns="http://www.w3.org/2000/svg"

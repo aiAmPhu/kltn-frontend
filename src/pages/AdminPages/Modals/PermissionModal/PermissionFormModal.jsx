@@ -1,42 +1,28 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { FaCheck, FaTimes, FaListUl } from "react-icons/fa";
+import { FaCheck, FaTimes, FaUserShield } from "react-icons/fa";
 import { toast } from "react-toastify";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing }) => {
+const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing, reloadUsers }) => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
-    const [admissionMajors, setAdmissionMajors] = useState([]);
-    const [selectedMajors, setSelectedMajors] = useState([]);
+    const [selectedRole, setSelectedRole] = useState("user");
     const [isLoading, setIsLoading] = useState(false);
 
     // Ensure we always have the correct userId (from userToEdit if not passed)
     const effectiveUserId = userId || userToEdit?._id || userToEdit?.userId;
 
     useEffect(() => {
-        const fetchAdmissionMajors = async () => {
-            try {
-                const token = localStorage.getItem("token");
-                const response = await axios.get(`${API_BASE_URL}/adms/getall`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                setAdmissionMajors(response.data?.data || response.data || []);
-            } catch (error) {
-                setError("Không thể tải danh sách ngành học");
-            }
-        };
-        fetchAdmissionMajors();
-
         if (userToEdit) {
             setName(userToEdit.name || "");
             setEmail(userToEdit.email || "");
-            setSelectedMajors(userToEdit.majorGroup || []);
+            setSelectedRole(userToEdit.role || "user");
         } else {
             setName("");
             setEmail("");
-            setSelectedMajors([]);
+            setSelectedRole("user");
         }
     }, [userToEdit]);
 
@@ -56,14 +42,20 @@ const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing 
         try {
             await axios.put(
                 `${API_BASE_URL}/permissions/update/${effectiveUserId}`,
-                { majorGroup: selectedMajors },
+                { role: selectedRole },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
+            
             // Refresh user list
-            const response = await axios.get(`${API_BASE_URL}/users/getall`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setUsers(response.data?.data || response.data || []);
+            if (typeof reloadUsers === "function") {
+                await reloadUsers();
+            } else {
+                const response = await axios.get(`${API_BASE_URL}/users/getall`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setUsers(response.data?.data || response.data || []);
+            }
+            
             toast.success("Cập nhật phân quyền thành công!");
             onClose();
         } catch (err) {
@@ -77,66 +69,75 @@ const PermissionFormModal = ({ userId, userToEdit, setUsers, onClose, isEditing 
         }
     };
 
-    const handleMajorChange = (majorId) => {
-        setSelectedMajors((prev) =>
-            prev.includes(majorId) ? prev.filter((id) => id !== majorId) : [...prev, majorId]
-        );
+    const handleRoleChange = (role) => {
+        setSelectedRole(role);
     };
 
     return (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-center items-center px-4">
-            <div className="bg-white w-full max-w-2xl rounded-2xl shadow-xl p-6 relative">
+            <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 relative">
                 <h2 className="text-2xl font-bold text-blue-600 text-center mb-6">
-                    <FaListUl className="inline mr-2 text-blue-500" />
+                    <FaUserShield className="inline mr-2 text-blue-500" />
                     Cập nhật phân quyền
                 </h2>
                 {error && (
                     <div className="mb-4 bg-red-100 text-red-700 p-3 rounded-md text-sm text-center">{error}</div>
                 )}
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="flex gap-4">
+                    <div className="space-y-3">
                         <input
                             type="text"
                             value={name}
                             disabled
-                            className="flex-1 border border-gray-300 rounded-md px-3 py-2 bg-gray-100"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100"
                             placeholder="Tên"
                         />
                         <input
                             type="text"
                             value={email}
                             disabled
-                            className="flex-1 border border-gray-300 rounded-md px-3 py-2 bg-gray-100"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100"
                             placeholder="Email"
                         />
                     </div>
+                    
                     <div>
-                        <label className="block mb-2 font-medium text-gray-700">
-                            Chọn các ngành học được phân quyền:
+                        <label className="block mb-3 font-medium text-gray-700">
+                            Chọn vai trò:
                         </label>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-56 overflow-y-auto border border-gray-300 rounded p-2 bg-gray-50">
-                            {admissionMajors.length === 0 && (
-                                <div className="col-span-full text-gray-400 italic text-center">
-                                    Không có ngành học nào
+                        <div className="space-y-2">
+                            <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                                <input
+                                    type="radio"
+                                    name="role"
+                                    value="user"
+                                    checked={selectedRole === "user"}
+                                    onChange={() => handleRoleChange("user")}
+                                    className="form-radio h-5 w-5 text-blue-600 mr-3"
+                                />
+                                <div>
+                                    <div className="font-medium text-gray-900">Người dùng thường</div>
+                                    <div className="text-sm text-gray-500">Không có quyền duyệt hồ sơ</div>
                                 </div>
-                            )}
-                            {admissionMajors.map((major) => (
-                                <label
-                                    key={major._id || major.majorId}
-                                    className="flex items-center gap-2 px-2 py-1 rounded hover:bg-blue-50 cursor-pointer"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        value={major.majorId}
-                                        checked={selectedMajors.includes(major.majorId)}
-                                        onChange={() => handleMajorChange(major.majorId)}
-                                        className="form-checkbox h-5 w-5 text-blue-600"
-                                    />
-                                    <span className="text-sm">{major.majorId}</span>
-                                </label>
-                            ))}
+                            </label>
+                            
+                            <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                                <input
+                                    type="radio"
+                                    name="role"
+                                    value="reviewer"
+                                    checked={selectedRole === "reviewer"}
+                                    onChange={() => handleRoleChange("reviewer")}
+                                    className="form-radio h-5 w-5 text-blue-600 mr-3"
+                                />
+                                <div>
+                                    <div className="font-medium text-gray-900">Người duyệt hồ sơ</div>
+                                    <div className="text-sm text-gray-500">Có thể duyệt tất cả hồ sơ thí sinh</div>
+                                </div>
+                            </label>
                         </div>
                     </div>
+                    
                     <div className="flex justify-between mt-6">
                         <button
                             type="submit"
