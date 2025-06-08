@@ -406,22 +406,7 @@ const Photo = ({ userId }) => {
     const statusInfo = getStatusInfo(photoData.status);
 
     return (
-        <div className="min-h-screen bg-slate-50">
-            {/* Header */}
-            <div className="bg-white border-b border-gray-200 shadow-sm">
-                <div className="max-w-7xl mx-auto px-6 py-4">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-slate-100 p-2 rounded-lg">
-                            <FaImages className="w-6 h-6 text-slate-600" />
-                        </div>
-                        <div>
-                            <h1 className="text-2xl font-bold text-slate-800">Xét duyệt hồ sơ ảnh</h1>
-                            <p className="text-slate-600 text-sm">Hệ thống quản lý hồ sơ điện tử</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+        <div className="bg-slate-50">
             <div className="max-w-7xl mx-auto p-6">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Document Images Section */}
