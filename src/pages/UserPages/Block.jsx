@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import useDocumentTitle from "../../hooks/useDocumentTitle";
 import { FaSpinner } from "react-icons/fa";
 
 function AdmissionBlocks() {
     const [blocks, setBlocks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    
+    // Set document title
+    useDocumentTitle("Khối xét tuyển");
 
     useEffect(() => {
         const fetchBlocks = async () => {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
+import useDocumentTitle from "../../../hooks/useDocumentTitle";
 import {
     FaUserCheck,
     FaInfoCircle,
@@ -34,6 +35,9 @@ function ProfilePage() {
     const [idPhoto, setIdPhoto] = useState(null);
     const token = localStorage.getItem("token");
     const userId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
+    
+    // Set document title
+    useDocumentTitle("Hồ sơ của tôi");
 
     useEffect(() => {
         const fetchData = async () => {

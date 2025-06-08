@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Chat from "../pages/UserPages/Chat.jsx";
 import { toast } from "react-toastify";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 function HomePage() {
     const [majors, setMajors] = useState([]);
@@ -16,6 +17,9 @@ function HomePage() {
     const [chatType, setChatType] = useState(null);
     const navigate = useNavigate();
     const { user } = useAuth();
+    
+    // Set document title cho trang chủ
+    useDocumentTitle("Trang chủ");
 
     const majorImages = [
         "/Major/HCMUTE-1.jpg",

@@ -6,6 +6,7 @@ import hcmuteLogo from "../assets/hcmuteLogo.png";
 import { Lock, Mail } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import axios from "axios";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 import Header from "../components/Header";
 
 const Login = () => {
@@ -14,6 +15,9 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    
+    // Set document title
+    useDocumentTitle("Đăng nhập");
 
     const handleLogin = async () => {
         setError("");

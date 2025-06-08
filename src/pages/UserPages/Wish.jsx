@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
+import useDocumentTitle from "../../hooks/useDocumentTitle";
 
 function WishRegistration() {
     const [criteriaList, setCriteriaList] = useState([]);
@@ -28,6 +29,9 @@ function WishRegistration() {
     const token = localStorage.getItem("token");
     const userId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
     const userRole = token ? JSON.parse(atob(token.split(".")[1])).role : null;
+    
+    // Set document title
+    useDocumentTitle("Đăng ký nguyện vọng");
 
     // Tách riêng function để fetch user wishes
     const fetchUserWishes = async () => {

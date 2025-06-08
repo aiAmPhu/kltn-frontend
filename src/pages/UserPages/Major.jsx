@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import useDocumentTitle from "../../hooks/useDocumentTitle";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight, FaArrowCircleRight, FaSearch } from "react-icons/fa";
 
@@ -9,6 +10,9 @@ function Majors() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
     const navigate = useNavigate();
+    
+    // Set document title
+    useDocumentTitle("Ngành xét tuyển");
 
     const majorImages = [
         "/Major/HCMUTE-1.jpg",
