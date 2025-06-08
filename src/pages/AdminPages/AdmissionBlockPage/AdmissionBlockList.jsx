@@ -3,7 +3,19 @@ import axios from "axios";
 import InfoModal from "../Modals/AdmissionBlockModal/InfoModal";
 import AdmissionBlockFormModal from "../Modals/AdmissionBlockModal/AdmissionBlockFormModal";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { FaFileExport, FaFileImport } from "react-icons/fa";
+import { 
+    FaFileExport, 
+    FaFileImport, 
+    FaExclamationCircle, 
+    FaSearch, 
+    FaPlus, 
+    FaSpinner, 
+    FaFileAlt, 
+    FaGraduationCap,
+    FaEdit, 
+    FaTrash, 
+    FaInfoCircle 
+} from "react-icons/fa";
 import { toast } from "react-toastify";
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -30,10 +42,19 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
             const response = await axios.get(`${API_BASE_URL}/adbs/getall`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setAdmissionBlocks(response.data);
+            setAdmissionBlocks(response.data || []);
             setError("");
         } catch (error) {
-            setError(error.response?.data?.message || "Lỗi khi tải danh sách khối xét tuyển");
+            // Chỉ hiển thị lỗi nếu không phải lỗi "không tìm thấy dữ liệu"
+            const errorMessage = error.response?.data?.message || "Lỗi khi tải danh sách khối xét tuyển";
+            if (!errorMessage.toLowerCase().includes("không tìm được") && 
+                !errorMessage.toLowerCase().includes("not found") &&
+                error.response?.status !== 404) {
+                setError(errorMessage);
+            } else {
+                setError("");
+                setAdmissionBlocks([]);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -197,57 +218,45 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
     return (
         <div className="w-full bg-white shadow-lg rounded-xl border border-gray-200">
             <div className="p-4 sm:p-6 lg:p-8">
-                <div className="mb-6">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 text-center">Quản lý Khối xét tuyển</h1>
+                <div className="mb-6 flex items-center justify-center gap-3">
+                    <FaGraduationCap className="w-8 h-8 text-blue-600" />
+                    <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">Quản lý khối xét tuyển</h1>
                 </div>
 
-                {error && (
-                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
-                        <div className="flex items-start">
-                            <div className="flex-shrink-0">
-                                <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                        clipRule="evenodd"
-                                    />
-                                </svg>
-                            </div>
-                            <div className="ml-3">
-                                <p className="text-sm text-red-700">{error}</p>
+                {/* Alert Messages */}
+                <div className="space-y-4 mb-6">
+                    {error && (
+                        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+                            <div className="flex items-start">
+                                <div className="flex-shrink-0">
+                                    <FaExclamationCircle className="h-5 w-5 text-red-500" />
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm text-red-700">{error}</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {importError && (
-                    <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
-                        <p className="text-sm text-red-700">{importError}</p>
-                    </div>
-                )}
+                    {importError && (
+                        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+                            <p className="text-sm text-red-700">{importError}</p>
+                        </div>
+                    )}
 
-                {importSuccess && (
-                    <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-r-lg">
-                        <p className="text-sm text-green-700">{importSuccess}</p>
-                    </div>
-                )}
+                    {importSuccess && (
+                        <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
+                            <p className="text-sm text-green-700">{importSuccess}</p>
+                        </div>
+                    )}
+                </div>
 
+                {/* Search and Actions */}
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
                     <div className="w-full lg:flex-1 lg:max-w-md">
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg
-                                    className="h-5 w-5 text-gray-400"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                >
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                        clipRule="evenodd"
-                                    />
-                                </svg>
+                                <FaSearch className="h-5 w-5 text-gray-400" />
                             </div>
                             <input
                                 type="text"
@@ -263,11 +272,15 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                         <button
                             onClick={handleExport}
                             className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 shadow-md"
+                            title="Xuất danh sách khối xét tuyển ra file JSON"
                         >
                             <FaFileExport className="text-sm" /> 
                             <span className="hidden sm:inline">Xuất</span>
                         </button>
-                        <label className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md">
+                        <label 
+                            className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                            title="Nhập danh sách khối xét tuyển từ file JSON"
+                        >
                             <FaFileImport className="text-sm" /> 
                             <span className="hidden sm:inline">Nhập</span>
                             <input type="file" accept=".json" onChange={handleImport} className="hidden" />
@@ -275,51 +288,25 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                         <button
                             onClick={handleAddBlock}
                             className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2 shadow-md whitespace-nowrap"
+                            title="Thêm khối xét tuyển mới"
                         >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                            </svg>
+                            <FaPlus className="text-sm" />
                             <span className="hidden sm:inline">Thêm khối xét tuyển</span>
                             <span className="sm:hidden">Thêm</span>
                         </button>
                     </div>
                 </div>
 
+                {/* Table */}
                 <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th
-                                        scope="col"
-                                        className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
-                                        Mã khối
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
-                                        Tên khối
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
-                                    >
-                                        Môn học
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
-                                        Thao tác
-                                    </th>
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã khối</th>
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên khối</th>
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Môn học</th>
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -327,38 +314,33 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                                     <tr>
                                         <td colSpan="4" className="px-4 sm:px-6 py-8 text-center">
                                             <div className="flex justify-center items-center">
-                                                <svg
-                                                    className="animate-spin h-6 w-6 text-blue-500 mr-3"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <circle
-                                                        className="opacity-25"
-                                                        cx="12"
-                                                        cy="12"
-                                                        r="10"
-                                                        stroke="currentColor"
-                                                        strokeWidth="4"
-                                                    ></circle>
-                                                    <path
-                                                        className="opacity-75"
-                                                        fill="currentColor"
-                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                    ></path>
-                                                </svg>
+                                                <FaSpinner className="animate-spin h-6 w-6 text-blue-500 mr-3" />
                                                 <span className="text-gray-600">Đang tải...</span>
                                             </div>
                                         </td>
                                     </tr>
                                 ) : currentBlocks.length === 0 ? (
                                     <tr>
-                                        <td colSpan="4" className="px-4 sm:px-6 py-8 text-center text-gray-500">
-                                            <div className="flex flex-col items-center">
-                                                <svg className="h-12 w-12 text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                </svg>
-                                                Không có khối xét tuyển phù hợp
+                                        <td colSpan="4" className="px-4 sm:px-6 py-12 text-center">
+                                            <div className="flex flex-col items-center justify-center space-y-4">
+                                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                                    <FaPlus className="h-5 w-5 text-blue-500" />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <h3 className="text-lg font-semibold text-gray-800">
+                                                        Chưa có khối xét tuyển nào
+                                                    </h3>
+                                                    <p className="text-sm text-gray-600 max-w-md">
+                                                        Bắt đầu bằng cách tạo khối xét tuyển đầu tiên cho hệ thống của bạn
+                                                    </p>
+                                                </div>
+                                                <button
+                                                    onClick={handleAddBlock}
+                                                    className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 shadow-lg hover:shadow-xl"
+                                                >
+                                                    <FaPlus className="text-sm" />
+                                                    Tạo khối xét tuyển đầu tiên
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -372,7 +354,6 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                                             </td>
                                             <td className="px-4 sm:px-6 py-4">
                                                 <div className="text-sm text-gray-900 font-medium">{block.admissionBlockName}</div>
-                                                {/* Hiển thị môn học trên mobile */}
                                                 <div className="text-xs text-gray-500 mt-1 md:hidden">
                                                     {[
                                                         block.admissionBlockSubject1,
@@ -401,60 +382,21 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                                                         className="text-yellow-600 hover:text-yellow-900 bg-yellow-100 hover:bg-yellow-200 p-2 rounded-lg transition-colors"
                                                         title="Cập nhật"
                                                     >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-4 w-4"
-                                                            fill="none"
-                                                            viewBox="0 0 24 24"
-                                                            stroke="currentColor"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth={2}
-                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                                            />
-                                                        </svg>
+                                                        <FaEdit className="h-4 w-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(block)}
                                                         className="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 p-2 rounded-lg transition-colors"
                                                         title="Xoá"
                                                     >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-4 w-4"
-                                                            fill="none"
-                                                            viewBox="0 0 24 24"
-                                                            stroke="currentColor"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth={2}
-                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                                            />
-                                                        </svg>
+                                                        <FaTrash className="h-4 w-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleMoreClick(block)}
                                                         className="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 p-2 rounded-lg transition-colors"
                                                         title="Xem thêm"
                                                     >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-4 w-4"
-                                                            fill="none"
-                                                            viewBox="0 0 24 24"
-                                                            stroke="currentColor"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth={2}
-                                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                            />
-                                                        </svg>
+                                                        <FaInfoCircle className="h-4 w-4" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -496,6 +438,7 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                                         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                         : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                 }`}
+                                title="Trang trước"
                             >
                                 <ChevronLeftIcon className="h-4 w-4" />
                             </button>
@@ -514,6 +457,7 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                                                 ? "bg-blue-500 text-white shadow-md"
                                                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                         }`}
+                                        title={`Trang ${page}`}
                                     >
                                         {page}
                                     </button>
@@ -528,6 +472,7 @@ const AdmissionBlockList = ({ admissionBlocks = [], setAdmissionBlocks }) => {
                                         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                         : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                 }`}
+                                title="Trang sau"
                             >
                                 <ChevronRightIcon className="h-4 w-4" />
                             </button>

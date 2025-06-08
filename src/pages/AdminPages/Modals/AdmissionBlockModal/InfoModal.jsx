@@ -1,105 +1,119 @@
 import React from "react";
-import { FaTimes, FaBook, FaGraduationCap, FaClipboardList } from "react-icons/fa";
+import { FaTimes, FaBook, FaGraduationCap, FaClipboardList, FaInfoCircle } from "react-icons/fa";
 
 const InfoModal = ({ admissionBlock, onClose }) => {
     if (!admissionBlock) return null;
 
+    const subjects = [
+        { subject: admissionBlock.admissionBlockSubject1, color: "bg-blue-500", bgColor: "bg-blue-50", borderColor: "border-blue-200" },
+        { subject: admissionBlock.admissionBlockSubject2, color: "bg-green-500", bgColor: "bg-green-50", borderColor: "border-green-200" },
+        { subject: admissionBlock.admissionBlockSubject3, color: "bg-orange-500", bgColor: "bg-orange-50", borderColor: "border-orange-200" }
+    ].filter(item => item.subject);
+
     return (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center px-4">
-            <div className="bg-white w-full max-w-sm sm:max-w-md lg:max-w-lg rounded-2xl shadow-2xl p-4 sm:p-6 relative max-h-[90vh] overflow-y-auto">
-                <div className="flex justify-between items-center mb-4 sm:mb-6 pb-3 border-b border-gray-200">
-                    <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-600">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-lg sm:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto">
+                {/* Header */}
+                <div className="text-center mb-6">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                        <FaInfoCircle className="w-8 h-8 text-blue-600" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">
                         Chi tiết khối xét tuyển
                     </h2>
-                    <button
-                        onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
-                        title="Đóng"
-                    >
-                        <FaTimes className="text-lg" />
-                    </button>
+                    <p className="text-gray-600 text-sm">
+                        Thông tin đầy đủ về khối xét tuyển và các môn học
+                    </p>
                 </div>
 
-                <div className="space-y-4">
-                    {/* Thông tin cơ bản */}
-                    <div className="bg-blue-50 rounded-lg p-4 space-y-3">
-                        <div className="flex items-start gap-3">
-                            <FaGraduationCap className="text-blue-500 text-lg mt-0.5 flex-shrink-0" />
-                            <div className="flex-1 min-w-0">
-                                <span className="block text-sm font-medium text-gray-700 mb-1">Mã khối:</span>
-                                <span className="text-base font-semibold text-gray-900 break-words">
-                                    {admissionBlock.admissionBlockId}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-3">
-                            <FaBook className="text-blue-500 text-lg mt-0.5 flex-shrink-0" />
-                            <div className="flex-1 min-w-0">
-                                <span className="block text-sm font-medium text-gray-700 mb-1">Tên khối:</span>
-                                <span className="text-base font-semibold text-gray-900 break-words">
-                                    {admissionBlock.admissionBlockName}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Danh sách môn học */}
-                    <div className="bg-gray-50 rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-4">
-                            <FaClipboardList className="text-gray-600 text-lg" />
-                            <span className="font-semibold text-gray-800">Các môn học</span>
-                        </div>
+                <div className="space-y-6">
+                    {/* Basic Information */}
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">
+                            <FaGraduationCap className="inline-block w-4 h-4 mr-2 text-gray-500" />
+                            Thông tin cơ bản
+                        </h3>
                         
-                        <div className="space-y-3">
-                            {admissionBlock.admissionBlockSubject1 && (
-                                <div className="bg-white border border-gray-200 rounded-lg p-3 transition-colors hover:bg-blue-50">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
-                                            1
-                                        </div>
-                                        <span className="text-gray-800 font-medium break-words">
-                                            {admissionBlock.admissionBlockSubject1}
-                                        </span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <FaGraduationCap className="text-blue-600 text-lg" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-sm font-medium text-gray-600 mb-1">Mã khối xét tuyển</p>
+                                        <p className="text-lg font-bold text-gray-900">
+                                            {admissionBlock.admissionBlockId}
+                                        </p>
                                     </div>
                                 </div>
-                            )}
-                            
-                            {admissionBlock.admissionBlockSubject2 && (
-                                <div className="bg-white border border-gray-200 rounded-lg p-3 transition-colors hover:bg-blue-50">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
-                                            2
-                                        </div>
-                                        <span className="text-gray-800 font-medium break-words">
-                                            {admissionBlock.admissionBlockSubject2}
-                                        </span>
+                            </div>
+
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <FaBook className="text-green-600 text-lg" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-sm font-medium text-gray-600 mb-1">Tên khối xét tuyển</p>
+                                        <p className="text-lg font-bold text-gray-900 break-words">
+                                            {admissionBlock.admissionBlockName}
+                                        </p>
                                     </div>
                                 </div>
-                            )}
-                            
-                            {admissionBlock.admissionBlockSubject3 && (
-                                <div className="bg-white border border-gray-200 rounded-lg p-3 transition-colors hover:bg-blue-50">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
-                                            3
-                                        </div>
-                                        <span className="text-gray-800 font-medium break-words">
-                                            {admissionBlock.admissionBlockSubject3}
-                                        </span>
-                                    </div>
-                                </div>
-                            )}
+                            </div>
                         </div>
                     </div>
+
+                    {/* Subjects Section */}
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">
+                            <FaClipboardList className="inline-block w-4 h-4 mr-2 text-gray-500" />
+                            Môn học trong khối
+                        </h3>
+                        
+                        {subjects.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {subjects.map((item, index) => (
+                                    <div 
+                                        key={index}
+                                        className={`${item.bgColor} ${item.borderColor} border rounded-lg p-4 transition-all duration-200 hover:shadow-md`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-8 h-8 ${item.color} text-white rounded-full flex items-center justify-center text-sm font-bold`}>
+                                                {index + 1}
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="text-xs font-medium text-gray-600 mb-1">Môn {index + 1}</p>
+                                                <p className="text-sm font-semibold text-gray-800 break-words">
+                                                    {item.subject}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8">
+                                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <FaBook className="text-gray-400 text-xl" />
+                                </div>
+                                <p className="text-gray-500 text-sm">Không có môn học nào được thiết lập</p>
+                            </div>
+                        )}
+                    </div>
+
+
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-gray-200">
+                {/* Action Buttons */}
+                <div className="flex justify-end pt-6 border-t border-gray-200 mt-6">
                     <button
                         onClick={onClose}
-                        className="w-full sm:w-auto sm:ml-auto flex items-center justify-center gap-2 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors font-medium"
+                        className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all duration-200 flex items-center justify-center gap-2 text-sm font-medium shadow-lg hover:shadow-xl"
+                        title="Đóng chi tiết khối xét tuyển"
                     >
-                        <FaTimes className="text-sm" /> 
+                        <FaTimes className="w-4 h-4" /> 
                         Đóng
                     </button>
                 </div>

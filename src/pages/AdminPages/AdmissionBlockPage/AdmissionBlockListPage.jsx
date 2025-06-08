@@ -30,10 +30,8 @@ const AdmissionBlockListPage = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-                <AdmissionBlockList admissionBlocks={admissionBlocks} setAdmissionBlocks={setAdmissionBlocks} />
-            </div>
+        <div>
+            <AdmissionBlockList admissionBlocks={admissionBlocks} setAdmissionBlocks={setAdmissionBlocks} />
         </div>
     );
 };
