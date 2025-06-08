@@ -139,6 +139,137 @@ const Photo = ({ userId }) => {
         </div>
     );
 
+    const ImageCarousel = () => {
+        const [currentIndex, setCurrentIndex] = React.useState(0);
+
+        const allDocuments = React.useMemo(() => {
+            const docs = [];
+            if (photoData.personalPic) docs.push({ label: "Ảnh chân dung", url: photoData.personalPic, icon: <FaUser className="w-4 h-4" /> });
+            if (photoData.birthCertificate) docs.push({ label: "Giấy khai sinh", url: photoData.birthCertificate, icon: <FaFileImage className="w-4 h-4" /> });
+            if (photoData.frontCCCD) docs.push({ label: "CCCD mặt trước", url: photoData.frontCCCD, icon: <FaIdCard className="w-4 h-4" /> });
+            if (photoData.backCCCD) docs.push({ label: "CCCD mặt sau", url: photoData.backCCCD, icon: <FaIdCard className="w-4 h-4" /> });
+            if (photoData.grade10Pic) docs.push({ label: "Học bạ lớp 10", url: photoData.grade10Pic, icon: <FaFileImage className="w-4 h-4" /> });
+            if (photoData.grade11Pic) docs.push({ label: "Học bạ lớp 11", url: photoData.grade11Pic, icon: <FaFileImage className="w-4 h-4" /> });
+            if (photoData.grade12Pic) docs.push({ label: "Học bạ lớp 12", url: photoData.grade12Pic, icon: <FaFileImage className="w-4 h-4" /> });
+            return docs;
+        }, [photoData]);
+
+        const nextImage = () => {
+            setCurrentIndex((prev) => (prev + 1) % allDocuments.length);
+        };
+
+        const prevImage = () => {
+            setCurrentIndex((prev) => (prev - 1 + allDocuments.length) % allDocuments.length);
+        };
+
+        const goToImage = (index) => {
+            setCurrentIndex(index);
+        };
+
+        if (allDocuments.length === 0) return null;
+
+        const currentDocument = allDocuments[currentIndex];
+
+        return (
+            <div className="space-y-4">
+                {/* Navigation Header */}
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h3 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
+                            {currentDocument.icon}
+                            {currentDocument.label}
+                        </h3>
+                        <p className="text-slate-600 text-sm mt-1">
+                            {currentIndex + 1} / {allDocuments.length} tài liệu
+                        </p>
+                    </div>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={prevImage}
+                            disabled={allDocuments.length <= 1}
+                            className="p-3 bg-slate-100 hover:bg-slate-200 disabled:bg-gray-50 disabled:text-gray-400 rounded-lg transition-colors"
+                        >
+                            <FaChevronLeft className="w-5 h-5" />
+                        </button>
+                        <button
+                            onClick={nextImage}
+                            disabled={allDocuments.length <= 1}
+                            className="p-3 bg-slate-100 hover:bg-slate-200 disabled:bg-gray-50 disabled:text-gray-400 rounded-lg transition-colors"
+                        >
+                            <FaChevronRight className="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Main Image Banner */}
+                <div className="relative">
+                    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                        <div 
+                            className="relative cursor-pointer group h-80"
+                            onClick={() => setSelectedImage({ 
+                                label: currentDocument.label, 
+                                url: currentDocument.url, 
+                                allImages: getAllImages(), 
+                                currentIndex: getAllImages().findIndex(img => img.url === currentDocument.url) 
+                            })}
+                        >
+                            <img 
+                                src={currentDocument.url} 
+                                alt={currentDocument.label} 
+                                className="w-full h-full object-contain bg-gray-50" 
+                            />
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 flex items-center justify-center">
+                                <div className="bg-white bg-opacity-90 px-4 py-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-2">
+                                    <FaSearchPlus className="text-slate-600" />
+                                    <span className="text-slate-700 font-medium">Xem chi tiết</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Navigation Arrows on Image */}
+                    {allDocuments.length > 1 && (
+                        <>
+                            <button
+                                onClick={prevImage}
+                                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all"
+                            >
+                                <FaChevronLeft className="w-6 h-6" />
+                            </button>
+                            <button
+                                onClick={nextImage}
+                                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all"
+                            >
+                                <FaChevronRight className="w-6 h-6" />
+                            </button>
+                        </>
+                    )}
+                </div>
+
+                {/* Thumbnail Navigation */}
+                <div className="flex justify-center gap-2 flex-wrap">
+                    {allDocuments.map((doc, index) => (
+                        <button
+                            key={index}
+                            onClick={() => goToImage(index)}
+                            className={`w-16 h-16 rounded-lg border-2 overflow-hidden transition-all ${
+                                index === currentIndex 
+                                    ? 'border-blue-500 ring-2 ring-blue-300' 
+                                    : 'border-gray-200 hover:border-gray-400'
+                            }`}
+                        >
+                            <img 
+                                src={doc.url} 
+                                alt={doc.label} 
+                                className="w-full h-full object-cover"
+                            />
+                        </button>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
     const checkImageSize = (url) => {
         return new Promise((resolve) => {
             const img = new Image();
@@ -420,15 +551,7 @@ const Photo = ({ userId }) => {
                                 <p className="text-slate-600 text-sm mt-1">Các tài liệu cần thiết cho hồ sơ đăng ký</p>
                             </div>
                             <div className="p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                                    {photoData.personalPic && renderImage("Ảnh chân dung", photoData.personalPic, <FaUser className="w-4 h-4" />)}
-                                    {photoData.birthCertificate && renderImage("Giấy khai sinh", photoData.birthCertificate, <FaFileImage className="w-4 h-4" />)}
-                                    {photoData.frontCCCD && renderImage("CCCD mặt trước", photoData.frontCCCD, <FaIdCard className="w-4 h-4" />)}
-                                    {photoData.backCCCD && renderImage("CCCD mặt sau", photoData.backCCCD, <FaIdCard className="w-4 h-4" />)}
-                                    {photoData.grade10Pic && renderImage("Học bạ lớp 10", photoData.grade10Pic, <FaFileImage className="w-4 h-4" />)}
-                                    {photoData.grade11Pic && renderImage("Học bạ lớp 11", photoData.grade11Pic, <FaFileImage className="w-4 h-4" />)}
-                                    {photoData.grade12Pic && renderImage("Học bạ lớp 12", photoData.grade12Pic, <FaFileImage className="w-4 h-4" />)}
-                                </div>
+                                <ImageCarousel />
                             </div>
                         </div>
                     </div>
