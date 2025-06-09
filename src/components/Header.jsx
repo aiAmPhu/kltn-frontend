@@ -195,6 +195,32 @@ function Header() {
         }
     };
 
+    // Mark all notifications as read
+    const markAllAsRead = async () => {
+        if (!user || unreadCount === 0) {
+            return;
+        }
+
+        try {
+            await axios.put(
+                `${process.env.REACT_APP_API_BASE_URL}/notifications/user/${user.userId}/read-all`,
+                {},
+                {
+                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+                }
+            );
+            
+            // Update all notifications to read status
+            setNotifications(prev =>
+                prev.map(n => ({ ...n, read: true }))
+            );
+            setUnreadCount(0);
+            toast.success("Đã đánh dấu tất cả thông báo đã đọc!");
+        } catch (error) {
+            toast.error("Không thể đánh dấu tất cả thông báo. Vui lòng thử lại sau.");
+        }
+    };
+
     const handleNotificationClick = (notification) => {
         if (!notification || !notification.id) return;
 
@@ -272,40 +298,55 @@ function Header() {
                                                 Không có thông báo mới
                                             </div>
                                         ) : (
-                                            notifications.map((notification) => {
-                                                if (!notification || !notification.id) {
-                                                    console.error("Invalid notification in list:", notification);
-                                                    return null;
-                                                }
-                                                return (
-                                                    <div
-                                                        key={notification.id}
-                                                        className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
-                                                            !notification.read ? "bg-blue-50" : ""
-                                                        }`}
-                                                        onClick={() => handleNotificationClick(notification)}
-                                                    >
-                                                        <div className="flex items-start gap-3">
-                                                            <div className="flex-1">
-                                                                <p className="text-sm font-medium text-gray-900">
-                                                                    {notification.title || 'Thông báo mới'}
-                                                                </p>
-                                                                <p className="text-sm text-gray-600 mt-1">
-                                                                    {notification.message || 'Nội dung thông báo'}
-                                                                </p>
-                                                                {notification.createdAt && (
-                                                                    <p className="text-xs text-gray-400 mt-1">
-                                                                        {new Date(notification.createdAt).toLocaleString('vi-VN')}
+                                            <>
+                                                                                                 <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200">
+                                                     <span className="text-sm font-medium text-gray-700">
+                                                         Thông báo
+                                                     </span>
+                                                     {unreadCount > 0 && (
+                                                         <button
+                                                             onClick={markAllAsRead}
+                                                             className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                                                         >
+                                                             Đánh dấu tất cả đã đọc
+                                                         </button>
+                                                     )}
+                                                 </div>
+                                                {notifications.map((notification) => {
+                                                    if (!notification || !notification.id) {
+                                                        console.error("Invalid notification in list:", notification);
+                                                        return null;
+                                                    }
+                                                    return (
+                                                        <div
+                                                            key={notification.id}
+                                                            className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
+                                                                !notification.read ? "bg-blue-50" : ""
+                                                            }`}
+                                                            onClick={() => handleNotificationClick(notification)}
+                                                        >
+                                                            <div className="flex items-start gap-3">
+                                                                <div className="flex-1">
+                                                                    <p className="text-sm font-medium text-gray-900">
+                                                                        {notification.title || 'Thông báo mới'}
                                                                     </p>
+                                                                    <p className="text-sm text-gray-600 mt-1">
+                                                                        {notification.message || 'Nội dung thông báo'}
+                                                                    </p>
+                                                                    {notification.createdAt && (
+                                                                        <p className="text-xs text-gray-400 mt-1">
+                                                                            {new Date(notification.createdAt).toLocaleString('vi-VN')}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                                {!notification.read && (
+                                                                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-1" />
                                                                 )}
                                                             </div>
-                                                            {!notification.read && (
-                                                                <div className="w-2 h-2 bg-blue-500 rounded-full mt-1" />
-                                                            )}
                                                         </div>
-                                                    </div>
-                                                );
-                                            }).filter(Boolean)
+                                                    );
+                                                }).filter(Boolean)}
+                                            </>
                                         )}
                                     </div>
                                 )}
