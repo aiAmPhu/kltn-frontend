@@ -21,6 +21,10 @@ function WishRegistration() {
     const [profileStatus, setProfileStatus] = useState("waiting"); // waiting, accepted, rejected
     const [isCheckingProfile, setIsCheckingProfile] = useState(true); // loading state cho việc kiểm tra profile
     const [showProfileModal, setShowProfileModal] = useState(false); // hiển thị modal thông báo profile
+    const [isExportingPDF, setIsExportingPDF] = useState(false);
+    const [deletingWishId, setDeletingWishId] = useState(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [wishToDelete, setWishToDelete] = useState(null);
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -46,6 +50,72 @@ function WishRegistration() {
             console.error("Lỗi khi tải nguyện vọng người dùng:", error);
         } finally {
             setIsLoadingWishes(false);
+        }
+    };
+
+    // Function to show delete confirmation modal
+    const handleDeleteClick = (wish) => {
+        setWishToDelete(wish);
+        setShowDeleteModal(true);
+    };
+
+    // Function to delete a wish
+    const handleConfirmDelete = async () => {
+        if (!wishToDelete) return;
+
+        setDeletingWishId(wishToDelete.wishId);
+        try {
+            await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/wish/delete/${wishToDelete.wishId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            toast.success("Xóa nguyện vọng thành công!");
+            await fetchUserWishes(); // Refresh the wishes list
+        } catch (error) {
+            console.error("Lỗi khi xóa nguyện vọng:", error);
+            toast.error(error.response?.data?.message || "Có lỗi xảy ra khi xóa nguyện vọng");
+        } finally {
+            setDeletingWishId(null);
+            setShowDeleteModal(false);
+            setWishToDelete(null);
+        }
+    };
+
+    // Function to cancel delete
+    const handleCancelDelete = () => {
+        setShowDeleteModal(false);
+        setWishToDelete(null);
+    };
+
+    // Function to export wishes to PDF
+    const handleExportPDF = async () => {
+        if (userWishes.length === 0) {
+            toast.warning("Bạn chưa có nguyện vọng nào để xuất");
+            return;
+        }
+
+        setIsExportingPDF(true);
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/wish/export-pdf/${userId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+                responseType: 'blob', // Important for PDF download
+            });
+
+            // Create blob link to download PDF
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `phieu-dang-ky-nguyen-vong-${userId}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+
+            toast.success("Xuất phiếu đăng ký thành công!");
+        } catch (error) {
+            console.error("Lỗi khi xuất PDF:", error);
+            toast.error(error.response?.data?.message || "Có lỗi xảy ra khi xuất phiếu đăng ký");
+        } finally {
+            setIsExportingPDF(false);
         }
     };
 
@@ -258,9 +328,37 @@ function WishRegistration() {
 
     return (
         <div className="max-w-7xl mx-auto py-10 px-4 mt-12">
-            <h1 className="text-3xl font-bold mb-8 text-blue-700 border-l-8 border-blue-500 pl-4 bg-blue-50 py-2">
-                ĐĂNG KÝ NGUYỆN VỌNG XÉT TUYỂN
-            </h1>
+            <div className="flex justify-between items-center mb-8">
+                <h1 className="text-3xl font-bold text-blue-700 border-l-8 border-blue-500 pl-4 bg-blue-50 py-2">
+                    ĐĂNG KÝ NGUYỆN VỌNG XÉT TUYỂN
+                </h1>
+                
+                {/* PDF Export Button */}
+                {userWishes.length > 0 && (
+                    <button
+                        onClick={handleExportPDF}
+                        disabled={isExportingPDF}
+                        className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 focus:ring-4 focus:ring-green-300 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200"
+                    >
+                        {isExportingPDF ? (
+                            <>
+                                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 818-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Đang xuất...
+                            </>
+                        ) : (
+                            <>
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Xuất PDF
+                            </>
+                        )}
+                    </button>
+                )}
+            </div>
 
             {userRole === "admin" && acceptedWishes.length > 0 && (
                 <div className="mb-8 bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-xl shadow-sm border border-green-200">
@@ -321,17 +419,51 @@ function WishRegistration() {
                             </div>
                         ) : userWishes.length > 0 ? (
                             userWishes.map((wish, index) => (
-                                <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                <div key={wish.wishId || index} className="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group">
                                     <span className="w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full font-semibold mr-3">
-                                        {index + 1}
+                                        {wish.priority || index + 1}
                                     </span>
                                     <div className="flex-1">
                                         <p className="text-sm text-gray-700">
-                                            Ngành: <span className="font-medium">{wish.majorId}</span> | 
-                                            Diện: <span className="font-medium">{wish.criteriaId}</span> | 
-                                            Khối: <span className="font-medium">{wish.admissionBlockId}</span>
+                                            <span className="font-medium">{wish.majorName || wish.majorId}</span>
                                         </p>
+                                        <p className="text-xs text-gray-500">
+                                            Diện: {wish.criteriaName || wish.criteriaId} | 
+                                            Khối: {wish.admissionBlockName || wish.admissionBlockId}
+                                            {wish.scores && ` | Điểm: ${wish.scores.toFixed(2)}`}
+                                        </p>
+                                        {wish.status && (
+                                            <span className={`inline-block px-2 py-1 rounded text-xs font-medium mt-1 ${
+                                                wish.status === 'accepted' ? 'bg-green-100 text-green-800' :
+                                                wish.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                'bg-yellow-100 text-yellow-800'
+                                            }`}>
+                                                {wish.status === 'accepted' ? 'Đã chấp nhận' :
+                                                 wish.status === 'rejected' ? 'Không đạt' : 'Chờ duyệt'}
+                                            </span>
+                                        )}
                                     </div>
+                                    
+                                    {/* Delete button */}
+                                    {wish.status !== 'accepted' && (
+                                        <button
+                                            onClick={() => handleDeleteClick(wish)}
+                                            disabled={deletingWishId === wish.wishId}
+                                            className="ml-2 p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50"
+                                            title="Xóa nguyện vọng"
+                                        >
+                                            {deletingWishId === wish.wishId ? (
+                                                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 818-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                            ) : (
+                                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            )}
+                                        </button>
+                                    )}
                                 </div>
                             ))
                         ) : (
@@ -418,6 +550,66 @@ function WishRegistration() {
                     </div>
                 </div>
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center px-4">
+                    <div className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full">
+                        <div className="text-center">
+                            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                                <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.502 0L4.732 15.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                            </div>
+                            <h3 className="text-lg font-medium text-gray-900 mb-4">
+                                Xác nhận xóa nguyện vọng
+                            </h3>
+                            {wishToDelete && (
+                                <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                                    <p className="text-sm text-gray-700 mb-2">
+                                        <span className="font-semibold">Ngành:</span> {wishToDelete.majorName || wishToDelete.majorId}
+                                    </p>
+                                    <p className="text-sm text-gray-700 mb-2">
+                                        <span className="font-semibold">Diện:</span> {wishToDelete.criteriaName || wishToDelete.criteriaId}
+                                    </p>
+                                    <p className="text-sm text-gray-700">
+                                        <span className="font-semibold">Khối:</span> {wishToDelete.admissionBlockName || wishToDelete.admissionBlockId}
+                                    </p>
+                                </div>
+                            )}
+                            <p className="text-sm text-gray-500 mb-6">
+                                Bạn có chắc chắn muốn xóa nguyện vọng này? Hành động này không thể hoàn tác.
+                            </p>
+                            <div className="flex gap-3 justify-center">
+                                <button
+                                    onClick={handleCancelDelete}
+                                    disabled={deletingWishId}
+                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50"
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    onClick={handleConfirmDelete}
+                                    disabled={deletingWishId}
+                                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center gap-2"
+                                >
+                                    {deletingWishId ? (
+                                        <>
+                                            <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 818-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Đang xóa...
+                                        </>
+                                    ) : (
+                                        "Xóa nguyện vọng"
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
