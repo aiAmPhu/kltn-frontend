@@ -97,23 +97,52 @@ function WishRegistration() {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/wish/export-pdf/${userId}`, {
                 headers: { Authorization: `Bearer ${token}` },
-                responseType: 'blob', // Important for PDF download
+                responseType: 'blob', // Important for file download
             });
 
-            // Create blob link to download PDF
+            // Check content type to determine if it's PDF or HTML
+            const contentType = response.headers['content-type'];
+            const contentDisposition = response.headers['content-disposition'];
+            
+            // Create blob link to download file
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `phieu-dang-ky-nguyen-vong-${userId}.pdf`);
+            
+            // Determine file extension and name based on content type
+            if (contentType && contentType.includes('application/pdf')) {
+                link.setAttribute('download', `phieu-dang-ky-nguyen-vong-${userId}.pdf`);
+                toast.success("Xuất phiếu đăng ký PDF thành công!");
+            } else if (contentType && contentType.includes('text/html')) {
+                link.setAttribute('download', `phieu-dang-ky-nguyen-vong-${userId}.html`);
+                toast.info("Hệ thống tạm thời xuất file HTML. Bạn có thể in hoặc lưu thành PDF từ trình duyệt.");
+            } else {
+                // Fallback based on content-disposition
+                if (contentDisposition && contentDisposition.includes('.pdf')) {
+                    link.setAttribute('download', `phieu-dang-ky-nguyen-vong-${userId}.pdf`);
+                    toast.success("Xuất phiếu đăng ký thành công!");
+                } else {
+                    link.setAttribute('download', `phieu-dang-ky-nguyen-vong-${userId}.html`);
+                    toast.info("Hệ thống tạm thời xuất file HTML. Bạn có thể in hoặc lưu thành PDF từ trình duyệt.");
+                }
+            }
+            
             document.body.appendChild(link);
             link.click();
             link.remove();
             window.URL.revokeObjectURL(url);
 
-            toast.success("Xuất phiếu đăng ký thành công!");
         } catch (error) {
-            console.error("Lỗi khi xuất PDF:", error);
-            toast.error(error.response?.data?.message || "Có lỗi xảy ra khi xuất phiếu đăng ký");
+            console.error("Lỗi khi xuất phiếu đăng ký:", error);
+            
+            // Enhanced error handling
+            if (error.response?.status === 404) {
+                toast.error("Không tìm thấy dữ liệu nguyện vọng để xuất");
+            } else if (error.response?.status === 500) {
+                toast.error("Lỗi hệ thống khi tạo phiếu đăng ký. Vui lòng thử lại sau hoặc liên hệ hỗ trợ.");
+            } else {
+                toast.error(error.response?.data?.message || "Có lỗi xảy ra khi xuất phiếu đăng ký");
+            }
         } finally {
             setIsExportingPDF(false);
         }
