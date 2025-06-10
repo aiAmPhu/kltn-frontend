@@ -4,20 +4,20 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import AdmissionQuantityFormModal from "../Modals/AdmissionQuantityModal/AdmissionQuantityFormModal";
 import InfoModal from "../Modals/AdmissionQuantityModal/InfoModal";
 import ImportModal from "../Modals/AdmissionQuantityModal/ImportModal";
-import { 
-    FaExclamationCircle, 
-    FaSearch, 
-    FaPlus, 
-    FaSpinner, 
+import {
+    FaExclamationCircle,
+    FaSearch,
+    FaPlus,
+    FaSpinner,
     FaChartBar,
-    FaEdit, 
-    FaTrash, 
+    FaEdit,
+    FaTrash,
     FaInfoCircle,
     FaDownload,
-    FaUpload 
+    FaUpload,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -45,11 +45,11 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                 const token = localStorage.getItem("token");
                 const [majorsRes, criteriaRes] = await Promise.all([
                     axios.get(`${API_BASE_URL}/adms/getall`, {
-                        headers: { Authorization: `Bearer ${token}` }
+                        headers: { Authorization: `Bearer ${token}` },
                     }),
                     axios.get(`${API_BASE_URL}/adcs/getall`, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    })
+                        headers: { Authorization: `Bearer ${token}` },
+                    }),
                 ]);
                 setMajors(majorsRes.data || []);
                 setCriteria(criteriaRes.data || []);
@@ -73,7 +73,7 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
     const performDelete = async () => {
         try {
             const token = localStorage.getItem("token");
-            
+
             if (!quantityToDelete.majorId || !quantityToDelete.criteriaId) {
                 throw new Error("Thiếu thông tin ngành hoặc diện xét tuyển");
             }
@@ -82,8 +82,8 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                 headers: { Authorization: `Bearer ${token}` },
                 data: {
                     majorId: quantityToDelete.majorId,
-                    criteriaId: quantityToDelete.criteriaId
-                }
+                    criteriaId: quantityToDelete.criteriaId,
+                },
             });
 
             const response = await axios.get(`${API_BASE_URL}/adqs/getall`, {
@@ -139,12 +139,14 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
     };
 
     // Filter quantities based on search
-    const filteredQuantities = quantities.filter(quantity => {
+    const filteredQuantities = quantities.filter((quantity) => {
         if (!searchQuery) return true;
-        const major = majors.find(m => m.majorId === quantity.majorId);
-        const criterion = criteria.find(c => c.criteriaId === quantity.criteriaId);
-        return (major?.majorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-               criterion?.criteriaName.toLowerCase().includes(searchQuery.toLowerCase()));
+        const major = majors.find((m) => m.majorId === quantity.majorId);
+        const criterion = criteria.find((c) => c.criteriaId === quantity.criteriaId);
+        return (
+            major?.majorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            criterion?.criteriaName.toLowerCase().includes(searchQuery.toLowerCase())
+        );
     });
 
     // Pagination
@@ -199,15 +201,13 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
         try {
             // Prepare data for export
             const exportData = quantities.map((quantity) => {
-                const major = majors.find(m => m.majorId === quantity.majorId);
-                const criterion = criteria.find(c => c.criteriaId === quantity.criteriaId);
-                
+                const major = majors.find((m) => m.majorId === quantity.majorId);
+                const criterion = criteria.find((c) => c.criteriaId === quantity.criteriaId);
+
                 return {
-                    'Mã ngành': quantity.majorId,
-                    'Tên ngành': major?.majorName || 'N/A',
-                    'Mã diện xét tuyển': quantity.criteriaId,
-                    'Tên diện xét tuyển': criterion?.criteriaName || 'N/A',
-                    'Số lượng chỉ tiêu': quantity.quantity
+                    "Mã ngành": quantity.majorId,
+                    "Mã diện xét tuyển": quantity.criteriaId,
+                    "Số lượng chỉ tiêu": quantity.quantity,
                 };
             });
 
@@ -221,9 +221,9 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                 { wch: 40 }, // Tên ngành
                 { wch: 20 }, // Mã diện xét tuyển
                 { wch: 30 }, // Tên diện xét tuyển
-                { wch: 20 }  // Số lượng chỉ tiêu
+                { wch: 20 }, // Số lượng chỉ tiêu
             ];
-            ws['!cols'] = colWidths;
+            ws["!cols"] = colWidths;
 
             // Add worksheet to workbook
             XLSX.utils.book_append_sheet(wb, ws, "Chỉ tiêu tuyển sinh");
@@ -234,7 +234,7 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
 
             // Save file
             XLSX.writeFile(wb, filename);
-            
+
             toast.success("Xuất file Excel thành công!");
         } catch (error) {
             console.error("Error exporting to Excel:", error);
@@ -301,12 +301,8 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                             ) : (
                                 <FaDownload className="text-sm" />
                             )}
-                            <span className="hidden sm:inline">
-                                {isExporting ? "Đang xuất..." : "Xuất Excel"}
-                            </span>
-                            <span className="sm:hidden">
-                                {isExporting ? "Xuất..." : "Xuất"}
-                            </span>
+                            <span className="hidden sm:inline">{isExporting ? "Đang xuất..." : "Xuất Excel"}</span>
+                            <span className="sm:hidden">{isExporting ? "Xuất..." : "Xuất"}</span>
                         </button>
 
                         <button
@@ -337,10 +333,30 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">Ngành</th>
-                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell w-1/3">Diện xét tuyển</th>
-                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Chỉ tiêu</th>
-                                    <th scope="col" className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Thao tác</th>
+                                    <th
+                                        scope="col"
+                                        className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5"
+                                    >
+                                        Ngành
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell w-1/3"
+                                    >
+                                        Diện xét tuyển
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20"
+                                    >
+                                        Chỉ tiêu
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-auto"
+                                    >
+                                        Thao tác
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -365,7 +381,8 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                                                         Chưa có chỉ tiêu tuyển sinh nào
                                                     </h3>
                                                     <p className="text-sm text-gray-600 max-w-md">
-                                                        Bắt đầu bằng cách tạo chỉ tiêu tuyển sinh đầu tiên cho hệ thống của bạn
+                                                        Bắt đầu bằng cách tạo chỉ tiêu tuyển sinh đầu tiên cho hệ thống
+                                                        của bạn
                                                     </p>
                                                 </div>
                                                 <button
@@ -380,18 +397,22 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                                     </tr>
                                 ) : (
                                     currentItems.map((quantity) => {
-                                        const major = majors.find(m => m.majorId === quantity.majorId);
-                                        const criterion = criteria.find(c => c.criteriaId === quantity.criteriaId);
+                                        const major = majors.find((m) => m.majorId === quantity.majorId);
+                                        const criterion = criteria.find((c) => c.criteriaId === quantity.criteriaId);
                                         return (
                                             <tr key={quantity.aqId} className="hover:bg-gray-50 transition-colors">
                                                 <td className="px-4 sm:px-6 py-4 w-2/5">
-                                                    <div className="text-sm text-gray-900 font-medium">{major?.majorName || 'N/A'}</div>
+                                                    <div className="text-sm text-gray-900 font-medium">
+                                                        {major?.majorName || "N/A"}
+                                                    </div>
                                                     <div className="text-xs text-gray-500 mt-1 lg:hidden">
-                                                        Diện: {criterion?.criteriaName || 'N/A'}
+                                                        Diện: {criterion?.criteriaName || "N/A"}
                                                     </div>
                                                 </td>
                                                 <td className="px-4 sm:px-6 py-4 hidden lg:table-cell w-1/3">
-                                                    <div className="text-sm text-gray-900 break-words">{criterion?.criteriaName || 'N/A'}</div>
+                                                    <div className="text-sm text-gray-900 break-words">
+                                                        {criterion?.criteriaName || "N/A"}
+                                                    </div>
                                                 </td>
                                                 <td className="px-4 sm:px-6 py-4 whitespace-nowrap w-20">
                                                     <div className="text-sm text-gray-900 font-semibold">
@@ -450,7 +471,8 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                             <span className="ml-2">mục / trang</span>
                         </div>
                         <div className="text-center sm:text-left">
-                            Tổng: <span className="font-medium text-blue-600">{filteredQuantities.length}</span> chỉ tiêu
+                            Tổng: <span className="font-medium text-blue-600">{filteredQuantities.length}</span> chỉ
+                            tiêu
                         </div>
                     </div>
 
@@ -522,7 +544,7 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
 
                 {/* Import Modal */}
                 {showImportModal && (
-                    <ImportModal 
+                    <ImportModal
                         onClose={() => setShowImportModal(false)}
                         onSuccess={handleImportSuccess}
                         majors={majors}
@@ -539,9 +561,7 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                                     <FaExclamationCircle className="w-8 h-8 text-red-600" />
                                 </div>
                                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Xác nhận xóa</h3>
-                                <p className="text-gray-600">
-                                    Bạn có chắc chắn muốn xóa chỉ tiêu này?
-                                </p>
+                                <p className="text-gray-600">Bạn có chắc chắn muốn xóa chỉ tiêu này?</p>
                                 <p className="text-sm text-red-500 mt-2">Hành động này không thể hoàn tác!</p>
                             </div>
                             <div className="flex gap-3 justify-center">
