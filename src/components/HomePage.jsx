@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { HelpCircle, UserPlus, GraduationCap, Award, BookOpen, MessageCircle, ChevronDown, X } from "lucide-react";
 import axios from "axios";
 import Banner from "./Banner.jsx";
+import Announcements from "./Announcements.jsx";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Chat from "../pages/UserPages/Chat.jsx";
@@ -152,6 +153,10 @@ function HomePage() {
                         </div>
                     </div>
                 </div>
+
+                {/* Announcements Section */}
+                <Announcements />
+
                 {/* Đại học chính quy */}
                 <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6 mb-6 shadow-md">
                     <div className="flex justify-center items-center mb-6">

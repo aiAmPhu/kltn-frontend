@@ -16,6 +16,7 @@ import {
     FaAngleDoubleRight,
     FaComments,
     FaChartPie,
+    FaBullhorn,
 } from "react-icons/fa";
 import logo from "../../assets/logo_hcmute.png";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
@@ -40,7 +41,12 @@ const menuItems = [
         to: "/admin/permissions",
         icon: <FaUserTag className="text-lg" />,
         label: "Quản lý quyền",
-    },    
+    },
+    {
+        to: "/admin/announcements",
+        icon: <FaBullhorn className="text-lg" />,
+        label: "Quản lý thông báo",
+    },
     {
         to: "/admin/admission-quantities",
         icon: <FaChartBar className="text-lg" />,
@@ -143,7 +149,7 @@ const AdminPage = () => {
 
     return (
         <div className="flex h-screen relative">
-            <style jsx>{`
+            <style>{`
                 .scrollbar-hide {
                     -ms-overflow-style: none;  /* Internet Explorer 10+ */
                     scrollbar-width: none;  /* Firefox */

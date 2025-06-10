@@ -47,6 +47,9 @@ import ForgotPasswordStep3 from "./pages/UserPages/ForgotPassword/ForgotPassword
 import AdmissionBlockListPage from "./pages/AdminPages/AdmissionBlockPage/AdmissionBlockListPage.jsx";
 import UserListPage from "./pages/AdminPages/UserPage/UserListPage.jsx";
 import StatisticsPage from "./pages/AdminPages/StatisticsPage/Statistic.jsx";
+import AnnouncementListPage from "./pages/AdminPages/AnnouncementPage/AnnouncementListPage.jsx";
+import AnnouncementListPagePublic from "./pages/UserPages/AnnouncementListPage.jsx";
+import AnnouncementDetailPage from "./pages/UserPages/AnnouncementDetailPage.jsx";
 
 function App() {
     return (
@@ -67,6 +70,8 @@ function App() {
                     <Route path="/block" element={<Block />} />
                     <Route path="/criteria" element={<Criteria />} />
                     <Route path="/editor" element={<TinyMCEEditor />} />
+                    <Route path="/announcements" element={<AnnouncementListPagePublic />} />
+                    <Route path="/announcements/:id" element={<AnnouncementDetailPage />} />
                     <Route path="/forgot-password/step1" element={<ForgotPasswordStep1 />} />
                     <Route path="/forgot-password/step2" element={<ForgotPasswordStep2 />} />
                     <Route path="/forgot-password/step3" element={<ForgotPasswordStep3 />} />
@@ -133,6 +138,7 @@ function App() {
                     <Route path="admission-objects" element={<AdmissionObjectListPage />} />
                     <Route path="admission-quantities" element={<AdmissionQuantityListPage />} />
                     <Route path="permissions" element={<PermissionListPage />} />
+                    <Route path="announcements" element={<AnnouncementListPage />} />
                     <Route path="list-accepted" element={<ListAcceptedPage />} />
                     <Route path="filter" element={<FilterPage />} />
                     <Route path="chat" element={<ChatPage />} />
