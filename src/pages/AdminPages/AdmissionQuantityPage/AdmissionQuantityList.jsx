@@ -390,17 +390,17 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                                                         Diện: {criterion?.criteriaName || 'N/A'}
                                                     </div>
                                                 </td>
-                                                <td className="px-4 sm:px-6 py-4 hidden lg:table-cell w-1/4">
+                                                <td className="px-4 sm:px-6 py-4 hidden lg:table-cell w-1/3">
                                                     <div className="text-sm text-gray-900 break-words">{criterion?.criteriaName || 'N/A'}</div>
                                                 </td>
-                                                <td className="px-4 sm:px-6 py-4 whitespace-nowrap w-1/8">
+                                                <td className="px-4 sm:px-6 py-4 whitespace-nowrap w-20">
                                                     <div className="text-sm text-gray-900 font-semibold">
                                                         <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
                                                             {quantity.quantity} chỉ tiêu
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium w-1/5">
+                                                <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium w-auto">
                                                     <div className="flex justify-end space-x-1 sm:space-x-2">
                                                         <button
                                                             onClick={() => handleEdit(quantity)}
