@@ -143,7 +143,7 @@ const AnnouncementDetailPage = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-gray-50 pt-20">
                 <div className="max-w-4xl mx-auto px-4 py-8">
                     <div className="bg-white rounded-lg shadow-md p-8 animate-pulse">
                         <div className="h-8 bg-gray-200 rounded mb-4"></div>
@@ -161,7 +161,7 @@ const AnnouncementDetailPage = () => {
 
     if (error || !announcement) {
         return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-gray-50 pt-20">
                 <div className="max-w-4xl mx-auto px-4 py-8">
                     <div className="bg-white rounded-lg shadow-md p-8 text-center">
                         <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
@@ -181,7 +181,7 @@ const AnnouncementDetailPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 pt-20">
             {/* Header */}
             <div className="bg-white shadow">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

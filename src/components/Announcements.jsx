@@ -100,7 +100,7 @@ function Announcements() {
 
     if (loading) {
         return (
-            <section className="py-12">
+            <section className="pt-20 pb-12">
                 <div className="container mx-auto px-4">
                     <h2 className="text-3xl font-bold text-center mb-8">Thông báo tuyển sinh</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -119,7 +119,7 @@ function Announcements() {
 
     if (error) {
         return (
-            <section className="py-12">
+            <section className="pt-20 pb-12">
                 <div className="container mx-auto px-4">
                     <h2 className="text-3xl font-bold text-center mb-8">Thông báo tuyển sinh</h2>
                     <div className="text-center">
@@ -132,7 +132,7 @@ function Announcements() {
     }
 
     return (
-        <section className="py-12 bg-gray-50">
+        <section className="pt-20 pb-12 bg-gray-50">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12">
                     <h2 className="text-3xl font-bold text-gray-900 mb-4">Thông báo tuyển sinh</h2>
