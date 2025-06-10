@@ -28,14 +28,42 @@ function Majors() {
     useEffect(() => {
         const fetchMajors = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getAll`);
-                const dataWithImages = response.data.map((major) => ({
-                    ...major,
-                    image: major.image || majorImages[Math.floor(Math.random() * majorImages.length)],
-                }));
-                setMajors(dataWithImages);
+                const token = localStorage.getItem("token");
+                let response;
+                
+                if (token) {
+                    // Đã đăng nhập: Lấy từ wish/form-data
+                    response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/wish/form-data`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    const { majors } = response.data.data;
+                    const dataWithImages = majors.map((major) => ({
+                        ...major,
+                        image: major.image || majorImages[Math.floor(Math.random() * majorImages.length)],
+                    }));
+                    setMajors(dataWithImages);
+                } else {
+                    // Chưa đăng nhập: Chỉ lấy những ngành được chấp nhận
+                    response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getAll`);
+                    const dataWithImages = response.data.map((major) => ({
+                        ...major,
+                        image: major.image || majorImages[Math.floor(Math.random() * majorImages.length)],
+                    }));
+                    setMajors(dataWithImages);
+                }
             } catch (error) {
                 console.error("Lỗi khi fetch majors:", error);
+                // Fallback to public endpoint
+                try {
+                    const fallbackResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getAll`);
+                    const dataWithImages = fallbackResponse.data.map((major) => ({
+                        ...major,
+                        image: major.image || majorImages[Math.floor(Math.random() * majorImages.length)],
+                    }));
+                    setMajors(dataWithImages);
+                } catch (fallbackError) {
+                    console.error("Lỗi khi fetch majors từ fallback:", fallbackError);
+                }
             }
         };
 

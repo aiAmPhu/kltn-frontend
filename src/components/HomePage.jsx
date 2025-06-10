@@ -40,19 +40,45 @@ function HomePage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch majors for display
-                const majorsResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getAll`);
-                setMajors(majorsResponse.data);
+                // Fetch data for display 
+                const token = localStorage.getItem("token");
+                let displayMajors = [];
+                
+                try {
+                    if (token) {
+                        // Đã đăng nhập: Lấy từ wish/form-data cho hiển thị
+                        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/wish/form-data`, {
+                            headers: { Authorization: `Bearer ${token}` },
+                        });
+                        const { majors } = response.data.data;
+                        displayMajors = majors;
+                        setMajors(displayMajors);
+                    } else {
+                        // Chưa đăng nhập: Lấy từ public endpoint cho hiển thị
+                        const majorsRes = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getAll`);
+                        displayMajors = majorsRes.data;
+                        setMajors(displayMajors);
+                    }
+                } catch (error) {
+                    // Fallback to public endpoint
+                    try {
+                        const fallbackResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getAll`);
+                        displayMajors = fallbackResponse.data;
+                        setMajors(displayMajors);
+                    } catch (fallbackError) {
+                        console.error("Lỗi khi fetch dữ liệu từ fallback:", fallbackError);
+                    }
+                }
                 setLoading(false);
 
-                // Fetch statistics data
+                // Fetch statistics data - Luôn dùng public endpoints để số liệu nhất quán
                 const [criteriaRes, blocksRes] = await Promise.all([
                     axios.get(`${process.env.REACT_APP_API_BASE_URL}/adcs/getall`),
                     axios.get(`${process.env.REACT_APP_API_BASE_URL}/adbs/getall`)
                 ]);
 
                 setStatistics({
-                    majorsCount: majorsResponse.data.length,
+                    majorsCount: displayMajors.length,
                     criteriaCount: criteriaRes.data.length,
                     blocksCount: blocksRes.data.length,
                     loading: false

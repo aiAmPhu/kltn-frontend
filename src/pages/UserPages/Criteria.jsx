@@ -9,11 +9,30 @@ function Criteria() {
     useEffect(() => {
         const fetchCriterias = async () => {
             try {
-                const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adcs/getAll`);
-                setCriterias(res.data);
+                const token = localStorage.getItem("token");
+                
+                if (token) {
+                    // Đã đăng nhập: Lấy từ wish/form-data
+                    const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/wish/form-data`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    const { criteria } = res.data.data;
+                    setCriterias(criteria);
+                } else {
+                    // Chưa đăng nhập: Chỉ lấy những diện được chấp nhận
+                    const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adcs/getAll`);
+                    setCriterias(res.data);
+                }
             } catch (err) {
                 console.error("Lỗi khi lấy diện xét tuyển:", err);
-                setError("Không thể tải dữ liệu diện xét tuyển.");
+                // Fallback to public endpoint
+                try {
+                    const fallbackRes = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adcs/getAll`);
+                    setCriterias(fallbackRes.data);
+                } catch (fallbackErr) {
+                    console.error("Lỗi khi lấy diện xét tuyển từ fallback:", fallbackErr);
+                    setError("Không thể tải dữ liệu diện xét tuyển.");
+                }
             } finally {
                 setLoading(false);
             }
