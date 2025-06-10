@@ -337,10 +337,10 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngành</th>
-                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Diện xét tuyển</th>
-                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chỉ tiêu</th>
-                                    <th scope="col" className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">Ngành</th>
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell w-1/3">Diện xét tuyển</th>
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Chỉ tiêu</th>
+                                    <th scope="col" className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -384,23 +384,23 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                                         const criterion = criteria.find(c => c.criteriaId === quantity.criteriaId);
                                         return (
                                             <tr key={quantity.aqId} className="hover:bg-gray-50 transition-colors">
-                                                <td className="px-4 sm:px-6 py-4">
+                                                <td className="px-4 sm:px-6 py-4 w-2/5">
                                                     <div className="text-sm text-gray-900 font-medium">{major?.majorName || 'N/A'}</div>
                                                     <div className="text-xs text-gray-500 mt-1 lg:hidden">
                                                         Diện: {criterion?.criteriaName || 'N/A'}
                                                     </div>
                                                 </td>
-                                                <td className="px-4 sm:px-6 py-4 whitespace-nowrap hidden lg:table-cell">
-                                                    <div className="text-sm text-gray-900">{criterion?.criteriaName || 'N/A'}</div>
+                                                <td className="px-4 sm:px-6 py-4 hidden lg:table-cell w-1/4">
+                                                    <div className="text-sm text-gray-900 break-words">{criterion?.criteriaName || 'N/A'}</div>
                                                 </td>
-                                                <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                                                <td className="px-4 sm:px-6 py-4 whitespace-nowrap w-1/8">
                                                     <div className="text-sm text-gray-900 font-semibold">
                                                         <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
                                                             {quantity.quantity} chỉ tiêu
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium w-1/5">
                                                     <div className="flex justify-end space-x-1 sm:space-x-2">
                                                         <button
                                                             onClick={() => handleEdit(quantity)}
