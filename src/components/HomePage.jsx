@@ -15,6 +15,12 @@ function HomePage() {
     const [showChatMenu, setShowChatMenu] = useState(false);
     const [showChat, setShowChat] = useState(false);
     const [chatType, setChatType] = useState(null);
+    const [statistics, setStatistics] = useState({
+        majorsCount: 0,
+        criteriaCount: 0,
+        blocksCount: 0,
+        loading: true
+    });
     const navigate = useNavigate();
     const { user } = useAuth();
     
@@ -26,25 +32,40 @@ function HomePage() {
         "/Major/HCMUTE-2.jpg",
         "/Major/HCMUTE-3.jpg",
         "/Major/HCMUTE-4.jpg",
-        "/Major/HCMUTE-5.jpg",
         "/Major/HCMUTE-6.png",
         "/Major/HCMUTE-7.png",
         "/Major/HCMUTE-8.png",
     ];
 
     useEffect(() => {
-        const fetchMajors = async () => {
+        const fetchData = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getAll`);
-                setMajors(response.data);
+                // Fetch majors for display
+                const majorsResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getAll`);
+                setMajors(majorsResponse.data);
                 setLoading(false);
+
+                // Fetch statistics data
+                const [criteriaRes, blocksRes] = await Promise.all([
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/adcs/getall`),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/adbs/getall`)
+                ]);
+
+                setStatistics({
+                    majorsCount: majorsResponse.data.length,
+                    criteriaCount: criteriaRes.data.length,
+                    blocksCount: blocksRes.data.length,
+                    loading: false
+                });
+
             } catch (err) {
                 setError(err.response?.data?.message || err.message);
                 setLoading(false);
+                setStatistics(prev => ({ ...prev, loading: false }));
             }
         };
 
-        fetchMajors();
+        fetchData();
     }, []);
 
     const handleChatClick = () => {
@@ -61,6 +82,50 @@ function HomePage() {
             <Banner />
 
             <div className="max-w-6xl mx-auto px-4 py-6">
+                {/* Statistics Section */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    {/* Số lượng ngành xét tuyển */}
+                    <div className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-200">
+                        <div className="text-4xl font-bold text-purple-600 mb-2">
+                            {statistics.loading ? (
+                                <div className="animate-pulse bg-gray-200 h-12 w-16 mx-auto rounded"></div>
+                            ) : (
+                                statistics.majorsCount
+                            )}
+                        </div>
+                        <div className="text-gray-600 font-medium">
+                            Ngành xét tuyển
+                        </div>
+                    </div>
+
+                    {/* Số lượng diện xét tuyển */}
+                    <div className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-200">
+                        <div className="text-4xl font-bold text-indigo-600 mb-2">
+                            {statistics.loading ? (
+                                <div className="animate-pulse bg-gray-200 h-12 w-16 mx-auto rounded"></div>
+                            ) : (
+                                statistics.criteriaCount
+                            )}
+                        </div>
+                        <div className="text-gray-600 font-medium">
+                            Diện xét tuyển
+                        </div>
+                    </div>
+
+                    {/* Số lượng khối xét tuyển */}
+                    <div className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-200">
+                        <div className="text-4xl font-bold text-emerald-600 mb-2">
+                            {statistics.loading ? (
+                                <div className="animate-pulse bg-gray-200 h-12 w-16 mx-auto rounded"></div>
+                            ) : (
+                                statistics.blocksCount
+                            )}
+                        </div>
+                        <div className="text-gray-600 font-medium">
+                            Khối xét tuyển
+                        </div>
+                    </div>
+                </div>
                 {/* Đại học chính quy */}
                 <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6 mb-6 shadow-md">
                     <div className="flex justify-center items-center mb-6">
@@ -83,32 +148,45 @@ function HomePage() {
                     ) : majors.length === 0 ? (
                         <p className="text-gray-600 mb-4 text-center">Không có ngành học nào.</p>
                     ) : (
-                        <div className="space-y-4 mb-4">
-                            {majors.map((major, index) => (
-                                <div
-                                    key={major.majorId}
-                                    className="flex flex-col md:flex-row justify-between items-center bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition duration-200"
-                                >
-                                    <div className="flex items-center mb-2 md:mb-0">
-                                        <Award className="w-5 h-5 mr-2 text-yellow-500" />
-                                        <span className="text-blue-800 font-medium text-lg">{major.majorName}</span>
+                        <>
+                            <div className="space-y-4 mb-4">
+                                {majors.slice(0, 5).map((major, index) => (
+                                    <div
+                                        key={major.majorId}
+                                        className="flex flex-col md:flex-row justify-between items-center bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition duration-200"
+                                    >
+                                        <div className="flex items-center mb-2 md:mb-0">
+                                            <Award className="w-5 h-5 mr-2 text-yellow-500" />
+                                            <span className="text-blue-800 font-medium text-lg">{major.majorName}</span>
+                                        </div>
+                                        <div className="flex space-x-2">
+                                            <button 
+                                                onClick={() => navigate('/wish', { state: { selectedMajor: major } })}
+                                                className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg shadow hover:shadow-lg flex items-center text-sm transition-all duration-200 hover:translate-y-px"
+                                            >
+                                                <UserPlus className="w-4 h-4 mr-1" />
+                                                Đăng ký
+                                            </button>
+                                            <button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg shadow hover:shadow-lg flex items-center text-sm transition-all duration-200 hover:translate-y-px">
+                                                <BookOpen className="w-4 h-4 mr-1" />
+                                                Hướng dẫn
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="flex space-x-2">
-                                        <button 
-                                            onClick={() => navigate('/wish', { state: { selectedMajor: major } })}
-                                            className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg shadow hover:shadow-lg flex items-center text-sm transition-all duration-200 hover:translate-y-px"
-                                        >
-                                            <UserPlus className="w-4 h-4 mr-1" />
-                                            Đăng ký
-                                        </button>
-                                        <button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg shadow hover:shadow-lg flex items-center text-sm transition-all duration-200 hover:translate-y-px">
-                                            <BookOpen className="w-4 h-4 mr-1" />
-                                            Hướng dẫn
-                                        </button>
-                                    </div>
+                                ))}
+                            </div>
+                            {majors.length > 5 && (
+                                <div className="text-center mt-6">
+                                    <button
+                                        onClick={() => navigate('/major')}
+                                        className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg shadow hover:shadow-lg flex items-center text-base transition-all duration-200 hover:translate-y-px mx-auto"
+                                    >
+                                        <ChevronDown className="w-5 h-5 mr-2" />
+                                        Xem thêm {majors.length - 5} ngành học
+                                    </button>
                                 </div>
-                            ))}
-                        </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
