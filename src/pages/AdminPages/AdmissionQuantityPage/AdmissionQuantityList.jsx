@@ -3,6 +3,7 @@ import axios from "axios";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import AdmissionQuantityFormModal from "../Modals/AdmissionQuantityModal/AdmissionQuantityFormModal";
 import InfoModal from "../Modals/AdmissionQuantityModal/InfoModal";
+import ImportModal from "../Modals/AdmissionQuantityModal/ImportModal";
 import { 
     FaExclamationCircle, 
     FaSearch, 
@@ -11,9 +12,12 @@ import {
     FaChartBar,
     FaEdit, 
     FaTrash, 
-    FaInfoCircle 
+    FaInfoCircle,
+    FaDownload,
+    FaUpload 
 } from "react-icons/fa";
 import { toast } from "react-toastify";
+import * as XLSX from 'xlsx';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -31,6 +35,8 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
     const [criteria, setCriteria] = useState([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [quantityToDelete, setQuantityToDelete] = useState(null);
+    const [showImportModal, setShowImportModal] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
 
     // Load majors and criteria
     useEffect(() => {
@@ -187,6 +193,78 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
         }
     }, [filteredQuantities.length, currentItems.length, currentPage]);
 
+    // Export to Excel function
+    const handleExportToExcel = async () => {
+        setIsExporting(true);
+        try {
+            // Prepare data for export
+            const exportData = quantities.map((quantity) => {
+                const major = majors.find(m => m.majorId === quantity.majorId);
+                const criterion = criteria.find(c => c.criteriaId === quantity.criteriaId);
+                
+                return {
+                    'Mã ngành': quantity.majorId,
+                    'Tên ngành': major?.majorName || 'N/A',
+                    'Mã diện xét tuyển': quantity.criteriaId,
+                    'Tên diện xét tuyển': criterion?.criteriaName || 'N/A',
+                    'Số lượng chỉ tiêu': quantity.quantity
+                };
+            });
+
+            // Create workbook and worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(exportData);
+
+            // Set column widths
+            const colWidths = [
+                { wch: 15 }, // Mã ngành
+                { wch: 40 }, // Tên ngành
+                { wch: 20 }, // Mã diện xét tuyển
+                { wch: 30 }, // Tên diện xét tuyển
+                { wch: 20 }  // Số lượng chỉ tiêu
+            ];
+            ws['!cols'] = colWidths;
+
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, "Chỉ tiêu tuyển sinh");
+
+            // Generate filename with current date
+            const currentDate = new Date().toISOString().slice(0, 10);
+            const filename = `Chi_tieu_tuyen_sinh_${currentDate}.xlsx`;
+
+            // Save file
+            XLSX.writeFile(wb, filename);
+            
+            toast.success("Xuất file Excel thành công!");
+        } catch (error) {
+            console.error("Error exporting to Excel:", error);
+            toast.error("Lỗi khi xuất file Excel");
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
+    const handleImportClick = () => {
+        setShowImportModal(true);
+    };
+
+    const handleImportSuccess = () => {
+        setShowImportModal(false);
+        // Refresh data after import
+        const fetchUpdatedData = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get(`${API_BASE_URL}/adqs/getall`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setQuantities(response.data);
+            } catch (error) {
+                console.error("Error refreshing data:", error);
+            }
+        };
+        fetchUpdatedData();
+    };
+
     return (
         <div className="w-full bg-white shadow-lg rounded-xl border border-gray-200">
             <div className="p-4 sm:p-6 lg:p-8">
@@ -211,15 +289,46 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                         </div>
                     </div>
 
-                    <button
-                        onClick={handleAddQuantity}
-                        className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2 shadow-md whitespace-nowrap"
-                        title="Thêm chỉ tiêu tuyển sinh mới"
-                    >
-                        <FaPlus className="text-sm" />
-                        <span className="hidden sm:inline">Thêm chỉ tiêu</span>
-                        <span className="sm:hidden">Thêm</span>
-                    </button>
+                    <div className="flex flex-wrap gap-2">
+                        <button
+                            onClick={handleExportToExcel}
+                            disabled={isExporting || quantities.length === 0}
+                            className="bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center gap-2 shadow-md whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Xuất file Excel"
+                        >
+                            {isExporting ? (
+                                <FaSpinner className="text-sm animate-spin" />
+                            ) : (
+                                <FaDownload className="text-sm" />
+                            )}
+                            <span className="hidden sm:inline">
+                                {isExporting ? "Đang xuất..." : "Xuất Excel"}
+                            </span>
+                            <span className="sm:hidden">
+                                {isExporting ? "Xuất..." : "Xuất"}
+                            </span>
+                        </button>
+
+                        <button
+                            onClick={handleImportClick}
+                            className="bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 transition-colors flex items-center justify-center gap-2 shadow-md whitespace-nowrap"
+                            title="Nhập từ file Excel"
+                        >
+                            <FaUpload className="text-sm" />
+                            <span className="hidden sm:inline">Nhập Excel</span>
+                            <span className="sm:hidden">Nhập</span>
+                        </button>
+
+                        <button
+                            onClick={handleAddQuantity}
+                            className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2 shadow-md whitespace-nowrap"
+                            title="Thêm chỉ tiêu tuyển sinh mới"
+                        >
+                            <FaPlus className="text-sm" />
+                            <span className="hidden sm:inline">Thêm chỉ tiêu</span>
+                            <span className="sm:hidden">Thêm</span>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Table */}
@@ -410,6 +519,16 @@ const AdmissionQuantityList = ({ quantities = [], setQuantities }) => {
                 )}
 
                 <InfoModal quantity={selectedQuantity} onClose={handleCloseModal} majors={majors} criteria={criteria} />
+
+                {/* Import Modal */}
+                {showImportModal && (
+                    <ImportModal 
+                        onClose={() => setShowImportModal(false)}
+                        onSuccess={handleImportSuccess}
+                        majors={majors}
+                        criteria={criteria}
+                    />
+                )}
 
                 {/* Delete Confirmation Modal */}
                 {showDeleteModal && quantityToDelete && (
