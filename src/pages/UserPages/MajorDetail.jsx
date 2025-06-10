@@ -64,12 +64,18 @@ function MajorDetail() {
                 </div>
 
                 <div className="text-center">
-                    <div className="text-right">
+                    <div className="flex justify-between items-center">
                         <button
                             onClick={handleBack}
                             className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
                         >
                             ← Quay lại danh sách ngành
+                        </button>
+                        <button
+                            onClick={() => navigate('/wish', { state: { selectedMajor: major } })}
+                            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
+                        >
+                            Đăng ký ngành này
                         </button>
                     </div>
                 </div>

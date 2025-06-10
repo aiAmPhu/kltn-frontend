@@ -128,12 +128,20 @@ function Majors() {
                                         __html: major?.majorDescription || "Chưa có mô tả cho ngành này...",
                                     }}
                                 />
-                                <button
-                                    onClick={() => navigate(`/majors/${major.majorId}`)}
-                                    className="inline-block px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-                                >
-                                    <FaArrowCircleRight className="inline mr-1" /> Xem chi tiết
-                                </button>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => navigate(`/majors/${major.majorId}`)}
+                                        className="inline-block px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                                    >
+                                        <FaArrowCircleRight className="inline mr-1" /> Xem chi tiết
+                                    </button>
+                                    <button
+                                        onClick={() => navigate('/wish', { state: { selectedMajor: major } })}
+                                        className="inline-block px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700"
+                                    >
+                                        Đăng ký
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))
