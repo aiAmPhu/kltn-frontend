@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { HelpCircle, UserPlus, GraduationCap, Award, BookOpen, MessageCircle, ChevronDown, X } from "lucide-react";
+import { UserPlus, GraduationCap, Award, BookOpen, MessageCircle, ChevronDown, X } from "lucide-react";
 import axios from "axios";
 import Banner from "./Banner.jsx";
 import Announcements from "./Announcements.jsx";
@@ -9,13 +9,41 @@ import Chat from "../pages/UserPages/Chat.jsx";
 import { toast } from "react-toastify";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 
+// Cache helper functions
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+const getCachedData = (key) => {
+    try {
+        const cached = localStorage.getItem(key);
+        if (!cached) return null;
+        
+        const { data, timestamp } = JSON.parse(cached);
+        if (Date.now() - timestamp > CACHE_DURATION) {
+            localStorage.removeItem(key);
+            return null;
+        }
+        return data;
+    } catch {
+        return null;
+    }
+};
+
+const setCachedData = (key, data) => {
+    try {
+        localStorage.setItem(key, JSON.stringify({
+            data,
+            timestamp: Date.now()
+        }));
+    } catch {
+        // Ignore cache errors
+    }
+};
+
 function HomePage() {
     const [majors, setMajors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showChatMenu, setShowChatMenu] = useState(false);
     const [showChat, setShowChat] = useState(false);
-    const [chatType, setChatType] = useState(null);
     const [statistics, setStatistics] = useState({
         majorsCount: 0,
         criteriaCount: 0,
@@ -28,16 +56,6 @@ function HomePage() {
     // Set document title cho trang chủ
     useDocumentTitle("Trang chủ");
 
-    const majorImages = [
-        "/Major/HCMUTE-1.jpg",
-        "/Major/HCMUTE-2.jpg",
-        "/Major/HCMUTE-3.jpg",
-        "/Major/HCMUTE-4.jpg",
-        "/Major/HCMUTE-6.png",
-        "/Major/HCMUTE-7.png",
-        "/Major/HCMUTE-8.png",
-    ];
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -45,45 +63,70 @@ function HomePage() {
                 const token = localStorage.getItem("token");
                 let displayMajors = [];
                 
-                try {
-                    if (token) {
-                        // Đã đăng nhập: Lấy từ wish/form-data cho hiển thị
-                        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/wish/form-data`, {
-                            headers: { Authorization: `Bearer ${token}` },
-                        });
-                        const { majors } = response.data.data;
-                        displayMajors = majors;
-                        setMajors(displayMajors);
-                    } else {
-                        // Chưa đăng nhập: Lấy từ public endpoint cho hiển thị
-                        const majorsRes = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getAll`);
-                        displayMajors = majorsRes.data;
-                        setMajors(displayMajors);
-                    }
-                } catch (error) {
-                    // Fallback to public endpoint
+                // Check cache first for majors
+                const cachedMajors = getCachedData('homepage_majors');
+                if (cachedMajors) {
+                    displayMajors = cachedMajors;
+                    setMajors(displayMajors);
+                } else {
+                    // Fetch majors with priority logic
                     try {
-                        const fallbackResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getAll`);
-                        displayMajors = fallbackResponse.data;
+                        if (token) {
+                            // Đã đăng nhập: Lấy từ wish/form-data cho hiển thị
+                            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/wish/form-data`, {
+                                headers: { Authorization: `Bearer ${token}` },
+                            });
+                            const { majors } = response.data.data;
+                            displayMajors = majors;
+                        } else {
+                            // Chưa đăng nhập: Lấy từ public endpoint cho hiển thị
+                            const majorsRes = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getAll`);
+                            displayMajors = majorsRes.data;
+                        }
                         setMajors(displayMajors);
-                    } catch (fallbackError) {
-                        console.error("Lỗi khi fetch dữ liệu từ fallback:", fallbackError);
+                        setCachedData('homepage_majors', displayMajors);
+                    } catch (error) {
+                        // Fallback to public endpoint
+                        try {
+                            const fallbackResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getAll`);
+                            displayMajors = fallbackResponse.data;
+                            setMajors(displayMajors);
+                            setCachedData('homepage_majors', displayMajors);
+                        } catch (fallbackError) {
+                            console.error("Lỗi khi fetch dữ liệu từ fallback:", fallbackError);
+                        }
                     }
                 }
                 setLoading(false);
 
-                // Fetch statistics data - Luôn dùng public endpoints để số liệu nhất quán
-                const [criteriaRes, blocksRes] = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/adcs/getall`),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/adbs/getall`)
-                ]);
+                // Check cache for statistics
+                const cachedStats = getCachedData('homepage_statistics');
+                if (cachedStats) {
+                    setStatistics({
+                        ...cachedStats,
+                        majorsCount: displayMajors.length, // Always use current majors count
+                        loading: false
+                    });
+                } else {
+                    // Fetch statistics data - Luôn dùng public endpoints để số liệu nhất quán
+                    const [criteriaRes, blocksRes] = await Promise.all([
+                        axios.get(`${process.env.REACT_APP_API_BASE_URL}/adcs/getall`),
+                        axios.get(`${process.env.REACT_APP_API_BASE_URL}/adbs/getall`)
+                    ]);
 
-                setStatistics({
-                    majorsCount: displayMajors.length,
-                    criteriaCount: criteriaRes.data.length,
-                    blocksCount: blocksRes.data.length,
-                    loading: false
-                });
+                    const statsData = {
+                        majorsCount: displayMajors.length,
+                        criteriaCount: criteriaRes.data.length,
+                        blocksCount: blocksRes.data.length,
+                        loading: false
+                    };
+
+                    setStatistics(statsData);
+                    setCachedData('homepage_statistics', {
+                        criteriaCount: criteriaRes.data.length,
+                        blocksCount: blocksRes.data.length
+                    });
+                }
 
             } catch (err) {
                 setError(err.response?.data?.message || err.message);

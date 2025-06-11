@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import Announcements from "./components/Announcements.jsx";
 import Timeline from "./components/Timeline.jsx";
