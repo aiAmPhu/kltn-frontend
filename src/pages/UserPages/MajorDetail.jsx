@@ -1,34 +1,60 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 
 function MajorDetail() {
     const { id } = useParams();
-    const [major, setMajor] = useState(null);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchMajor = async () => {
-            try {
-                const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getMajorByID/${id}`);
-                console.log(res.data); // Kiểm tra dữ liệu trả về
-                setMajor(res.data);
-            } catch (err) {
-                console.error("Không thể lấy thông tin ngành:", err);
-            }
-        };
-        fetchMajor();
-    }, [id]);
+    const { data: major, isLoading, error } = useQuery({
+        queryKey: ['major', id],
+        queryFn: async () => {
+            const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adms/getMajorByID/${id}`);
+            return res.data;
+        },
+        staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    });
 
     const handleBack = () => {
         navigate("/major");
     };
 
-    if (!major) {
-        return <div className="text-center py-10 text-xl">Đang tải thông tin ngành...</div>;
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+                <span className="ml-3 text-lg">Đang tải thông tin ngành...</span>
+            </div>
+        );
     }
 
-    const isActive = major?.isActive;
+    if (error) {
+        return (
+            <div className="text-center py-10">
+                <div className="text-red-600 text-xl mb-4">Không thể tải thông tin ngành</div>
+                <button
+                    onClick={handleBack}
+                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
+                >
+                    Quay lại danh sách ngành
+                </button>
+            </div>
+        );
+    }
+
+    if (!major) {
+        return (
+            <div className="text-center py-10">
+                <div className="text-gray-600 text-xl mb-4">Không tìm thấy thông tin ngành</div>
+                <button
+                    onClick={handleBack}
+                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
+                >
+                    Quay lại danh sách ngành
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-10 mt-12">

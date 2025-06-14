@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const HighSchoolTranscript = () => {
     const token = localStorage.getItem("token");
@@ -11,6 +12,7 @@ const HighSchoolTranscript = () => {
     const [subjects, setSubjects] = useState([]);
     const [isLoadingSubjects, setIsLoadingSubjects] = useState(true);
     const inputsRef = useRef([]);
+    const queryClient = useQueryClient();
 
     const years = [
         {
@@ -39,70 +41,105 @@ const HighSchoolTranscript = () => {
         },
     ];
 
-    // Fetch subjects từ API
-    useEffect(() => {
-        const fetchSubjects = async () => {
-            try {
-                setIsLoadingSubjects(true);
-                const response = await axios.get(
-                    `${process.env.REACT_APP_API_BASE_URL}/subjects`
-                );
-                if (response.data.success) {
-                    // Lấy tên môn học từ data
-                    const subjectNames = response.data.data.map(subject => subject.subject);
-                    setSubjects(subjectNames);
-                }
-            } catch (error) {
-                console.error("Lỗi khi lấy danh sách môn học:", error);
-                toast.error("Không thể tải danh sách môn học. Vui lòng thử lại.");
-            } finally {
-                setIsLoadingSubjects(false);
+    // Fetch subjects using React Query
+    const { data: subjectsData, isLoading: isLoadingSubjectsData } = useQuery({
+        queryKey: ['subjects'],
+        queryFn: async () => {
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/subjects`);
+            if (response.data.success) {
+                return response.data.data.map(subject => subject.subject);
             }
-        };
-        fetchSubjects();
-    }, []);
-
-    useEffect(() => {
-        const fetchTranscript = async () => {
-            if (subjects.length === 0) return; // Chờ subjects được load trước
-            
-            try {
-                const response = await axios.get(
-                    `${process.env.REACT_APP_API_BASE_URL}/transcripts/getTranscriptByE/${userId}`,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
-                const apiScores = response.data.data?.scores || [];
-                if (apiScores.length > 0) {
-                    const initialGrades = {};
-                    const uniqueSubjects = [...new Set(apiScores.map((item) => item.subject.trim()))];
-                    uniqueSubjects.forEach((subject, subjectIndex) => {
-                        initialGrades[subjectIndex] = {};
-                        years.forEach((year, yearIndex) => {
-                            const yearLabel = year.label;
-                            const scoresForYear = apiScores.find(
-                                (item) => item.subject.trim() === subject && item.year === yearLabel
-                            );
-                            if (scoresForYear) {
-                                initialGrades[subjectIndex][yearIndex] = {};
-                                year.fields.forEach((field) => {
-                                    initialGrades[subjectIndex][yearIndex][field.key] = scoresForYear[field.key] ?? "";
-                                });
-                            }
-                        });
-                    });
-                    setGrades(initialGrades);
-                }
-            } catch (error) {
-                console.error("Lỗi khi lấy học bạ:", error);
-            }
-        };
-        
-        if (userId) {
-            fetchTranscript();
+            throw new Error("Failed to fetch subjects");
+        },
+        onError: (error) => {
+            console.error("Lỗi khi lấy danh sách môn học:", error);
+            toast.error("Không thể tải danh sách môn học. Vui lòng thử lại.");
         }
-    }, [userId, subjects]); // Thêm subjects vào dependency array
+    });
+
+    // Update subjects when data is fetched
+    useEffect(() => {
+        if (subjectsData) {
+            setSubjects(subjectsData);
+        }
+    }, [subjectsData]);
+
+    // Fetch transcript using React Query
+    const { data: transcriptData } = useQuery({
+        queryKey: ['transcript', userId],
+        queryFn: async () => {
+            const response = await axios.get(
+                `${process.env.REACT_APP_API_BASE_URL}/transcripts/getTranscriptByE/${userId}`,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            return response.data;
+        },
+        enabled: !!userId && !!token && subjects.length > 0,
+        staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    });
+
+    // Update grades when transcript data is fetched
+    useEffect(() => {
+        if (transcriptData?.data?.scores) {
+            const apiScores = transcriptData.data.scores;
+            const initialGrades = {};
+            const uniqueSubjects = [...new Set(apiScores.map((item) => item.subject.trim()))];
+            uniqueSubjects.forEach((subject, subjectIndex) => {
+                initialGrades[subjectIndex] = {};
+                years.forEach((year, yearIndex) => {
+                    const yearLabel = year.label;
+                    const scoresForYear = apiScores.find(
+                        (item) => item.subject.trim() === subject && item.year === yearLabel
+                    );
+                    if (scoresForYear) {
+                        initialGrades[subjectIndex][yearIndex] = {};
+                        year.fields.forEach((field) => {
+                            initialGrades[subjectIndex][yearIndex][field.key] = scoresForYear[field.key] ?? "";
+                        });
+                    }
+                });
+            });
+            setGrades(initialGrades);
+        }
+    }, [transcriptData]);
+
+    // Update mutation using React Query
+    const updateMutation = useMutation({
+        mutationFn: async (scores) => {
+            const response = await axios.put(
+                `${process.env.REACT_APP_API_BASE_URL}/transcripts/update/${userId}`,
+                { scores },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(['transcript', userId]);
+            toast.success("Cập nhật học bạ thành công!", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+        },
+        onError: (error) => {
+            console.error("Error updating transcript:", error);
+            toast.error(error.message || "Cập nhật học bạ thất bại. Vui lòng thử lại.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+        }
+    });
 
     const handleInputChange = (subjectIndex, yearIndex, field, value) => {
         const newGrades = grades ? { ...grades } : {};
@@ -128,9 +165,9 @@ const HighSchoolTranscript = () => {
         }
     };
 
-    const updateTranscript = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         try {
-            setIsLoading(true);
             const scores = {};
             subjects.forEach((subject, subjectIndex) => {
                 const subjectScores = [];
@@ -149,45 +186,16 @@ const HighSchoolTranscript = () => {
                 });
                 scores[subject] = subjectScores;
             });
-
-            await axios.put(
-                `${process.env.REACT_APP_API_BASE_URL}/transcripts/update/${userId}`,
-                { scores },
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-            toast.success("Cập nhật học bạ thành công!", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-            });
-            return true;
+            updateMutation.mutate(scores);
         } catch (error) {
-            console.error("Error updating transcript:", error);
-            toast.error(error.message || "Cập nhật học bạ thất bại. Vui lòng thử lại.", {
+            toast.error(error.message || "Vui lòng kiểm tra lại thông tin!", {
                 position: "top-right",
                 autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
             });
-            return false;
-        } finally {
-            setIsLoading(false);
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        await updateTranscript();
-    };
-
-    if (isLoadingSubjects) {
+    if (isLoadingSubjectsData) {
         return (
             <div className="p-6">
                 <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Học bạ THPT</h1>
@@ -201,8 +209,6 @@ const HighSchoolTranscript = () => {
     return (
         <div className="p-6">
             <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Học bạ THPT</h1>
-
-
 
             <table className="w-full border-collapse border border-gray-300 text-sm">
                 <thead>

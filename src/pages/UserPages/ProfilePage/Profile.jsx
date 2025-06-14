@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
 import useDocumentTitle from "../../../hooks/useDocumentTitle";
@@ -27,41 +27,44 @@ import AdmissionInformation from "../../../components/Profile/AdmissionInformati
 import LearningProcess from "../../../components/Profile/LearningProcess";
 import PhotoID from "../../../components/Profile/PhotoID";
 import HighSchoolTranscript from "../../../components/Profile/HighSchoolTranscript";
+import { useQuery } from "@tanstack/react-query";
 
 function ProfilePage() {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [activeSection, setActiveSection] = useState(null);
-    const [idPhoto, setIdPhoto] = useState(null);
     const token = localStorage.getItem("token");
     const userId = token ? JSON.parse(atob(token.split(".")[1])).userId : null;
     
     // Set document title
     useDocumentTitle("Hồ sơ của tôi");
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [userRes, photoRes] = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/adis/getBasicInfo/${userId}`, {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/photo/getPhoto/${userId}`, {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }),
-                ]);
-                setUser(userRes.data.data);
-                if (photoRes.data.data) {
-                    setIdPhoto(photoRes.data.data.personalPic);
-                }
-            } catch (err) {
-                console.error("Lỗi khi lấy thông tin:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        if (userId) fetchData();
-    }, [userId, token]);
+    // Fetch user info using React Query
+    const { data: user, isLoading: isUserLoading } = useQuery({
+        queryKey: ['userBasicInfo', userId],
+        queryFn: async () => {
+            const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adis/getBasicInfo/${userId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return res.data.data;
+        },
+        enabled: !!userId && !!token,
+        staleTime: 5 * 60 * 1000,
+    });
+
+    // Fetch user photo using React Query
+    const { data: photoData, isLoading: isPhotoLoading } = useQuery({
+        queryKey: ['userPhoto', userId],
+        queryFn: async () => {
+            const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/photo/getPhoto/${userId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return res.data.data;
+        },
+        enabled: !!userId && !!token,
+        staleTime: 5 * 60 * 1000,
+    });
+
+    const idPhoto = photoData?.personalPic;
+    const loading = isUserLoading || isPhotoLoading;
 
     const handleClick = (section) => {
         setActiveSection(section);

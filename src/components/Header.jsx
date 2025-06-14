@@ -6,26 +6,29 @@ import { useAuth } from "../contexts/AuthContext.js";
 import axios from "axios";
 import hcmuteLogo from "../assets/logo_hcmute.png"
 import io from "socket.io-client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+// Create a singleton socket instance
+let socketInstance = null;
 
 function Header() {
     const { user, logout } = useAuth();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-    const [notifications, setNotifications] = useState([]);
-    const [unreadCount, setUnreadCount] = useState(0);
     const dropdownRef = useRef(null);
     const notificationRef = useRef(null);
     const navigate = useNavigate();
     const location = useLocation();
-    const socketRef = useRef(null);
+    const token = localStorage.getItem("token");
+    const queryClient = useQueryClient();
 
     // Socket.IO connection
     useEffect(() => {
-        if (user) {
+        if (user && !socketInstance) {
             const token = localStorage.getItem("token");
-            // Remove /api from the base URL for Socket.IO connection
             const socketUrl = process.env.REACT_APP_API_BASE_URL.replace('/api', '');
-            socketRef.current = io(socketUrl, {
+            
+            socketInstance = io(socketUrl, {
                 auth: { token },
                 transports: ['websocket', 'polling'],
                 path: '/socket.io/',
@@ -34,29 +37,24 @@ function Header() {
                 reconnectionDelay: 1000
             });
 
-            socketRef.current.on("connect", () => {
-                // Remove console.log
+            socketInstance.on("connect", () => {
+                // Connection established
             });
 
-            socketRef.current.on("connect_error", (error) => {
-                // Remove console.error
+            socketInstance.on("connect_error", (error) => {
                 setTimeout(() => {
-                    if (socketRef.current) {
-                        socketRef.current.connect();
+                    if (socketInstance) {
+                        socketInstance.connect();
                     }
                 }, 5000);
             });
 
-            socketRef.current.on("notification", (notification) => {
+            socketInstance.on("notification", (notification) => {
                 if (!notification || !notification.id) {
                     return;
                 }
-                setNotifications(prev => {
-                    const exists = prev.some(n => n.id === notification.id);
-                    if (exists) return prev;
-                    return [notification, ...prev];
-                });
-                setUnreadCount(prev => prev + 1);
+                // Invalidate notifications query to refetch
+                queryClient.invalidateQueries(['notifications', user?.userId]);
                 if (notification.message && !notification.read) {
                     toast.info(notification.message, {
                         toastId: notification.id,
@@ -69,40 +67,59 @@ function Header() {
                     });
                 }
             });
-
-            // Fetch existing notifications
-            const fetchNotifications = async () => {
-                try {
-                    const response = await axios.get(
-                        `${process.env.REACT_APP_API_BASE_URL}/notifications/user/${user.userId}`,
-                        {
-                            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-                        }
-                    );
-                    
-                    if (!Array.isArray(response.data)) {
-                        return;
-                    }
-
-                    const sortedNotifications = response.data
-                        .filter(current => current && current.id)
-                        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-                    setNotifications(sortedNotifications);
-                    setUnreadCount(sortedNotifications.filter(n => !n.read).length);
-                } catch (error) {
-                    toast.error("Không thể tải thông báo. Vui lòng thử lại sau.");
-                }
-            };
-            fetchNotifications();
-
-            return () => {
-                if (socketRef.current) {
-                    socketRef.current.disconnect();
-                }
-            };
         }
-    }, [user]);
+        return () => {};
+    }, [user, queryClient]);
+
+    // Fetch notifications using React Query
+    const { data: notificationsData, isLoading: isNotificationsLoading } = useQuery({
+        queryKey: ['notifications', user?.userId],
+        queryFn: async () => {
+            const response = await axios.get(
+                `${process.env.REACT_APP_API_BASE_URL}/notifications/user/${user.userId}`,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            return Array.isArray(response.data)
+                ? response.data.filter(n => n && n.id).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                : [];
+        },
+        enabled: !!user?.userId && !!token,
+        staleTime: 2 * 60 * 1000,
+    });
+
+    const notifications = notificationsData || [];
+    const unreadCount = notifications.filter(n => !n.read).length;
+
+    // Mark as read mutation
+    const markAsReadMutation = useMutation({
+        mutationFn: async (notificationId) => {
+            await axios.put(
+                `${process.env.REACT_APP_API_BASE_URL}/notifications/${notificationId}/read`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(['notifications', user?.userId]);
+        }
+    });
+
+    // Mark all as read mutation
+    const markAllAsReadMutation = useMutation({
+        mutationFn: async () => {
+            await axios.put(
+                `${process.env.REACT_APP_API_BASE_URL}/notifications/user/${user.userId}/read-all`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(['notifications', user?.userId]);
+            toast.success("Đã đánh dấu tất cả thông báo đã đọc!");
+        }
+    });
 
     //useEffect xử lý dropdownBox User
     useEffect(() => {
@@ -170,64 +187,20 @@ function Header() {
     };
 
     // Mark notifications as read
-    const markAsRead = async (notificationId) => {
-        if (!notificationId) {
-            return;
-        }
-
-        try {
-            await axios.put(
-                `${process.env.REACT_APP_API_BASE_URL}/notifications/${notificationId}/read`,
-                {},
-                {
-                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-                }
-            );
-            
-            setNotifications(prev =>
-                prev.map(n =>
-                    n.id === notificationId ? { ...n, read: true } : n
-                )
-            );
-            setUnreadCount(prev => Math.max(0, prev - 1));
-        } catch (error) {
-            toast.error("Không thể đánh dấu thông báo đã đọc. Vui lòng thử lại sau.");
-        }
+    const markAsRead = (notificationId) => {
+        if (!notificationId) return;
+        markAsReadMutation.mutate(notificationId);
     };
 
     // Mark all notifications as read
-    const markAllAsRead = async () => {
-        if (!user || unreadCount === 0) {
-            return;
-        }
-
-        try {
-            await axios.put(
-                `${process.env.REACT_APP_API_BASE_URL}/notifications/user/${user.userId}/read-all`,
-                {},
-                {
-                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-                }
-            );
-            
-            // Update all notifications to read status
-            setNotifications(prev =>
-                prev.map(n => ({ ...n, read: true }))
-            );
-            setUnreadCount(0);
-            toast.success("Đã đánh dấu tất cả thông báo đã đọc!");
-        } catch (error) {
-            toast.error("Không thể đánh dấu tất cả thông báo. Vui lòng thử lại sau.");
-        }
+    const markAllAsRead = () => {
+        if (!user || unreadCount === 0) return;
+        markAllAsReadMutation.mutate();
     };
 
     const handleNotificationClick = (notification) => {
         if (!notification || !notification.id) return;
-
-        // Mark as read first
         markAsRead(notification.id);
-
-        // Navigate to profile page
         navigate('/profile');
         setIsNotificationOpen(false);
     };
@@ -293,25 +266,27 @@ function Header() {
 
                                 {isNotificationOpen && (
                                     <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded shadow-lg z-50 max-h-96 overflow-y-auto">
-                                        {!notifications || notifications.length === 0 ? (
+                                        {isNotificationsLoading ? (
+                                            <div className="p-4 text-center text-gray-500">Đang tải thông báo...</div>
+                                        ) : !notifications || notifications.length === 0 ? (
                                             <div key="no-notifications" className="p-4 text-center text-gray-500">
                                                 Không có thông báo mới
                                             </div>
                                         ) : (
                                             <>
-                                                                                                 <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200">
-                                                     <span className="text-sm font-medium text-gray-700">
-                                                         Thông báo
-                                                     </span>
-                                                     {unreadCount > 0 && (
-                                                         <button
-                                                             onClick={markAllAsRead}
-                                                             className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
-                                                         >
-                                                             Đánh dấu tất cả đã đọc
-                                                         </button>
-                                                     )}
-                                                 </div>
+                                                <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200">
+                                                    <span className="text-sm font-medium text-gray-700">
+                                                        Thông báo
+                                                    </span>
+                                                    {unreadCount > 0 && (
+                                                        <button
+                                                            onClick={markAllAsRead}
+                                                            className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                                                        >
+                                                            Đánh dấu tất cả đã đọc
+                                                        </button>
+                                                    )}
+                                                </div>
                                                 {notifications.map((notification) => {
                                                     if (!notification || !notification.id) {
                                                         console.error("Invalid notification in list:", notification);

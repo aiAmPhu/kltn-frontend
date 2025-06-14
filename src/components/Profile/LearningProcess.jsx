@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { FaSchool, FaMapMarkerAlt, FaCity, FaCalendarAlt, FaFlag } from "react-icons/fa";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const LearningProcess = () => {
     const token = localStorage.getItem("token");
@@ -21,100 +22,115 @@ const LearningProcess = () => {
         priorityGroup: "",
     });
     const [errors, setErrors] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
-    const [priorityGroupOptions, setPriorityGroupOptions] = useState([]);
-    const [regionOptions, setRegionOptions] = useState([]);
-    const [isLoadingOptions, setIsLoadingOptions] = useState(true);
+    const queryClient = useQueryClient();
 
-    // Fetch priority groups and regions from API
+    // Fetch priority groups using React Query
+    const { data: priorityGroups } = useQuery({
+        queryKey: ['priorityGroups'],
+        queryFn: async () => {
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/ados/getall`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return response.data.map(item => ({
+                value: item.objectId,
+                label: item.objectName
+            }));
+        },
+        enabled: !!token,
+        staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    });
+
+    // Fetch regions using React Query
+    const { data: regions } = useQuery({
+        queryKey: ['regions'],
+        queryFn: async () => {
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adrs/getall`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return response.data.map(item => ({
+                value: item.regionId,
+                label: item.regionName
+            }));
+        },
+        enabled: !!token,
+        staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    });
+
+    // Fetch learning process data using React Query
+    const { data: learningProcessData } = useQuery({
+        queryKey: ['learningProcess', userId],
+        queryFn: async () => {
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/learning/getLPByE/${userId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return response.data;
+        },
+        enabled: !!userId && !!token,
+        staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    });
+
+    // Update form data when learning process data is fetched
     useEffect(() => {
-        const fetchOptions = async () => {
-            try {
-                setIsLoadingOptions(true);
-                
-                // Fetch priority groups (admission objects)
-                const priorityResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/ados/getall`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                
-                // Fetch regions (admission regions)
-                const regionsResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/adrs/getall`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-
-                // Map the API response to the expected format
-                if (priorityResponse.data) {
-                    const mappedPriorityGroups = priorityResponse.data.map(item => ({
-                        value: item.objectId,
-                        label: item.objectName
-                    }));
-                    setPriorityGroupOptions(mappedPriorityGroups);
-                }
-
-                if (regionsResponse.data) {
-                    const mappedRegions = regionsResponse.data.map(item => ({
-                        value: item.regionId,
-                        label: item.regionName
-                    }));
-                    setRegionOptions(mappedRegions);
-                }
-            } catch (error) {
-                console.error("Error fetching options:", error);
-                toast.error("Không thể tải dữ liệu tùy chọn. Vui lòng thử lại.", {
-                    position: "top-right",
-                    autoClose: 3000,
-                });
-                
-                // Fallback to empty arrays if API fails
-                setPriorityGroupOptions([]);
-                setRegionOptions([]);
-            } finally {
-                setIsLoadingOptions(false);
-            }
-        };
-
-        if (token) {
-            fetchOptions();
-        }
-    }, [token]);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!priorityGroupOptions.length || !regionOptions.length) return;
+        if (learningProcessData?.data && priorityGroups && regions) {
+            const priorityGroupId = priorityGroups.find(
+                (option) => option.label === learningProcessData.data.priorityGroup
+            )?.value;
+            const regionId = regions.find(
+                (option) => option.label === learningProcessData.data.region
+            )?.value;
             
-            try {
-                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/learning/getLPByE/${userId}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (response.data.data) {
-                    const priorityGroupId = priorityGroupOptions.find(
-                        (option) => option.label === response.data.data.priorityGroup
-                    )?.value;
-                    const regionId = regionOptions.find((option) => option.label === response.data.data.region)?.value;
-                    setFormData({
-                        grade10_province: response.data.data.grade10_province ?? "",
-                        grade10_district: response.data.data.grade10_district ?? "",
-                        grade10_school: response.data.data.grade10_school ?? "",
-                        grade11_province: response.data.data.grade11_province ?? "",
-                        grade11_district: response.data.data.grade11_district ?? "",
-                        grade11_school: response.data.data.grade11_school ?? "",
-                        grade12_province: response.data.data.grade12_province ?? "",
-                        grade12_district: response.data.data.grade11_district ?? "",
-                        grade12_school: response.data.data.grade12_school ?? "",
-                        graduationYear: response.data.data.graduationYear ?? "",
-                        priorityGroup: priorityGroupId ?? "",
-                        region: regionId ?? "",
-                    });
-                }
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-        
-        if (userId && !isLoadingOptions) {
-            fetchData();
+            setFormData({
+                grade10_province: learningProcessData.data.grade10_province ?? "",
+                grade10_district: learningProcessData.data.grade10_district ?? "",
+                grade10_school: learningProcessData.data.grade10_school ?? "",
+                grade11_province: learningProcessData.data.grade11_province ?? "",
+                grade11_district: learningProcessData.data.grade11_district ?? "",
+                grade11_school: learningProcessData.data.grade11_school ?? "",
+                grade12_province: learningProcessData.data.grade12_province ?? "",
+                grade12_district: learningProcessData.data.grade12_district ?? "",
+                grade12_school: learningProcessData.data.grade12_school ?? "",
+                graduationYear: learningProcessData.data.graduationYear ?? "",
+                priorityGroup: priorityGroupId ?? "",
+                region: regionId ?? "",
+            });
         }
-    }, [userId, priorityGroupOptions, regionOptions, isLoadingOptions, token]);
+    }, [learningProcessData, priorityGroups, regions]);
+
+    // Update mutation using React Query
+    const updateMutation = useMutation({
+        mutationFn: async (data) => {
+            const response = await axios.put(
+                `${process.env.REACT_APP_API_BASE_URL}/learning/update/${userId}`,
+                data,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(['learningProcess', userId]);
+            toast.success("Cập nhật thông tin thành công!", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+        },
+        onError: (error) => {
+            console.error("Error updating learning process:", error);
+            toast.error("Cập nhật thông tin thất bại. Vui lòng thử lại.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+        }
+    });
 
     const validateForm = () => {
         const newErrors = {};
@@ -141,37 +157,6 @@ const LearningProcess = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const updateLearningProcess = async () => {
-        try {
-            setIsLoading(true);
-            await axios.put(`${process.env.REACT_APP_API_BASE_URL}/learning/update/${userId}`, formData, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            toast.success("Cập nhật thông tin thành công!", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-            });
-            return true;
-        } catch (error) {
-            console.error("Error updating learning process:", error);
-            toast.error("Cập nhật thông tin thất bại. Vui lòng thử lại.", {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-            });
-            return false;
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) {
@@ -181,7 +166,7 @@ const LearningProcess = () => {
             });
             return;
         }
-        await updateLearningProcess();
+        updateMutation.mutate(formData);
     };
 
     const renderGradeInputs = (grade) => (
@@ -261,15 +246,10 @@ const LearningProcess = () => {
                         <select
                             value={formData.priorityGroup}
                             onChange={(e) => setFormData({ ...formData, priorityGroup: e.target.value })}
-                            disabled={isLoadingOptions}
-                            className={`w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none ${
-                                isLoadingOptions ? "bg-gray-200 text-gray-600 cursor-not-allowed" : ""
-                            }`}
+                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         >
-                            <option value="">
-                                {isLoadingOptions ? "Đang tải..." : "Chọn đối tượng ưu tiên"}
-                            </option>
-                            {priorityGroupOptions.map((option) => (
+                            <option value="">Chọn đối tượng ưu tiên</option>
+                            {priorityGroups?.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
                                 </option>
@@ -285,15 +265,10 @@ const LearningProcess = () => {
                         <select
                             value={formData.region}
                             onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                            disabled={isLoadingOptions}
-                            className={`w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none ${
-                                isLoadingOptions ? "bg-gray-200 text-gray-600 cursor-not-allowed" : ""
-                            }`}
+                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         >
-                            <option value="">
-                                {isLoadingOptions ? "Đang tải..." : "Chọn khu vực ưu tiên"}
-                            </option>
-                            {regionOptions.map((option) => (
+                            <option value="">Chọn khu vực ưu tiên</option>
+                            {regions?.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
                                 </option>
@@ -319,10 +294,9 @@ const LearningProcess = () => {
                     <button
                         type="button"
                         onClick={handleSubmit}
-                        disabled={isLoading || isLoadingOptions}
                         className="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium hover:bg-blue-600 transition duration-200 disabled:opacity-50"
                     >
-                        {isLoading ? "Đang xử lý..." : isLoadingOptions ? "Đang tải dữ liệu..." : "Cập nhật"}
+                        Cập nhật
                     </button>
                 </div>
             </section>
