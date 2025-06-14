@@ -4,7 +4,7 @@ import {
     FaYoutube,
     FaMapMarkerAlt,
     FaPhoneAlt,
-    FaEnvelope,
+   
 } from "react-icons/fa";
 
 const Footer = () => {

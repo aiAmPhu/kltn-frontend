@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { 
     Calendar, 
     Eye, 
@@ -12,43 +12,32 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 
 function Announcements() {
-    const [announcements, setAnnouncements] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        fetchAnnouncements();
-    }, []);
-
-    const fetchAnnouncements = async () => {
-        try {
-            setLoading(true);
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['announcements', 1, 6],
+        queryFn: async () => {
             const response = await axios.get(
                 `${process.env.REACT_APP_API_BASE_URL}/announcements/public?limit=6&page=1`
             );
-
             if (response.data.success) {
-                setAnnouncements(response.data.data.announcements);
+                return response.data.data.announcements;
             }
-        } catch (error) {
-            console.error('Error fetching announcements:', error);
-            setError('Không thể tải thông báo');
-        } finally {
-            setLoading(false);
-        }
-    };
+            throw new Error('Không thể tải thông báo');
+        },
+        staleTime: 5 * 60 * 1000,
+    });
+
+    const announcements = data || [];
 
     const handleViewDetails = async (announcementId) => {
         try {
-            // Increment view count when viewing details
             await axios.get(
                 `${process.env.REACT_APP_API_BASE_URL}/announcements/public/${announcementId}?incrementView=true`
             );
-            
-            // Navigate to announcement detail page
             navigate(`/announcements/${announcementId}`);
         } catch (error) {
             console.error('Error viewing announcement:', error);
@@ -98,7 +87,7 @@ function Announcements() {
         urgent: 'Khẩn cấp'
     };
 
-    if (loading) {
+    if (isLoading) {
         return (
             <section className="pt-20 pb-12">
                 <div className="container mx-auto px-4">
@@ -124,7 +113,7 @@ function Announcements() {
                     <h2 className="text-3xl font-bold text-center mb-8">Thông báo tuyển sinh</h2>
                     <div className="text-center">
                         <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                        <p className="text-red-600">{error}</p>
+                        <p className="text-red-600">{error.message || 'Không thể tải thông báo'}</p>
                     </div>
                 </div>
             </section>
