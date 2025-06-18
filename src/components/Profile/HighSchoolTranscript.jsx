@@ -1,7 +1,44 @@
+// Component được cập nhật với button Random
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"; 
+
+// Hàm random điểm từ 7.1 đến 9.8 với bước nhảy 0.1
+const generateRandomScore = () => {
+    const min = 7.1;
+    const max = 9.8;
+    const step = 0.1;
+    
+    // Tạo mảng các giá trị có thể có
+    const possibleValues = [];
+    for (let i = min; i <= max; i += step) {
+        possibleValues.push(Math.round(i * 10) / 10); // Làm tròn để tránh lỗi floating point
+    }
+    
+    // Chọn ngẫu nhiên một giá trị
+    const randomIndex = Math.floor(Math.random() * possibleValues.length);
+    return possibleValues[randomIndex];
+};
+
+// Hàm random tất cả điểm trong bảng
+const randomizeAllScores = (subjects, years, setGrades) => {
+    const newGrades = {};
+    
+    subjects.forEach((subject, subjectIndex) => {
+        newGrades[subjectIndex] = {};
+        years.forEach((year, yearIndex) => {
+            newGrades[subjectIndex][yearIndex] = {};
+            year.fields.forEach((field) => {
+                newGrades[subjectIndex][yearIndex][field.key] = generateRandomScore();
+            });
+        });
+    });
+    
+    setGrades(newGrades);
+};
+
+
 
 const HighSchoolTranscript = () => {
     const token = localStorage.getItem("token");
@@ -41,6 +78,42 @@ const HighSchoolTranscript = () => {
         },
     ];
 
+    // Hàm random điểm
+    const generateRandomScore = () => {
+        const min = 7.1;
+        const max = 9.8;
+        const step = 0.1;
+        
+        const possibleValues = [];
+        for (let i = min; i <= max; i += step) {
+            possibleValues.push(Math.round(i * 10) / 10);
+        }
+        
+        const randomIndex = Math.floor(Math.random() * possibleValues.length);
+        return possibleValues[randomIndex];
+    };
+
+    // Hàm random tất cả điểm
+    const handleRandomizeScores = () => {
+        const newGrades = {};
+        
+        subjects.forEach((subject, subjectIndex) => {
+            newGrades[subjectIndex] = {};
+            years.forEach((year, yearIndex) => {
+                newGrades[subjectIndex][yearIndex] = {};
+                year.fields.forEach((field) => {
+                    newGrades[subjectIndex][yearIndex][field.key] = generateRandomScore();
+                });
+            });
+        });
+        
+        setGrades(newGrades);
+        toast.success("Đã random tất cả điểm thành công!", {
+            position: "top-right",
+            autoClose: 2000,
+        });
+    };
+
     // Fetch subjects using React Query
     const { data: subjectsData, isLoading: isLoadingSubjectsData } = useQuery({
         queryKey: ['subjects'],
@@ -77,7 +150,7 @@ const HighSchoolTranscript = () => {
             return response.data;
         },
         enabled: !!userId && !!token && subjects.length > 0,
-        staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+        staleTime: 5 * 60 * 1000,
     });
 
     // Update grades when transcript data is fetched
@@ -209,6 +282,17 @@ const HighSchoolTranscript = () => {
     return (
         <div className="p-6">
             <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Học bạ THPT</h1>
+
+            {/* Buttons */}
+            <div className="mb-4 flex gap-2">
+                <button
+                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50"
+                    onClick={handleRandomizeScores}
+                    disabled={subjects.length === 0}
+                >
+                    🎲 Random
+                </button>
+            </div>
 
             <table className="w-full border-collapse border border-gray-300 text-sm">
                 <thead>
