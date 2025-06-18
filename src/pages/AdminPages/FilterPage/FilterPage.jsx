@@ -98,7 +98,26 @@ const FilterPage = () => {
             toast.success("Xét duyệt nguyện vọng thành công!");
         } catch (err) {
             console.error("Filter error:", err);
-            const errorMessage = "Lỗi khi lọc nguyện vọng.";
+            console.error("Error response:", err.response?.data);
+            console.error("Error status:", err.response?.status);
+            console.error("Error headers:", err.response?.headers);
+
+            let errorMessage = "Lỗi khi lọc nguyện vọng.";
+
+            // Xử lý các loại lỗi cụ thể
+            if (err.code === "ECONNABORTED") {
+                errorMessage = "Quá trình xét duyệt mất quá nhiều thời gian. Vui lòng thử lại sau.";
+            } else if (err.response?.status === 500) {
+                const backendError = err.response?.data?.message || err.response?.data?.error;
+                errorMessage = `Lỗi server: ${backendError || "Có lỗi xảy ra trong quá trình xử lý"}`;
+            } else if (err.response?.status === 401) {
+                errorMessage = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
+            } else if (err.response?.status === 403) {
+                errorMessage = "Bạn không có quyền thực hiện thao tác này.";
+            } else if (err.response?.data?.message) {
+                errorMessage = `Lỗi: ${err.response.data.message}`;
+            }
+
             setError(errorMessage);
             toast.error(errorMessage);
         } finally {
