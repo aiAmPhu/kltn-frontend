@@ -10,7 +10,7 @@ function Criteria() {
         const fetchCriterias = async () => {
             try {
                 const token = localStorage.getItem("token");
-                
+
                 if (token) {
                     // Đã đăng nhập: Lấy từ wish/form-data
                     const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/wish/form-data`, {
