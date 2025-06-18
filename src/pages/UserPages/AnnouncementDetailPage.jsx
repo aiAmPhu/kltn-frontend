@@ -290,7 +290,7 @@ const AnnouncementDetailPage = () => {
                     </div>
 
                     {/* Attachments */}
-                    {announcement.attachments && announcement.attachments.length > 0 && (
+                    {Array.isArray(announcement.attachments) && announcement.attachments.length > 0 && (
                         <div className="p-8 border-t border-gray-200 bg-gray-50">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4">
                                 File đính kèm ({announcement.attachments.length})

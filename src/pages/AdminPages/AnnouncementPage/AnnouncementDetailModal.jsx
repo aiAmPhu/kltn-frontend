@@ -190,7 +190,7 @@ const AnnouncementDetailModal = ({ isOpen, onClose, announcement }) => {
                             </div>
 
                             {/* Attachments */}
-                            {announcement.attachments && announcement.attachments.length > 0 && (
+                            {Array.isArray(announcement.attachments) && announcement.attachments.length > 0 && (
                                 <div>
                                     <h4 className="text-lg font-medium text-gray-900 mb-3">
                                         File đính kèm ({announcement.attachments.length})

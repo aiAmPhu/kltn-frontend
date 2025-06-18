@@ -437,7 +437,7 @@ const AnnouncementModal = ({ isOpen, onClose, announcement, isEditing, onSuccess
                                 </div>
 
                                 {/* Existing Attachments */}
-                                {isEditing && formData.attachments && formData.attachments.length > 0 && (
+                                {isEditing && Array.isArray(formData.attachments) && formData.attachments.length > 0 && (
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">File hiện tại</label>
                                         <div className="mt-2 space-y-2">
