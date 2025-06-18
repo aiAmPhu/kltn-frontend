@@ -83,7 +83,7 @@ const FilterPage = () => {
                         },
                         {
                             headers: { Authorization: `Bearer ${token}` },
-                            timeout: 120000,
+                            timeout: 600000,
                         }
                     );
 
