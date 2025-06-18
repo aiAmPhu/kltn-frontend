@@ -65,7 +65,7 @@ const FilterPage = () => {
                 {},
                 {
                     headers: token ? { Authorization: `Bearer ${token}` } : {},
-                    timeout: 60000,
+                    timeout: 300000,
                 }
             );
 
@@ -83,7 +83,7 @@ const FilterPage = () => {
                         },
                         {
                             headers: { Authorization: `Bearer ${token}` },
-                            timeout: 60000,
+                            timeout: 120000,
                         }
                     );
 

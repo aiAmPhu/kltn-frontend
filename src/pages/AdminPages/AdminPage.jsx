@@ -37,11 +37,11 @@ const menuItems = [
         icon: <FaUsers className="text-lg" />,
         label: "Quản lý người dùng",
     },
-    {
-        to: "/admin/permissions",
-        icon: <FaUserTag className="text-lg" />,
-        label: "Quản lý quyền",
-    },
+    // {
+    //     to: "/admin/permissions",
+    //     icon: <FaUserTag className="text-lg" />,
+    //     label: "Quản lý quyền",
+    // },
     {
         to: "/admin/announcements",
         icon: <FaBullhorn className="text-lg" />,
@@ -81,7 +81,7 @@ const menuItems = [
         to: "/admin/admission-blocks",
         icon: <FaGraduationCap className="text-lg" />,
         label: "Quản lý khối xét tuyển",
-    },  
+    },
     {
         to: "/admin/admission-regions",
         icon: <FaMapMarkerAlt className="text-lg" />,
@@ -102,7 +102,7 @@ const AdminPage = () => {
     const [isMobile, setIsMobile] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
-    
+
     // Set document title cho trang admin
     useDocumentTitle("Quản trị hệ thống");
 
@@ -117,8 +117,8 @@ const AdminPage = () => {
         };
 
         checkScreenSize();
-        window.addEventListener('resize', checkScreenSize);
-        return () => window.removeEventListener('resize', checkScreenSize);
+        window.addEventListener("resize", checkScreenSize);
+        return () => window.removeEventListener("resize", checkScreenSize);
     }, []);
 
     const toggleSidebar = () => {
@@ -154,29 +154,22 @@ const AdminPage = () => {
                     -ms-overflow-style: none;  /* Internet Explorer 10+ */
                     scrollbar-width: none;  /* Firefox */
                 }
-                .scrollbar-hide::-webkit-scrollbar { 
+                .scrollbar-hide::-webkit-scrollbar {
                     display: none;  /* Safari and Chrome */
                 }
             `}</style>
-            
+
             {/* Mobile Overlay */}
             {isMobile && sidebarOpen && (
-                <div 
-                    className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-                    onClick={closeSidebar}
-                />
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={closeSidebar} />
             )}
 
             {/* Sidebar */}
             <div
-                className={`${
-                    isMobile ? 'fixed' : 'relative'
+                className={`${isMobile ? "fixed" : "relative"} ${sidebarOpen ? "w-64" : "w-16"} ${
+                    isMobile && !sidebarOpen ? "-translate-x-full" : "translate-x-0"
                 } ${
-                    sidebarOpen ? "w-64" : "w-16"
-                } ${
-                    isMobile && !sidebarOpen ? '-translate-x-full' : 'translate-x-0'
-                } ${
-                    isMobile ? 'z-50 h-full' : ''
+                    isMobile ? "z-50 h-full" : ""
                 } bg-[#00548f] text-white flex flex-col transition-all duration-300 ease-in-out border-r border-blue-950 overflow-hidden`}
             >
                 {/* Logo */}
@@ -192,9 +185,9 @@ const AdminPage = () => {
                 {/* Menu items */}
                 <nav className={`flex-1 ${sidebarOpen ? "px-2" : "px-1"} space-y-1 overflow-y-auto scrollbar-hide`}>
                     {menuItems.map((item) => (
-                        <Link 
-                            key={item.to} 
-                            to={item.to} 
+                        <Link
+                            key={item.to}
+                            to={item.to}
                             className={linkClass(item.to)}
                             onClick={() => isMobile && setSidebarOpen(false)} // Close sidebar after clicking on mobile
                         >
@@ -223,7 +216,7 @@ const AdminPage = () => {
             </div>
 
             {/* Main Content */}
-            <div className={`flex-1 flex flex-col ${isMobile ? 'w-full' : ''}`}>
+            <div className={`flex-1 flex flex-col ${isMobile ? "w-full" : ""}`}>
                 {/* Topbar */}
                 <div className="bg-[#00548f] text-white py-3 px-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -250,7 +243,9 @@ const AdminPage = () => {
                             )}
                         </button>
                         <span className="text-sm sm:text-base lg:text-lg font-semibold uppercase truncate">
-                            <span className="hidden lg:inline">TRƯỜNG ĐẠI HỌC SƯ PHẠM KỸ THUẬT THÀNH PHỐ HỒ CHÍ MINH</span>
+                            <span className="hidden lg:inline">
+                                TRƯỜNG ĐẠI HỌC SƯ PHẠM KỸ THUẬT THÀNH PHỐ HỒ CHÍ MINH
+                            </span>
                             <span className="hidden md:inline lg:hidden">ĐH SƯ PHẠM KỸ THUẬT TP.HCM</span>
                             <span className="md:hidden">HCMUTE</span>
                         </span>
