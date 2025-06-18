@@ -3,7 +3,6 @@ import axios from "axios";
 import { FaUpload, FaCheck, FaTimes } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const PhotoID = () => {
     const token = localStorage.getItem("token");
@@ -16,135 +15,30 @@ const PhotoID = () => {
     const [grade11Pic, setGrade11Pic] = useState(null);
     const [grade12Pic, setGrade12Pic] = useState(null);
     const [isLoading, setIsLoading] = useState({});
-    const queryClient = useQueryClient();
 
-    // Fetch photo data using React Query
-    const { data: photoData } = useQuery({
-        queryKey: ['photo', userId],
-        queryFn: async () => {
-            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/photo/getPhoto/${userId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            return response.data;
-        },
-        enabled: !!userId && !!token,
-        staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    });
-
-    // Update photo states when data is fetched
     useEffect(() => {
-        if (photoData?.data) {
-            setPersonalPic(photoData.data.personalPic);
-            setBirthCertificate(photoData.data.birthCertificate);
-            setFrontCCCD(photoData.data.frontCCCD);
-            setBackCCCD(photoData.data.backCCCD);
-            setGrade10Pic(photoData.data.grade10Pic);
-            setGrade11Pic(photoData.data.grade11Pic);
-            setGrade12Pic(photoData.data.grade12Pic);
-        }
-    }, [photoData]);
-
-    // Upload mutation using React Query
-    const uploadMutation = useMutation({
-        mutationFn: async ({ fieldName, file }) => {
-            const formData = new FormData();
-            formData.append("image", file);
-            const response = await axios.post(
-                `${process.env.REACT_APP_API_BASE_URL}/upload/`,
-                formData,
-                {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/photo/getPhoto/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` },
+                });
+                if (response.data.data) {
+                    setPersonalPic(response.data.data.personalPic);
+                    setBirthCertificate(response.data.data.birthCertificate);
+                    setFrontCCCD(response.data.data.frontCCCD);
+                    setBackCCCD(response.data.data.backCCCD);
+                    setGrade10Pic(response.data.data.grade10Pic);
+                    setGrade11Pic(response.data.data.grade11Pic);
+                    setGrade12Pic(response.data.data.grade12Pic);
                 }
-            );
-            return { fieldName, imageUrl: response.data.imageUrl };
-        },
-        onSuccess: ({ fieldName, imageUrl }) => {
-            switch (fieldName) {
-                case "personalPic":
-                    setPersonalPic(imageUrl);
-                    break;
-                case "birthCertificate":
-                    setBirthCertificate(imageUrl);
-                    break;
-                case "frontCCCD":
-                    setFrontCCCD(imageUrl);
-                    break;
-                case "backCCCD":
-                    setBackCCCD(imageUrl);
-                    break;
-                case "grade10Pic":
-                    setGrade10Pic(imageUrl);
-                    break;
-                case "grade11Pic":
-                    setGrade11Pic(imageUrl);
-                    break;
-                case "grade12Pic":
-                    setGrade12Pic(imageUrl);
-                    break;
+            } catch (error) {
+                console.error("Error fetching data:", error);
             }
-            toast.success(`Tải lên ${fieldName} thành công!`, {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                style: { marginTop: "60px" },
-            });
-        },
-        onError: (error, { fieldName }) => {
-            console.error(`Error uploading ${fieldName}:`, error);
-            toast.error(`Tải lên ${fieldName} thất bại. Vui lòng thử lại.`, {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                style: { marginTop: "60px" },
-            });
-        }
-    });
+        };
+        fetchData();
+    }, [token, userId]);
 
-    // Update photo mutation using React Query
-    const updateMutation = useMutation({
-        mutationFn: async (data) => {
-            const response = await axios.put(
-                `${process.env.REACT_APP_API_BASE_URL}/photo/update/${userId}`,
-                data,
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-            return response.data;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries(['photo', userId]);
-            toast.success("Cập nhật hồ sơ ảnh thành công!", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                style: { marginTop: "60px" },
-            });
-        },
-        onError: (error) => {
-            console.error("Error updating photo ID:", error);
-            toast.error("Cập nhật hồ sơ ảnh thất bại. Vui lòng thử lại.", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                style: { marginTop: "60px" },
-            });
-        }
-    });
-
-    const handleUpload = async (fieldName, file) => {
+    const handleUpload = async (fieldName, file, setFileUrl) => {
         if (!file) {
             toast.error("Vui lòng chọn file để tải lên", {
                 position: "top-right",
@@ -157,21 +51,91 @@ const PhotoID = () => {
             });
             return;
         }
-        uploadMutation.mutate({ fieldName, file });
+
+        const formData = new FormData();
+        formData.append("image", file);
+
+        try {
+            setIsLoading((prev) => ({ ...prev, [fieldName]: true }));
+            const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/upload/`, formData, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setFileUrl(res.data.imageUrl);
+            toast.success(`Tải lên ${fieldName} thành công!`, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                style: { marginTop: "60px" },
+            });
+            console.log(`${fieldName} uploaded successfully:`, res.data.imageUrl);
+        } catch (err) {
+            console.error(`Error uploading ${fieldName}:`, err);
+            toast.error(`Tải lên ${fieldName} thất bại. Vui lòng thử lại.`, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                style: { marginTop: "60px" },
+            });
+        } finally {
+            setIsLoading((prev) => ({ ...prev, [fieldName]: false }));
+        }
+    };
+
+    const updatePhotoID = async () => {
+        try {
+            setIsLoading((prev) => ({ ...prev, submit: true }));
+            const updateData = {
+                personalPic,
+                birthCertificate,
+                frontCCCD,
+                backCCCD,
+                grade10Pic,
+                grade11Pic,
+                grade12Pic,
+            };
+            const response = await axios.put(
+                `${process.env.REACT_APP_API_BASE_URL}/photo/update/${userId}`,
+                updateData,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            toast.success("Cập nhật hồ sơ ảnh thành công!", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                style: { marginTop: "60px" },
+            });
+            return true;
+        } catch (error) {
+            console.error("Error updating photo ID:", error);
+            toast.error("Cập nhật hồ sơ ảnh thất bại. Vui lòng thử lại.", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                style: { marginTop: "60px" },
+            });
+            return false;
+        } finally {
+            setIsLoading((prev) => ({ ...prev, submit: false }));
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const updateData = {
-            personalPic,
-            birthCertificate,
-            frontCCCD,
-            backCCCD,
-            grade10Pic,
-            grade11Pic,
-            grade12Pic,
-        };
-        updateMutation.mutate(updateData);
+        await updatePhotoID();
     };
 
     return (
@@ -219,7 +183,7 @@ const PhotoID = () => {
                             />
                             <button
                                 type="button"
-                                onClick={() => handleUpload(fieldName, file)}
+                                onClick={() => handleUpload(fieldName, file, setFile)}
                                 disabled={isLoading[fieldName]}
                                 className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition flex items-center gap-2 disabled:opacity-50"
                             >
