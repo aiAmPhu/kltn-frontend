@@ -2,20 +2,20 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"; 
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Hàm random điểm từ 7.1 đến 9.8 với bước nhảy 0.1
 const generateRandomScore = () => {
     const min = 7.1;
     const max = 9.8;
     const step = 0.1;
-    
+
     // Tạo mảng các giá trị có thể có
     const possibleValues = [];
     for (let i = min; i <= max; i += step) {
         possibleValues.push(Math.round(i * 10) / 10); // Làm tròn để tránh lỗi floating point
     }
-    
+
     // Chọn ngẫu nhiên một giá trị
     const randomIndex = Math.floor(Math.random() * possibleValues.length);
     return possibleValues[randomIndex];
@@ -24,7 +24,7 @@ const generateRandomScore = () => {
 // Hàm random tất cả điểm trong bảng
 const randomizeAllScores = (subjects, years, setGrades) => {
     const newGrades = {};
-    
+
     subjects.forEach((subject, subjectIndex) => {
         newGrades[subjectIndex] = {};
         years.forEach((year, yearIndex) => {
@@ -34,11 +34,9 @@ const randomizeAllScores = (subjects, years, setGrades) => {
             });
         });
     });
-    
+
     setGrades(newGrades);
 };
-
-
 
 const HighSchoolTranscript = () => {
     const token = localStorage.getItem("token");
@@ -83,12 +81,12 @@ const HighSchoolTranscript = () => {
         const min = 7.1;
         const max = 9.8;
         const step = 0.1;
-        
+
         const possibleValues = [];
         for (let i = min; i <= max; i += step) {
             possibleValues.push(Math.round(i * 10) / 10);
         }
-        
+
         const randomIndex = Math.floor(Math.random() * possibleValues.length);
         return possibleValues[randomIndex];
     };
@@ -96,7 +94,7 @@ const HighSchoolTranscript = () => {
     // Hàm random tất cả điểm
     const handleRandomizeScores = () => {
         const newGrades = {};
-        
+
         subjects.forEach((subject, subjectIndex) => {
             newGrades[subjectIndex] = {};
             years.forEach((year, yearIndex) => {
@@ -106,7 +104,7 @@ const HighSchoolTranscript = () => {
                 });
             });
         });
-        
+
         setGrades(newGrades);
         toast.success("Đã random tất cả điểm thành công!", {
             position: "top-right",
@@ -116,18 +114,18 @@ const HighSchoolTranscript = () => {
 
     // Fetch subjects using React Query
     const { data: subjectsData, isLoading: isLoadingSubjectsData } = useQuery({
-        queryKey: ['subjects'],
+        queryKey: ["subjects"],
         queryFn: async () => {
             const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/subjects`);
             if (response.data.success) {
-                return response.data.data.map(subject => subject.subject);
+                return response.data.data.map((subject) => subject.subject);
             }
             throw new Error("Failed to fetch subjects");
         },
         onError: (error) => {
             console.error("Lỗi khi lấy danh sách môn học:", error);
             toast.error("Không thể tải danh sách môn học. Vui lòng thử lại.");
-        }
+        },
     });
 
     // Update subjects when data is fetched
@@ -139,7 +137,7 @@ const HighSchoolTranscript = () => {
 
     // Fetch transcript using React Query
     const { data: transcriptData } = useQuery({
-        queryKey: ['transcript', userId],
+        queryKey: ["transcript", userId],
         queryFn: async () => {
             const response = await axios.get(
                 `${process.env.REACT_APP_API_BASE_URL}/transcripts/getTranscriptByE/${userId}`,
@@ -191,7 +189,7 @@ const HighSchoolTranscript = () => {
             return response.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries(['transcript', userId]);
+            queryClient.invalidateQueries(["transcript", userId]);
             toast.success("Cập nhật học bạ thành công!", {
                 position: "top-right",
                 autoClose: 3000,
@@ -211,7 +209,7 @@ const HighSchoolTranscript = () => {
                 pauseOnHover: true,
                 draggable: true,
             });
-        }
+        },
     });
 
     const handleInputChange = (subjectIndex, yearIndex, field, value) => {
@@ -284,7 +282,7 @@ const HighSchoolTranscript = () => {
             <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Học bạ THPT</h1>
 
             {/* Buttons */}
-            <div className="mb-4 flex gap-2">
+            {/* <div className="mb-4 flex gap-2">
                 <button
                     className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50"
                     onClick={handleRandomizeScores}
@@ -292,7 +290,7 @@ const HighSchoolTranscript = () => {
                 >
                     🎲 Random
                 </button>
-            </div>
+            </div> */}
 
             <table className="w-full border-collapse border border-gray-300 text-sm">
                 <thead>
